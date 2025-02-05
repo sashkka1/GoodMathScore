@@ -235,7 +235,7 @@ body{
         font-size: 6vw;
     }
     .back-to-home{
-        width: 55px;
+        width: 11vw;
     }
 }
 @media (max-width: 570px) {
@@ -250,7 +250,7 @@ body{
         width: 5vw;
     }
     .back-to-home{
-        width: 50px;
+        width: 13vw;
     }
 }
 @media (max-width: 400px) {
@@ -265,7 +265,7 @@ body{
         width: 5.5vw;
     }
     .back-to-home{
-        width: 40px;
+        width: 15vw;
     }
 }
 
