@@ -622,6 +622,7 @@ function checkChekBox(value){ // проверка есть ли хоть оди�
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
     let test = localStorage.getItem('forScore');
     let checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    console.log(test);
     if (test === null || test === undefined || test === "") {
         for(let i =0;i<5;i++){    
             checkboxes[i].checked = true;
