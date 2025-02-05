@@ -1,6 +1,6 @@
 
 let values =[]; // 0+   1-   2x   3/  4t  5+-(min)  6+-(max)  7x/(min)  8x/(max) 
-// let examples =[[],[],[],[],[],[],[],[],[],[]];
+let examples =[];
 let score = 1, mistake =0,examplesCount=10;
 let block;
 let numberOne,numberTwo,answer;
@@ -61,7 +61,9 @@ function fromHomeToExample() { // переход с главного экран�
     values[6]= inputLower[1].value;
     values[7]= inputLower[2].value;
     values[8]= inputLower[3].value;
-    localStorage.setItem('values',values);
+    
+    window.Telegram.WebApp.CloudStorage.setItem("values",values);
+    // localStorage.setItem('values',values);
 
     // меняю экраны между собой
     block = document.getElementById('main1');
@@ -79,6 +81,8 @@ function fromHomeToExample() { // переход с главного экран�
         Interval = setInterval(startTimer, 10);
     }
 
+    // обнуляю масив примеров, ошибки и количество примеров перед новой итерацией
+    examples =[]; 
     mistake=0;
     score=1;
     setExample();
@@ -87,21 +91,24 @@ function fromHomeToExample() { // переход с главного экран�
 function fromExampleToHome() {// переход с экранв с пирмером на главный экран
 
     //меняю ползунки и чекбоксы на сохраненные значения
-    let test = localStorage.getItem('values');
-    let checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    if (test === null || test === undefined || test === "") {
-        for(let i =0;i<5;i++){    
-            checkboxes[i].checked = true;
-        }
-    }else{
-        let forMemery = test.split(',');
-        for(let i =0;i<5;i++){  
-            if(forMemery[i] == "true"){
+    window.Telegram.WebApp.CloudStorage.getItem("values", (err,test) => {
+        // let test = localStorage.getItem('values');
+
+        let checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        if (test === null || test === undefined || test === "") {
+            for(let i =0;i<5;i++){    
                 checkboxes[i].checked = true;
             }
+        }else{
+            let forMemery = test.split(',');
+            for(let i =0;i<5;i++){  
+                if(forMemery[i] == "true"){
+                    checkboxes[i].checked = true;
+                }
+            }
+            dinamicRange();
         }
-        dinamicRange();
-    }
+    });
 
     // меняю страницы местами
     block = document.getElementById('main1');
@@ -122,117 +129,120 @@ function fromExampleToHome() {// переход с экранв с пирмер�
 
 function dinamicRange(){ // изменяет ползунки на сохранненые значения, ничего не менял взял с старого кода
     // console.log('7');
-    let test = localStorage.getItem('values');
-    let adapter = test.split(',');
-    let forMemery = [adapter[5],adapter[6],adapter[7],adapter[8]] 
-    // 1valLower  2valUpper  3lower-double  4upper-double 
-    // console.log('8');
-    var max = $('.upper').attr('max');
-	var min = $('.lower').attr('min');
-    var valLower = forMemery[0];
-    var valUpper = forMemery[1];
+    window.Telegram.WebApp.CloudStorage.getItem("values", (err,test) => {
+        // let test = localStorage.getItem('values');
 
-    if (parseFloat(valLower) > parseFloat(valUpper)) {
-        var trade = valLower;
-        valLower = valUpper;
-        valUpper = trade;
-    }
-    var width = valUpper * 100 / max;
-    var left = valLower * 100 / max;
-    $('.fill').css('left', 'calc(' + left + '%)');
-    $('.fill').css('width', width - left + '%');
-    
-    // Update info
-    if (parseInt(valLower) == min) {
-        $('.easy-basket-lower').val('0');
-    } else {
-        $('.easy-basket-lower').val(parseInt(valLower));
-    }
-    if (parseInt(valUpper) == max) {
-        $('.easy-basket-upper').val('300');
-    } else {
-        $('.easy-basket-upper').val(parseInt(valUpper));
-    }
+        let adapter = test.split(',');
+        let forMemery = [adapter[5],adapter[6],adapter[7],adapter[8]] 
+        // 1valLower  2valUpper  3lower-double  4upper-double 
+        // console.log('8');
+        var max = $('.upper').attr('max');
+        var min = $('.lower').attr('min');
+        var valLower = forMemery[0];
+        var valUpper = forMemery[1];
 
-    // изменяем диапазон цен вручную
-    if ( valUpper > 300 ) {
-        var left = max;
-    }
-    if ( valLower < 0 ) {
-        var left = min;
-    } else if ( valLower > max ) {
-        var left = min;
-    }
-    // меняем положение ползунков
-    $('.lower').val(valLower);
-    $('.upper').val(valUpper);  
-	$('.easy-basket-filter-info p input').focus(function() {
-		$(this).val('');
-	});
-	$('.easy-basket-filter-info .iLower input').blur(function() {
-		var valLower = $('.lower').val();
-		$(this).val(Math.floor(valLower));
-	});
-	$('.easy-basket-filter-info .iUpper input').blur(function() {
-		var valUpper = $('.upper').val();
-		$(this).val(Math.floor(valUpper));
-	});
+        if (parseFloat(valLower) > parseFloat(valUpper)) {
+            var trade = valLower;
+            valLower = valUpper;
+            valUpper = trade;
+        }
+        var width = valUpper * 100 / max;
+        var left = valLower * 100 / max;
+        $('.fill').css('left', 'calc(' + left + '%)');
+        $('.fill').css('width', width - left + '%');
+        
+        // Update info
+        if (parseInt(valLower) == min) {
+            $('.easy-basket-lower').val('0');
+        } else {
+            $('.easy-basket-lower').val(parseInt(valLower));
+        }
+        if (parseInt(valUpper) == max) {
+            $('.easy-basket-upper').val('300');
+        } else {
+            $('.easy-basket-upper').val(parseInt(valUpper));
+        }
 
-
-
-
-    max = $('.upper-double').attr('max');
-    min = $('.lower-double').attr('min');
-    valLower = forMemery[2];
-    valUpper = forMemery[3];
-    if (parseFloat(valLower) > parseFloat(valUpper)) {
-        var trade = valLower;
-        valLower = valUpper;
-        valUpper = trade;
-    }
-    width = valUpper * 100 / max;
-    left = valLower * 100 / max;
-    $('.fill-double').css('left', 'calc(' + left + '%)');
-    $('.fill-double').css('width', width - left + '%');
-    
-    // Update info
-    if (parseInt(valLower) == min) {
-        $('.easy-basket-lower-double').val('0');
-    } else {
-        $('.easy-basket-lower-double').val(parseInt(valLower));
-    }
-    if (parseInt(valUpper) == max) {
-        $('.easy-basket-upper-double').val('50');
-    } else {
-        $('.easy-basket-upper-double').val(parseInt(valUpper));
-    }
+        // изменяем диапазон цен вручную
+        if ( valUpper > 300 ) {
+            var left = max;
+        }
+        if ( valLower < 0 ) {
+            var left = min;
+        } else if ( valLower > max ) {
+            var left = min;
+        }
+        // меняем положение ползунков
+        $('.lower').val(valLower);
+        $('.upper').val(valUpper);  
+        $('.easy-basket-filter-info p input').focus(function() {
+            $(this).val('');
+        });
+        $('.easy-basket-filter-info .iLower input').blur(function() {
+            var valLower = $('.lower').val();
+            $(this).val(Math.floor(valLower));
+        });
+        $('.easy-basket-filter-info .iUpper input').blur(function() {
+            var valUpper = $('.upper').val();
+            $(this).val(Math.floor(valUpper));
+        });
 
 
-    if ( valUpper > 50 ) {
-        var left = max;
-    }
-    if ( valLower < 0 ) {
-        var left = min;
-    } else if ( valLower > max ) {
-        var left = min;
-    }
-    $('.fill-double').css('left', 'calc(' + left + '%)');
-    $('.fill-double').css('width', width - left + '%');
-    // меняем положение ползунков
-    $('.lower-double').val(valLower);
-    $('.upper-double').val(valUpper);
-    $('.easy-basket-filter-info-double p input').focus(function() {
-        $(this).val('');
+
+
+        max = $('.upper-double').attr('max');
+        min = $('.lower-double').attr('min');
+        valLower = forMemery[2];
+        valUpper = forMemery[3];
+        if (parseFloat(valLower) > parseFloat(valUpper)) {
+            var trade = valLower;
+            valLower = valUpper;
+            valUpper = trade;
+        }
+        width = valUpper * 100 / max;
+        left = valLower * 100 / max;
+        $('.fill-double').css('left', 'calc(' + left + '%)');
+        $('.fill-double').css('width', width - left + '%');
+        
+        // Update info
+        if (parseInt(valLower) == min) {
+            $('.easy-basket-lower-double').val('0');
+        } else {
+            $('.easy-basket-lower-double').val(parseInt(valLower));
+        }
+        if (parseInt(valUpper) == max) {
+            $('.easy-basket-upper-double').val('50');
+        } else {
+            $('.easy-basket-upper-double').val(parseInt(valUpper));
+        }
+
+
+        if ( valUpper > 50 ) {
+            var left = max;
+        }
+        if ( valLower < 0 ) {
+            var left = min;
+        } else if ( valLower > max ) {
+            var left = min;
+        }
+        $('.fill-double').css('left', 'calc(' + left + '%)');
+        $('.fill-double').css('width', width - left + '%');
+        // меняем положение ползунков
+        $('.lower-double').val(valLower);
+        $('.upper-double').val(valUpper);
+        $('.easy-basket-filter-info-double p input').focus(function() {
+            $(this).val('');
+        });
+        $('.easy-basket-filter-info-double .iLower-double input').blur(function() {
+            var valLower = $('.lower-double').val();
+            $(this).val(Math.floor(valLower));
+        });
+        $('.easy-basket-filter-info-double .iUpper-double input').blur(function() {
+            var valUpper = $('.upper-double').val();
+            $(this).val(Math.floor(valUpper));
+        });
+        // console.log('9');
     });
-    $('.easy-basket-filter-info-double .iLower-double input').blur(function() {
-        var valLower = $('.lower-double').val();
-        $(this).val(Math.floor(valLower));
-    });
-    $('.easy-basket-filter-info-double .iUpper-double input').blur(function() {
-        var valUpper = $('.upper-double').val();
-        $(this).val(Math.floor(valUpper));
-    });
-    // console.log('9');
 }
 
 function smallRange(){  // изменяет ползунки и чек боксы на заданное значения, ничего не менял взял с старого кода
@@ -526,65 +536,92 @@ function setExample(){ // создаю пример и вывожу на экр�
 
     numberOne = 0;
     numberTwo = 0;
-    let symbol
-    values = localStorage.getItem('values').split(',');
+    let symbol;
+    window.Telegram.WebApp.CloudStorage.getItem("values", (err,test) => {
+        values = test.split(',');
+        // values = localStorage.getItem('values').split(',');
+        let symbolArray = ['+', '-', '*', '/',];
 
-    let symbolArray = ['+', '-', '*', '/',];
-    for(let i=0;i<5;){ // рандомлю знак из тех что доступны
-        symbol = randomNumber(0, 3);
-        if(values[symbol] == "true"){
-            i=10;
+        for(let exit=0;exit<10;exit++){ // проверка на то были ли уже в предыдущих примерах подобные ответы или операнды
+            let a =0;
+            console.log("новая итерация");
+            for(let i=0;i<5;){ // рандомлю знак из тех что доступны
+                symbol = randomNumber(0, 3);
+                if(values[symbol] == "true"){
+                    i=10;
+                }
+            }
+
+            switch(symbol){ // создаю числа для примера
+                case 0: // '+'
+                    numberOne = randomNumber(+values[5],+values[6]);
+                    numberTwo = randomNumber(+values[5],+values[6]);
+                    answer = numberOne + numberTwo;
+                break;
+                case 1:// '-'
+                    for(let exit=0;exit<10;){
+                        numberOne = randomNumber(+values[5],+values[6]);
+                        numberTwo = randomNumber(+values[5],+values[6]);
+                        let a;
+                        if(numberOne < numberTwo){
+                            answer = numberTwo - numberOne;
+                            a=numberTwo;
+                            numberTwo = numberOne;
+                            numberOne = a;
+                            exit= 100;
+                        } else if(numberOne = numberTwo){
+                        } else {
+                            answer = numberOne - numberTwo;
+                            exit= 100;
+                        }
+                    }
+                break;
+                case 2:// '*'
+                    numberOne = randomNumber(+values[7],+values[8]);
+                    numberTwo = randomNumber(+values[7],+values[8]);
+                    answer = numberOne * numberTwo;
+                break;
+                case 3:// '/'
+                    let forSort;
+                    for(let i =0;i < 1;){
+                        numberOne = randomNumber(+values[7],+values[8]);
+                        numberTwo = randomNumber(+values[7],+values[8]);
+                        if(numberOne == numberTwo || numberOne == 0 ||numberTwo == 0 || numberOne == 1 ||numberTwo == 1){
+                        } else{
+                            forSort = numberOne * numberTwo;
+                            numberOne =forSort;
+                            answer = forSort / numberTwo;
+                            i++;
+                        }
+                    }
+                break;
+            }
+            for(let i=1;i<=examplesCount;i++){
+                if(symbol == examples[(i-1)*4]){
+                    // console.log('символы равны', examples);
+                    if(examples[(i-1)*4+3] == answer  || examples[(i-1)*4+1] == numberOne || examples[(i-1)*4+1] == numberTwo || examples[(i-1)*4+2] == numberOne || examples[(i-1)*4+2] == numberTwo){
+                        i=100;
+                    }else{
+                        a++;
+                    }
+                }else{
+                    a++;
+                }
+            }
+            if(a ==examplesCount ){exit=100;} // если прошло сверку со всеми 10 примерами то 
+            examples[(score-1)*4]=symbol;
+            examples[(score-1)*4+1]=numberOne;
+            examples[(score-1)*4+2]=numberTwo;
+            examples[(score-1)*4+3]=answer;
+            console.log(examples);
+            console.log(a,'a', exit, 'exit');
+            // exit=0;
         }
-    }
-
-    switch(symbol){ // создаю числа для примера
-        case 0: // '+'
-            numberOne = randomNumber(+values[5],+values[6]);
-            numberTwo = randomNumber(+values[5],+values[6]);
-            answer = numberOne + numberTwo;
-        break;
-        case 1:// '-'
-            for(let exit=0;exit<10;){
-                numberOne = randomNumber(+values[5],+values[6]);
-                numberTwo = randomNumber(+values[5],+values[6]);
-                let a;
-                if(numberOne < numberTwo){
-                    answer = numberTwo - numberOne;
-                    a=numberTwo;
-                    numberTwo = numberOne;
-                    numberOne = a;
-                    exit= 100;
-                } else if(numberOne = numberTwo){
-                } else {
-                    answer = numberOne - numberTwo;
-                    exit= 100;
-                }
-            }
-        break;
-        case 2:// '*'
-            numberOne = randomNumber(+values[7],+values[8]);
-            numberTwo = randomNumber(+values[7],+values[8]);
-            answer = numberOne * numberTwo;
-        break;
-        case 3:// '/'
-            let forSort;
-            for(let i =0;i < 1;){
-                numberOne = randomNumber(+values[7],+values[8]);
-                numberTwo = randomNumber(+values[7],+values[8]);
-                if(numberOne == numberTwo || numberOne == 0 ||numberTwo == 0 || numberOne == 1 ||numberTwo == 1){
-                } else{
-                    forSort = numberOne * numberTwo;
-                    numberOne =forSort;
-                    answer = forSort / numberTwo;
-                    i++;
-                }
-            }
-        break;
-    }
+    });
 
     let inputExample = document.getElementById('example');
     inputExample.outerHTML = `<p id="example">${ numberOne } ${ symbolArray[symbol] } ${ numberTwo } = </p>`;
-    console.log(answer);
+    console.log("Answer - ",answer);
 
     let inputScore = document.getElementById('score');
     inputScore.outerHTML = `<p id="score">${score}/${examplesCount}</p>`;
@@ -622,22 +659,26 @@ function checkChekBox(value){ // проверка есть ли хоть оди�
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    let test = localStorage.getItem('values');
-    let checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    console.log(test);
-    if (test === null || test === undefined || test === "") {
-        for(let i =0;i<5;i++){    
-            checkboxes[i].checked = true;
-        }
-    }else{
-        let forMemery = test.split(',');
-        for(let i =0;i<5;i++){  
-            if(forMemery[i] == "true"){
+    window.Telegram.WebApp.expand();
+    window.Telegram.WebApp.disableVerticalSwipes();
+    window.Telegram.WebApp.CloudStorage.getItem("values", (err,test) => {
+        // let test = localStorage.getItem('values');
+        let checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        console.log(test);
+        if (test === null || test === undefined || test === "") {
+            for(let i =0;i<5;i++){    
                 checkboxes[i].checked = true;
             }
+        }else{
+            let forMemery = test.split(',');
+            for(let i =0;i<5;i++){  
+                if(forMemery[i] == "true"){
+                    checkboxes[i].checked = true;
+                }
+            }
+            dinamicRange();
         }
-        dinamicRange();
-    }
+    });
 })
 
 
