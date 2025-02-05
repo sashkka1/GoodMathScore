@@ -29,8 +29,7 @@ document.getElementById('small-range').addEventListener('click', () => { smallRa
 document.getElementById('big-range').addEventListener('click', () => { bigRange();});
 
 // клик на кнопку начать
-// document.getElementById('start-button').addEventListener('click', () => {fromHomeToExample();});
-document.getElementById('start-button').addEventListener('click', () => {test();});
+document.getElementById('start-button').addEventListener('click', () => {fromHomeToExample();});
 
 // клик на возврат на главную
 document.getElementById('back-to-home').addEventListener('click', () => { fromExampleToHome();});
@@ -588,12 +587,7 @@ function setExample(){ // создаю пример и вывожу на экр�
     let inputScore = document.getElementById('score');
     inputScore.outerHTML = `<p id="score">${score}/${examplesCount}</p>`;
 }
-function test(){
-    for(let i=0;i<100;i++){
 
-        console.log();      
-    }
-}
 function randomNumber(min, max){ // генерациия рандомных чисел
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
