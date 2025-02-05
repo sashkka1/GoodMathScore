@@ -62,8 +62,8 @@ function fromHomeToExample() { // переход с главного экран�
     values[7]= inputLower[2].value;
     values[8]= inputLower[3].value;
     
-    window.Telegram.WebApp.CloudStorage.setItem("values",values);
-    // localStorage.setItem('values',values);
+    // window.Telegram.WebApp.CloudStorage.setItem("values",values);
+    localStorage.setItem('values',values);
 
     // меняю экраны между собой
     block = document.getElementById('main1');
@@ -91,8 +91,8 @@ function fromHomeToExample() { // переход с главного экран�
 function fromExampleToHome() {// переход с экранв с пирмером на главный экран
 
     //меняю ползунки и чекбоксы на сохраненные значения
-    window.Telegram.WebApp.CloudStorage.getItem("values", (err,test) => {
-        // let test = localStorage.getItem('values');
+    // window.Telegram.WebApp.CloudStorage.getItem("values", (err,test) => {
+        let test = localStorage.getItem('values');
 
         let checkboxes = document.querySelectorAll('input[type="checkbox"]');
         if (test === null || test === undefined || test === "") {
@@ -108,7 +108,7 @@ function fromExampleToHome() {// переход с экранв с пирмер�
             }
             dinamicRange();
         }
-    });
+    // });
 
     // меняю страницы местами
     block = document.getElementById('main1');
@@ -129,8 +129,8 @@ function fromExampleToHome() {// переход с экранв с пирмер�
 
 function dinamicRange(){ // изменяет ползунки на сохранненые значения, ничего не менял взял с старого кода
     // console.log('7');
-    window.Telegram.WebApp.CloudStorage.getItem("values", (err,test) => {
-        // let test = localStorage.getItem('values');
+    // window.Telegram.WebApp.CloudStorage.getItem("values", (err,test) => {
+        let test = localStorage.getItem('values');
 
         let adapter = test.split(',');
         let forMemery = [adapter[5],adapter[6],adapter[7],adapter[8]] 
@@ -242,7 +242,7 @@ function dinamicRange(){ // изменяет ползунки на сохран�
             $(this).val(Math.floor(valUpper));
         });
         // console.log('9');
-    });
+    // });
 }
 
 function smallRange(){  // изменяет ползунки и чек боксы на заданное значения, ничего не менял взял с старого кода
@@ -537,10 +537,10 @@ function setExample(){ // создаю пример и вывожу на экр�
     numberOne = 0;
     numberTwo = 0;
     let symbol;
-    window.Telegram.WebApp.CloudStorage.getItem("values", (err,test) => {
-        values = test.split(',');
-        // values = localStorage.getItem('values').split(',');
-        let symbolArray = ['+', '-', '*', '/',];
+    let symbolArray = ['+', '-', '*', '/',];
+    // window.Telegram.WebApp.CloudStorage.getItem("values", (err,test) => {
+        // values = test.split(',');
+        values = localStorage.getItem('values').split(',');
 
         for(let exit=0;exit<10;exit++){ // проверка на то были ли уже в предыдущих примерах подобные ответы или операнды
             let a =0;
@@ -617,7 +617,7 @@ function setExample(){ // создаю пример и вывожу на экр�
             console.log(a,'a', exit, 'exit');
             // exit=0;
         }
-    });
+    // });
 
     let inputExample = document.getElementById('example');
     inputExample.outerHTML = `<p id="example">${ numberOne } ${ symbolArray[symbol] } ${ numberTwo } = </p>`;
@@ -661,8 +661,8 @@ function checkChekBox(value){ // проверка есть ли хоть оди�
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
     window.Telegram.WebApp.expand();
     window.Telegram.WebApp.disableVerticalSwipes();
-    window.Telegram.WebApp.CloudStorage.getItem("values", (err,test) => {
-        // let test = localStorage.getItem('values');
+    // window.Telegram.WebApp.CloudStorage.getItem("values", (err,test) => {
+        let test = localStorage.getItem('values');
         let checkboxes = document.querySelectorAll('input[type="checkbox"]');
         console.log(test);
         if (test === null || test === undefined || test === "") {
@@ -678,7 +678,7 @@ document.addEventListener('DOMContentLoaded', () => { // первый заход
             }
             dinamicRange();
         }
-    });
+    // });
 })
 
 
