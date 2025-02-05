@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <title>MathScore</title>
+    <link rel="stylesheet" href="style.css" /></link>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js'></script>
+    <script src="https://telegram.org/js/telegram-web-app.js?v=1.0.1"></script>
+</head>
+<body>
+
+    <div   id="main1">
+        <div class="main1">
+            <p id="win-message" class="win-message none">Количество ошибок: <br> Время: </p>
+
+            <div class="choice">
+                <p class="choice-value"><input type="checkbox" id="checkbox+" value="0"> +</p>
+                <p class="choice-value"><input type="checkbox" id="checkbox-" value="1"> -</p>
+                <p class="choice-value"><input type="checkbox" id="checkboxx" value="2"> x</p>
+                <p class="choice-value"><input type="checkbox" id="checkbox/" value="3"> /</p>
+                <p class="choice-value"><input type="checkbox"> t</p>
+            </div>
+
+            <div class="tuning-small-big">
+                <button class="small-range" id="small-range">Малый диапозон</button>
+                <button class="big-range" id="big-range">Большой диапозон</button>
+            </div>
+
+            <div class="filter">
+                <p>Диапозон для операторов: +, -</p>
+                <div class="easy-basket-filter">
+                    <div class="easy-basket-filter-info">
+                        <p class="iLower"><input disabled type="text" id="easy-basket-lower" class="easy-basket-lower" value="0" min="0" max="300" maxlength=3/></p>
+                        <p class="iUpper"><input disabled type="text" class="easy-basket-upper" value="100" min="0" max="300" maxlength=3/></p>
+                    </div>
+                    
+                    <div class="easy-basket-filter-range">
+                        <input type="range" class="lower range" step="1" min="0" max="300" value="0"/>
+                        <input type="range" class="upper range" step="1" min="0" max="300" value="100"/>
+                        <div class="fill"></div>
+                    </div>
+                    
+                    <div class="easy-basket-filter-ticks">
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter">
+                <p>Диапозон для операторов: x, /</p>
+                <div class="easy-basket-filter-double">
+                    <div class="easy-basket-filter-info-double">
+                        <p class="iLower-double"><input disabled type="text" class="easy-basket-lower-double" value="0" min="0" max="50" maxlength=2/></p>
+                        <p class="iUpper-double"><input disabled type="text" class="easy-basket-upper-double" value="20" min="0" max="50" maxlength=2/></p>
+                    </div>
+                    
+                    <div class="easy-basket-filter-range-double">
+                        <input type="range" class="lower-double range-double" step="1" min="0" max="50" value="0"/>
+                        <input type="range" class="upper-double range-double" step="1" min="0" max="50" value="20"/>
+                        <div class="fill-double"></div>
+                    </div>
+                    
+                    <div class="easy-basket-filter-ticks-double">
+                    </div>
+                </div>
+            </div>
+            
+            <button class="start-button" id="start-button">Начать</button>
+        </div>
+    </div>
+
+    <div class = "none" id="main2">
+        <div class="main2">
+            <div class="header">
+                <img class="back-to-home" id="back-to-home" src="materials/back-to-main.png" alt="">
+                <div class="time">
+                    <div class="wrapper-stopwath">
+                        <p><span id="seconds">00</span>:<span id="tens">00</span></p>
+                    </div> 
+                </div>
+                <div class="score">
+                    <p id="score">/</p>
+                </div>
+            </div>
+
+            <div class="example-block">
+                <p id="example">35 + 343 = </p>
+                <div class="example-answer" id="example-answer-block">
+                    <p id="example-answer"></p>
+                </div>
+            </div>
+
+            <div class="keyboard">
+                <button  class="number" id="number-1" value="1"> 1 </button>
+                <button  class="number" id="number-2" value="2"> 2 </button>
+                <button  class="number" id="number-3" value="3"> 3 </button>
+                <button  class="number" id="number-4" value="4"> 4 </button>
+                <button  class="number" id="number-5" value="5"> 5 </button>
+                <button  class="number" id="number-6" value="6"> 6 </button>
+                <button  class="number" id="number-7" value="7"> 7 </button>
+                <button  class="number" id="number-8" value="8"> 8 </button>
+                <button  class="number" id="number-9" value="9"> 9 </button>
+                <!-- <button  class="number"> 1 </button> -->
+                <button class="number" id="number-delete" value="delete">
+                    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAsTAAALEwEAmpwYAAAE5klEQVR4nO2bW2wUZRTHVzEGjQ9CAk8WrEiUxKAGb0Ej4A3UxKARTQiSUB+MRuMt8UFNJJAYLw+KEo2XhPhooZW2VGyhXFtLTSjFmtIiBBRKt7vb27bdbruXnzl7SQrOt537ziT7S763ndn5n5n5zjn/75tAoESJEiVcALgBWAd8DdQAbcBZi6Md2AP8AFQA8wJeA1gKVAMTOE8SOACs9ILwebk7IxdVDOqB8mKJXwScpvhEgEfcFr8CGMI7TMnc45b4p4AY3kPmn/ucFv9iLtpepReY45T4jUAC7/OZE+LfBdL4A3kVFtgpfgv+Y6sdwq8CtuFPOq2KnwXswN+YK5CAa4Gd+J81ZsRfD+w1+k8XxpI8vT/Ck/v+P55pijAQT+k6TyoNm5oHNc8j42Bf3MhlVRgVfyPQjEne+WOYmyr7NMdHJ0Z0naPyXEx5jtWNEZLG8tAHRsTPz7WdpgnHUyz5Jah58eW7gpwbLdwvxZNp7t8TUgagNTRp9JI26xVfBpzCBr7vGVMKeK21cOvwbbf62NePmWo7Zg4AUA6cwSYSaXi0Iawpoqyyj5OD2lX08GSKO3b3ax63uCrIxfGk/QEg+9hfxGaO9k8q7+TzBwc0j9nSEVUes/3UmNlLUQcAuBpowCFebhlSCrpyJr8US3Jrlfbc8eCvISYlNTgQgLdwEHlkFytEPdYQvmw2f7NNnT32XTKU9vQFAJidaxsd5fO/RpXCJN0JXcMJFuzU/s36w4NWL0EZgDdwgYlkmgcUae2euhCxZDojUpU2z0QTjgWgBZeo/XdC+RRUNGuLl/Hxn1E7/n6zqtpL4CIvHBpQCtUad9f2MzqVdiwAa3CZnpEENyvec61Rdd42u1EzAJsoAh+2j+gSv7YpYqftpBmA9ygCUundWaNd6eWHZIOOAVv9Vu8EQHi7QLcoQ0pom9EMwEsUgdMyD+ya+RWQrOF0AFZRBDYcUae86ePeuhBj0lE5GIDrgHFcpP6CuhbQGp922lIDFCyE6nGJTDVYrzY5VFXgWetVYMEAbMAlCvUDW09GWaioDzYetdwHFAzALLscoEL8M5ZkkaIjfKIxnDFAC/mIjb2WOsEZ2+F1OIy4uypxR4JZf68vpm6bl9eHMj6hBWZ0hH7EIQ4H40rxkhGmI5Oe6rfbukYdDcBs4Dg2M5VKs2JvWFntdQ5dXu2NJtLcVatdJYpTJGsOJtFlis4HTmAjX3Wp3V1557XY8fe48phXfje9EUW3LT4HaMUGxN+7rTqovJu9Cnc3kYKHFU+NjEPGVoSMBWDa/r4mqwF4tXXIdIFTqGBa+Vs4EyTHAjBtTqgzK74tPJnx/rUELK3pJ6rD5Hj2gNo8+a7HsD2uf2ksD3AN8JPRf5Ly/XHFgogMecf10D4wpQzi7dVBgrGUc4ujVxRKsvlRN1K0qFZ0xfiUzKCX94+PKM/1Tbehp2B1wOLukC/xNwtNByCP7LXBn3QE7IKsi+SXHWLmMsBMSIaTDRz4A7GVywJ2A6z3yUbJT2wXn0dStWzmwLucl8WfgJOQ9RUttWkOPvrLHBWfB3gICOEdxGB4LuAmwC1At0c+mFjlqvg8wFxgexEnx2pbCh6rAEuAn12y3BO57T3LA16D7E7TtcAXue22LbldaFY+m5NP73bnPsWTbxbmFltniRIlAr7iP4m5xts05O2/AAAAAElFTkSuQmCC">
+                </button>
+                <button  class="number" id="number-0" value="0"> 0 </button>
+                <button class="number" id="number-enter" value="enter">
+                    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAAC0UlEQVR4nO3cS4jNYRjH8XGpIUqywEJuC1lIIjtJUSzE0gIbl8bSwi12VgqLyUbKZWthUhQL2YhSUrKQDUKZhdsCNeGrJzN1TBbnnP/7nud53/P71DSrOed9zre5/c/7fwcGRERERERERERERERERET6CjALWGufvdfS94AlwHv+eges6vsXxRNwmn99AFYoil+QC5OCTHynLFOUOEHMG2CxosQJYl4CCxUlThDzDJinKHGCmKfAXEWJE8Q8Amb3Yk19jfaDmHvATO81V43Ogpi7wKD3uqtF50HMCDDde+1Vorsg5jowzXv91aH7IOYKMMV7hqrQLIgZ9p6hKjQPYs57z1EN0gQxp7xnqQLpgpij3vMUj7RBfgOHvGcqGmmDTETZ7z1XsUgfxPwEdnkNtBTYARwADhb4cZ88xoDtvQyxE3iSaZha/AA25w4xCFzznrQg34CNuWJMBW56T1igr8D6HEGOeE9WsI/A6pQx5gCfvacq3CiwMlWQ3d7TVCLNRjzgkvckFXkFLGoa5Lb3FJWxPV8LmgTJ9Q9UP3sBzFeQWB7YvxP6Dolln4LEMqIgsdxSkFiOKUgcr+0qiIKUfikFuOO9+sp8anSxEbjqPUFFml+OB4a8p6hEmjes7LrL+FuS0j17/bY0jtES5WyDxfS7seSbHuzuIeCx92QFyrctaPxHl91vJ+35BezNEqMlygzguN7SbWsX41DWGP/ZErQVOGH3SQAXC/x4Tj6HexajFuTZSmpOes9WJPIEOec9V7FIH0S3uAUKclk3gcYJotukAwW5oYME4gTRURuBgugwmkBBHuq4pjhBdKBZoCA68i9QEB2KGSiIjo0NFOStDlaOE2Q02W1o0jiI3VO5po2HkR4E+QKsS/ZE0iiI7Z3a0OZDSErAmUkxvgObkj6JtM9+R7RsALQY2zr4cskBWA7s0Z+2IiIiIiIiIiIiIjKQxR/cJ+YV7KzAfQAAAABJRU5ErkJggg==">
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="main.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</body>
+</html>
