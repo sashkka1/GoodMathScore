@@ -544,7 +544,6 @@ function setExample(){ // создаю пример и вывожу на экр�
 
         for(let exit=0;exit<10;exit++){ // проверка на то были ли уже в предыдущих примерах подобные ответы или операнды
             let a =0;
-            console.log("новая итерация");
             for(let i=0;i<5;){ // рандомлю знак из тех что доступны
                 symbol = randomNumber(0, 3);
                 if(values[symbol] == "true"){
@@ -598,7 +597,6 @@ function setExample(){ // создаю пример и вывожу на экр�
             }
             for(let i=1;i<=examplesCount;i++){
                 if(symbol == examples[(i-1)*4]){
-                    // console.log('символы равны', examples);
                     if(examples[(i-1)*4+3] == answer  || examples[(i-1)*4+1] == numberOne || examples[(i-1)*4+1] == numberTwo || examples[(i-1)*4+2] == numberOne || examples[(i-1)*4+2] == numberTwo){
                         i=100;
                     }else{
@@ -613,8 +611,8 @@ function setExample(){ // создаю пример и вывожу на экр�
             examples[(score-1)*4+1]=numberOne;
             examples[(score-1)*4+2]=numberTwo;
             examples[(score-1)*4+3]=answer;
-            console.log(examples);
-            console.log(a,'a', exit, 'exit');
+            // console.log(examples);
+            // console.log(a,'a', exit, 'exit');
             // exit=0;
         }
     // });
@@ -664,7 +662,7 @@ document.addEventListener('DOMContentLoaded', () => { // первый заход
     // window.Telegram.WebApp.CloudStorage.getItem("values", (err,test) => {
         let test = localStorage.getItem('values');
         let checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        console.log(test);
+        // console.log(test);
         if (test === null || test === undefined || test === "") {
             for(let i =0;i<5;i++){    
                 checkboxes[i].checked = true;
