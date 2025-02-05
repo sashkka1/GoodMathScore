@@ -1,7 +1,7 @@
 
-let forScore =[]; // 0+   1-   2x   3/  4t  5+-(min)  6+-(max)  7x/(min)  8x/(max) 
+let values =[]; // 0+   1-   2x   3/  4t  5+-(min)  6+-(max)  7x/(min)  8x/(max) 
 // let examples =[[],[],[],[],[],[],[],[],[],[]];
-let score = 1, mistake =0,examplesCount=2;
+let score = 1, mistake =0,examplesCount=10;
 let block;
 let numberOne,numberTwo,answer;
 
@@ -54,14 +54,14 @@ function fromHomeToExample() { // переход с главного экран�
     // считываю все пораметры ползункув и чекбоксов
     let checkboxes = document.querySelectorAll('input[type="checkbox"]');
     for(let i =0;i<5;i++){    
-        forScore[i] = checkboxes[i].checked;
+        values[i] = checkboxes[i].checked;
     }
     var inputLower = document.querySelectorAll('input[type="text"]');
-    forScore[5]= inputLower[0].value;
-    forScore[6]= inputLower[1].value;
-    forScore[7]= inputLower[2].value;
-    forScore[8]= inputLower[3].value;
-    localStorage.setItem('forScore',forScore);
+    values[5]= inputLower[0].value;
+    values[6]= inputLower[1].value;
+    values[7]= inputLower[2].value;
+    values[8]= inputLower[3].value;
+    localStorage.setItem('values',values);
 
     // меняю экраны между собой
     block = document.getElementById('main1');
@@ -74,7 +74,7 @@ function fromHomeToExample() { // переход с главного экран�
     block.classList.add('none');
 
     // запускаю время если пользователь это отметил
-    if(forScore[4] == "true" || forScore[4] == true){
+    if(values[4] == "true" || values[4] == true){
         clearInterval(Interval);
         Interval = setInterval(startTimer, 10);
     }
@@ -87,7 +87,7 @@ function fromHomeToExample() { // переход с главного экран�
 function fromExampleToHome() {// переход с экранв с пирмером на главный экран
 
     //меняю ползунки и чекбоксы на сохраненные значения
-    let test = localStorage.getItem('forScore');
+    let test = localStorage.getItem('values');
     let checkboxes = document.querySelectorAll('input[type="checkbox"]');
     if (test === null || test === undefined || test === "") {
         for(let i =0;i<5;i++){    
@@ -122,7 +122,7 @@ function fromExampleToHome() {// переход с экранв с пирмер�
 
 function dinamicRange(){ // изменяет ползунки на сохранненые значения, ничего не менял взял с старого кода
     // console.log('7');
-    let test = localStorage.getItem('forScore');
+    let test = localStorage.getItem('values');
     let adapter = test.split(',');
     let forMemery = [adapter[5],adapter[6],adapter[7],adapter[8]] 
     // 1valLower  2valUpper  3lower-double  4upper-double 
@@ -527,48 +527,50 @@ function setExample(){ // создаю пример и вывожу на экр�
     numberOne = 0;
     numberTwo = 0;
     let symbol
-    forScore = localStorage.getItem('forScore').split(',');
+    values = localStorage.getItem('values').split(',');
 
     let symbolArray = ['+', '-', '*', '/',];
     for(let i=0;i<5;){ // рандомлю знак из тех что доступны
         symbol = randomNumber(0, 3);
-        if(forScore[symbol] == "true"){
+        if(values[symbol] == "true"){
             i=10;
         }
     }
 
     switch(symbol){ // создаю числа для примера
         case 0: // '+'
-            numberOne = randomNumber(+forScore[5],+forScore[6]);
-            numberTwo = randomNumber(+forScore[5],+forScore[6]);
+            numberOne = randomNumber(+values[5],+values[6]);
+            numberTwo = randomNumber(+values[5],+values[6]);
             answer = numberOne + numberTwo;
         break;
         case 1:// '-'
-            numberOne = randomNumber(+forScore[5],+forScore[6]);
-            numberTwo = randomNumber(+forScore[5],+forScore[6]);
-            let a;
-            if(numberOne < numberTwo){
-                answer = numberTwo - numberOne;
-                a=numberTwo;
-                numberTwo = numberOne;
-                numberOne = a;
-            } else if(numberOne = numberTwo){
-                numberOne = numberOne + 1;
-                answer = numberOne - numberTwo;
-            } else {
-                answer = numberOne - numberTwo;
+            for(let exit=0;exit<10;){
+                numberOne = randomNumber(+values[5],+values[6]);
+                numberTwo = randomNumber(+values[5],+values[6]);
+                let a;
+                if(numberOne < numberTwo){
+                    answer = numberTwo - numberOne;
+                    a=numberTwo;
+                    numberTwo = numberOne;
+                    numberOne = a;
+                    exit= 100;
+                } else if(numberOne = numberTwo){
+                } else {
+                    answer = numberOne - numberTwo;
+                    exit= 100;
+                }
             }
         break;
         case 2:// '*'
-            numberOne = randomNumber(+forScore[7],+forScore[8]);
-            numberTwo = randomNumber(+forScore[7],+forScore[8]);
+            numberOne = randomNumber(+values[7],+values[8]);
+            numberTwo = randomNumber(+values[7],+values[8]);
             answer = numberOne * numberTwo;
         break;
         case 3:// '/'
             let forSort;
             for(let i =0;i < 1;){
-                numberOne = randomNumber(+forScore[7],+forScore[8]);
-                numberTwo = randomNumber(+forScore[7],+forScore[8]);
+                numberOne = randomNumber(+values[7],+values[8]);
+                numberTwo = randomNumber(+values[7],+values[8]);
                 if(numberOne == numberTwo || numberOne == 0 ||numberTwo == 0 || numberOne == 1 ||numberTwo == 1){
                 } else{
                     forSort = numberOne * numberTwo;
@@ -605,7 +607,7 @@ function checkChekBox(value){ // проверка есть ли хоть оди�
     let checkboxes = document.querySelectorAll('input[type="checkbox"]');
     let a=0;
     for(let i =0;i<4;i++){    
-        forScore[i] = checkboxes[i].checked;
+        values[i] = checkboxes[i].checked;
         if(checkboxes[i].checked == true){
             a++;
         }
@@ -620,7 +622,7 @@ function checkChekBox(value){ // проверка есть ли хоть оди�
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    let test = localStorage.getItem('forScore');
+    let test = localStorage.getItem('values');
     let checkboxes = document.querySelectorAll('input[type="checkbox"]');
     console.log(test);
     if (test === null || test === undefined || test === "") {
