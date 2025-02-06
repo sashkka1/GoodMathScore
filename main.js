@@ -16,6 +16,12 @@ var buttonStop = document.getElementById('button-stop');
 var buttonReset = document.getElementById('button-reset');
 var Interval ;
 
+// document.getElementById('different-color').addEventListener('click', () => { differentColor();});
+
+// function differentColor(){
+//     console.log('asdasd');
+//     document.getElementById('theme').href = "./thems/standart.css";
+// }
 // при нажатии на чекбокс вызываю проверку есть ли хоть один закрытый чекбокс
 document.getElementById('checkbox+').addEventListener('click', () => { checkChekBox(document.getElementById('checkbox+').value);});
 document.getElementById('checkbox-').addEventListener('click', () => { checkChekBox(document.getElementById('checkbox-').value);});
@@ -512,7 +518,7 @@ function keyboardClick(value){
         if(answerUser == answer){
             score++;
             input.outerHTML = `<p id="example-answer"></p>`;
-            blink('example-answer-block','green');
+            blink('example-answer-block','good');
             if(score>=(examplesCount+1)){
                 document.getElementById('win-message').outerHTML = `<p id="win-message" class="win-message ">Количество ошибок: ${mistake}<br> Время: ${document.getElementById("seconds").textContent}:${document.getElementById("tens").textContent}</p>`;
                 fromExampleToHome();
@@ -521,13 +527,13 @@ function keyboardClick(value){
             }
         }else{
             mistake++;
-            blink('example-answer-block','red')
+            blink('example-answer-block','bad')
         }
     } else if(answerUser.length < 6){
         answerUser += value ;
         input.outerHTML = `<p id="example-answer">${ answerUser }</p>`;
     } else{
-        blink('example-answer-block','red')
+        blink('example-answer-block','bad')
     }
 }
 
@@ -629,13 +635,20 @@ function randomNumber(min, max){ // генерациия рандомных чи
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function blink(input, color){ // при проверках подсвечивать правильные или неправильные действия
-    let inpu = document.getElementById(input) ;
-    inpu.style.backgroundColor = color;
-    inpu.style.transition = "0.4s";
-    setTimeout(function() {
-        inpu.style.backgroundColor = '';
-    }, 400);
+function blink(input, value){ // при проверках подсвечивать правильные или неправильные действия
+    let inputt = document.getElementById(input) ;
+    inputt.style.transition = "0.4s";
+    if(value == 'bad'){
+        inputt.classList.add('blink-bad');
+        setTimeout(function() {
+            inputt.classList.remove('blink-bad');
+        }, 400);
+    }else{
+        inputt.classList.add('blink-good');
+        setTimeout(function() {
+            inputt.classList.remove('blink-good');
+        }, 400);
+    }
 }
 
 function checkChekBox(value){ // проверка есть ли хоть один закрытый чекбокс
@@ -659,6 +672,7 @@ function checkChekBox(value){ // проверка есть ли хоть оди�
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
     window.Telegram.WebApp.expand();
     window.Telegram.WebApp.disableVerticalSwipes();
+    document.getElementById('theme').href = "./thems/standart.css";
     // window.Telegram.WebApp.CloudStorage.getItem("values", (err,test) => {
         let test = localStorage.getItem('values');
         let checkboxes = document.querySelectorAll('input[type="checkbox"]');

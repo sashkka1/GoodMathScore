@@ -22,12 +22,13 @@ body{
 .main1{
     width: 100vw;
     height: 100vh;
-    background-color: rgb(234, 234, 234);
+    /* background-color: rgb(234, 234, 234); */
 
     display: flex;
     align-items: center;
     flex-direction: column;
 }
+
 
 .win-message{
     width: 80vw;
@@ -50,16 +51,21 @@ body{
     flex-direction: column;
 }
 .choice input{
-    /* margin-bottom: 50%; */
-    height: 4vh;
+    appearance: none; /* Убираем стандартное оформление */
     width: 4vw;
-    accent-color: rgb(28, 170, 231);
-    /* background-color: #1c5858; */
-    /* appearance: none; */
+    aspect-ratio: 1 / 1;
+    /* border: 1px solid #000; */
+    border-radius: 1vw;
 }
-.choice input:active{
-    accent-color: rgb(28, 170, 231);
+.choice input[type="checkbox"]{
+    /* background-color: rgb(234, 234, 234); */
 }
+.choice input[type="checkbox"]:checked{
+    /* background-color: rgb(28, 170, 231); 
+    border-color: rgb(28, 170, 231); */
+}
+
+
 .tuning-small-big{
     width: 90vw;
     height: 12vh;
@@ -71,16 +77,16 @@ body{
     width: 40%;
     height: 80%;
     border-radius: 5px;
-    box-shadow: 0px 1px 4px  rgb(92, 92, 92);
-    background-color: rgb(28, 170, 231);
-    color: white;
+    /* box-shadow: 0px 1px 4px  rgb(92, 92, 92); */
+    /* background-color: rgb(28, 170, 231);
+    color: white; */
     transition-duration: 0.4s;
 }
 .tuning-small-big button:active {
     width: 35%;
     height: 75%;
     transition-duration: 0.4s;
-    background-color: rgb(18, 108, 146);
+    /* background-color: rgb(18, 108, 146); */
 }
 
 
@@ -100,9 +106,9 @@ body{
     width: 40vw;
     height: 10vh;
     border-radius: 5px;
-    box-shadow: 0px 1px 4px  rgb(92, 92, 92);
+    /* box-shadow: 0px 1px 4px  rgb(92, 92, 92);
     background-color: rgb(28, 170, 231);
-    color: white;
+    color: white; */
     transition-duration: 0.4s;
 }
 
@@ -110,7 +116,7 @@ body{
     width: 35%;
     height: 9%;
     transition-duration: 0.4s;
-    background-color: rgb(18, 108, 146);
+    /* background-color: rgb(18, 108, 146); */
 }
 
 
@@ -118,9 +124,9 @@ body{
 .main2{
     width: 100vw;
     height: 100vh;
-    background-color: rgb(234, 234, 234);
+    /* background-color: rgb(234, 234, 234); */
     font-weight: 550;
-    color: rgb(8, 130, 183);
+    /* color: rgb(8, 130, 183); */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -133,14 +139,12 @@ body{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    /* background-color: #888; */
 }
 .back-to-home{
     height: auto;
 }
 
 .keyboard{
-    /* background-color: #f1f1f1; */
     display: flex;
     justify-content: center;
     align-items: flex-end;
@@ -157,16 +161,16 @@ body{
     /* text-align: center; */
     margin: 3px;
     border-radius: 5px;
-    box-shadow: 0px 1px 4px  rgb(92, 92, 92);
+    /* box-shadow: 0px 1px 4px  rgb(92, 92, 92);
     background-color: rgb(28, 170, 231);
-    color: white;
+    color: white; */
     font-weight: 600;
     transition-duration: 0.4s;
 }
 
 .keyboard button:active {
     transition-duration: 0.4s;
-    background-color: rgb(18, 108, 146);
+    /* background-color: rgb(18, 108, 146); */
 }
 .keyboard img{
     height: 4.5vh;
@@ -185,17 +189,16 @@ body{
     position: relative;
     display: flex;
     justify-content: center;
-    border-bottom: 1px solid rgb(8, 130, 183); /* Толщина, стиль и цвет */
-    width: 30vw;
+    /* border-bottom: 1px solid rgb(8, 130, 183); */
+    width: 40vw;
     height: 6vh;
-    /* height: 50%; */
+    background-color: rgb(240, 240, 240);
+    box-shadow: 0px 1px 4px  rgb(92, 92, 92); 
+    border-radius: 5px;  
 }
 .example-answer p{
     position: absolute;
     bottom: 0;
-}
-.forbadanswer{
-    height: 10vh;
 }
 
 
@@ -269,7 +272,6 @@ body{
         font-size: 4.5vw;
     }
     .choice input{
-        height: 5vh;
         width: 5vw;
     }
     .back-to-home{
@@ -287,13 +289,28 @@ body{
         font-size: 5.5vw;
     }
     .choice input{
-        height: 5.5vh;
         width: 5.5vw;
     }
     .back-to-home{
         width: 15vw;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .easy-basket-filter {
     width: 50%;
     position: relative;
@@ -301,7 +318,7 @@ body{
 .fill {
     height: 3px;
     width: 33%;
-    background-color: rgb(28, 170, 231);
+    /* background-color: rgb(28, 170, 231); */
     position: absolute;
     top: 0;
     left: 0;
@@ -316,9 +333,9 @@ body{
     top: -50px; */
 }
 .easy-basket-filter-info p{
-    color: #fff;
+    /* color: #fff; */
     padding: 2px 6px;
-    background-color: rgb(28, 170, 231);
+    /* background-color: rgb(28, 170, 231); */
     border-radius: 4px;
     margin:0;
 }
@@ -339,9 +356,9 @@ body{
 .easy-basket-filter-info input{
     width: inherit;
     border: none;
-    color: #fff;
+    /* color: #fff; */
     /* font: 11px Open Sans; */
-    background-color: rgb(28, 170, 231);
+    /* background-color: rgb(28, 170, 231); */
     /* width: 40px; */
     position: absolute;
     bottom: 0;
@@ -376,10 +393,10 @@ input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
     height:20px;
     width: 20px;
-    border: 5px solid #f1f1f1;
-    box-shadow: 0 1px 5px -1px rgba(0, 0, 0, 0.5);
+    /* border: 5px solid #f1f1f1;
+    box-shadow: 0 1px 5px -1px rgba(0, 0, 0, 0.5); */
     border-radius: 100%;
-    background: rgb(28, 170, 231);
+    /* background: rgb(28, 170, 231); */
     cursor: pointer;
     margin-top: -9px;
 }
@@ -387,12 +404,12 @@ input[type=range]::-webkit-slider-runnable-track {
     width: 100%;
     height: 3px;
     cursor: pointer;
-    background: #707D7D;
+    /* background: #707D7D; */
     border-radius: 1.3px;
 }
 
 input[type=range].lower::-webkit-slider-runnable-track {
-    background: red;
+    /* background: red; */
 }
 .easy-basket-filter-ticks {
     display: -webkit-box;
@@ -412,8 +429,8 @@ input[type=range].lower::-webkit-slider-runnable-track {
 .easy-basket-filter-ticks > div {
     height: 100%;
     width: 1px;
-    background: #DDD;
-    color: #888;
+    /* background: #DDD;
+    color: #888; */
 }
 .easy-basket-filter-ticks > div:nth-child(10n - 9) {
     height: 150%;
@@ -436,7 +453,7 @@ input[type=range].lower::-webkit-slider-runnable-track {
 .fill-double {
     height: 3px;
     width: 38%;
-    background-color: rgb(28, 170, 231);
+    /* background-color: rgb(28, 170, 231); */
     position: absolute;
     top: 0;
     left: 0;
@@ -451,9 +468,9 @@ input[type=range].lower::-webkit-slider-runnable-track {
     top: -50px; */
 }
 .easy-basket-filter-info-double p{
-    color: #fff;
+    /* color: #fff; */
     padding: 2px 6px;
-    background-color: rgb(28, 170, 231);
+    /* background-color: rgb(28, 170, 231); */
     border-radius: 4px;
     margin:0;
 }
@@ -474,9 +491,9 @@ input[type=range].lower::-webkit-slider-runnable-track {
 .easy-basket-filter-info-double input{
     width: inherit;
     border: none;
-    color: #fff;
+    /* color: #fff; */
     /* font: 11px Open Sans; */
-    background-color: rgb(28, 170, 231);
+    /* background-color: rgb(28, 170, 231); */
     /* width: 40px; */
     text-align:center;
     position: absolute;
@@ -489,45 +506,8 @@ input[type=range].lower::-webkit-slider-runnable-track {
     top: 0;
 }
 
-/****** Style range ******/
-input[type=range] {
-    -webkit-appearance: none;
-    width: 100%;
-    margin: 0;
-    background: transparent;
-}
-
-input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    cursor: pointer;
-    position: relative;
-    z-index: 3;
-}
-
-input[type=range]:focus, input[type=text]:focus {
-    outline: none;
-}
-input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    height:20px;
-    width: 20px;
-    border: 5px solid #f1f1f1;
-    box-shadow: 0 1px 5px -1px rgba(0, 0, 0, 0.5);
-    border-radius: 100%;
-    background: rgb(28, 170, 231);
-    cursor: pointer;
-    margin-top: -9px;
-}
-input[type=range]::-webkit-slider-runnable-track {
-    width: 100%;
-    height: 3px;
-    cursor: pointer;
-    background: #707D7D;
-    border-radius: 1.3px;
-}
-
 input[type=range].lower-double::-webkit-slider-runnable-track {
-    background: red;
+    /* background: red; */
 }
 .easy-basket-filter-ticks-double {
     display: -webkit-box;

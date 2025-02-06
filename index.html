@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, user-scalable=no">
     <title>MathScore</title>
     <link rel="stylesheet" href="./style.css" /></link>
+    <link rel="stylesheet" id="theme" href="./style.css" /></link>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js'></script>
     <script src="https://telegram.org/js/telegram-web-app.js?v=1.0.1"></script>
 </head>
@@ -12,7 +13,10 @@
 
     <div   id="main1">
         <div class="main1 cssmain1">
-            <p id="win-message" class="win-message none">Количество ошибок: <br> Время: </p>
+            <div class="header">
+                <p id="win-message" class="win-message none">Количество ошибок: <br> Время: </p>
+                <!-- <button class="different-color" id="different-color">цвета</button> -->
+            </div>
             <div class="choice">
                 <p class="choice-value"><input type="checkbox" id="checkbox+" value="0"> +</p>
                 <p class="choice-value"><input type="checkbox" id="checkbox-" value="1"> -</p>

@@ -1,0 +1,48 @@
+.main1{
+    background-color: rgb(234, 234, 234);
+    color: black;
+}
+.choice input[type="checkbox"]{
+    border: 1px solid #000;
+    background-color: rgb(234, 234, 234); /* Цвет заливки в открытом состоянии */
+}
+.choice input[type="checkbox"]:checked{
+    background-color: rgb(28, 170, 231); /* Зеленая заливка */
+    border-color: rgb(28, 170, 231);
+}
+button{
+    box-shadow: 0px 1px 4px  rgb(92, 92, 92);
+    background-color: rgb(28, 170, 231);
+    color: white;
+}
+button:active {
+    background-color: rgb(18, 108, 146);
+}
+.main2{
+    background-color: rgb(234, 234, 234);
+    color: rgb(8, 130, 183);
+}
+.example-answer{
+    border-bottom: 1px solid rgb(8, 130, 183); /* Толщина, стиль и цвет */
+}
+.fill, .fill-double {
+    background-color: rgb(28, 170, 231);
+}
+.easy-basket-filter-info p,.easy-basket-filter-info-double p, .easy-basket-filter-info input, .easy-basket-filter-info-double input{
+    color: white;
+    background-color: rgb(28, 170, 231);
+}
+input[type=range]::-webkit-slider-thumb {
+    border: 5px solid #f1f1f1;
+    box-shadow: 0 1px 5px -1px rgba(0, 0, 0, 0.5);
+    background: rgb(28, 170, 231);
+}
+input[type=range]::-webkit-slider-runnable-track, input[type=range].lower-double::-webkit-slider-runnable-track  {
+    background: #707D7D;
+}
+.blink-bad{
+    background-color: red;
+}
+.blink-good{
+    background-color: green;
+}
