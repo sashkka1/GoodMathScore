@@ -519,7 +519,7 @@ function keyboardClick(value){
             }else{
                 setExample();
             }
-        } else{
+        }else{
             mistake++;
             blink('example-answer-block','red')
         }
