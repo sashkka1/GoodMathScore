@@ -205,13 +205,15 @@ body{
 
 
 
-
 @media (min-width: 992px) {
     .cssmain1{
         font-size: 2vw;
     }
     .cssmain2{
         font-size: 3vw;
+    }
+    .forPSize{
+        font-size: 2vw;
     }
     .back-to-home{
         width: 70px;
@@ -224,6 +226,9 @@ body{
     .cssmain2{
         font-size: 4vw;
     }
+    .forPSize{
+        font-size: 2.5vw;
+    }
 }
 @media (max-width: 780px) {
     .cssmain1{
@@ -231,6 +236,9 @@ body{
     }
     .cssmain2{
         font-size: 5vw;
+    }
+    .forPSize{
+        font-size: 3vw;
     }
     .back-to-home{
         width: 60px;
@@ -243,6 +251,9 @@ body{
     .cssmain2{
         font-size: 6vw;
     }
+    .forPSize{
+        font-size: 4vw;
+    }
     .back-to-home{
         width: 11vw;
     }
@@ -253,6 +264,9 @@ body{
     }
     .cssmain2{
         font-size: 7vw;
+    }
+    .forPSize{
+        font-size: 4.5vw;
     }
     .choice input{
         height: 5vh;
@@ -269,6 +283,9 @@ body{
     .cssmain2{
         font-size: 8vw;
     }
+    .forPSize{
+        font-size: 5.5vw;
+    }
     .choice input{
         height: 5.5vh;
         width: 5.5vw;
@@ -277,8 +294,6 @@ body{
         width: 15vw;
     }
 }
-
-
 .easy-basket-filter {
     width: 50%;
     position: relative;
@@ -310,10 +325,16 @@ body{
 .easy-basket-filter-info .iLower{
     float:left;
     display: inline-block;
+    min-height: 4.5vh;
+    width: 40px;
+    position: relative;
 }
 .easy-basket-filter-info .iUpper{
     float:right;
     display: inline-block;
+    min-height: 4.5vh;
+    width: 40px;
+    position: relative;
 }
 .easy-basket-filter-info input{
     width: inherit;
@@ -321,7 +342,9 @@ body{
     color: #fff;
     /* font: 11px Open Sans; */
     background-color: rgb(28, 170, 231);
-    width: 30px;
+    /* width: 40px; */
+    position: absolute;
+    bottom: 0;
     text-align:center;
 }
 /***** Position dual *****/
@@ -437,10 +460,16 @@ input[type=range].lower::-webkit-slider-runnable-track {
 .easy-basket-filter-info-double .iLower-double{
     float:left;
     display: inline-block;
+    min-height: 4.5vh;
+    width: 40px;
+    position: relative;
 }
 .easy-basket-filter-info-double .iUpper-double{
     float:right;
     display: inline-block;
+    min-height: 4.5vh;
+    width: 40px;
+    position: relative;
 }
 .easy-basket-filter-info-double input{
     width: inherit;
@@ -448,8 +477,10 @@ input[type=range].lower::-webkit-slider-runnable-track {
     color: #fff;
     /* font: 11px Open Sans; */
     background-color: rgb(28, 170, 231);
-    width: 30px;
+    /* width: 40px; */
     text-align:center;
+    position: absolute;
+    bottom: 0;
 }
 /***** Position dual *****/
 .range-double {
