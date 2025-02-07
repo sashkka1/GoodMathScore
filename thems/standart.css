@@ -1,13 +1,62 @@
+.main1,.choice input[type="checkbox"],.main2,.example-answer{
+    background-color: rgb(234, 234, 234);
+}
 .main1{
+    color: black;
+}
+.different-theme,.choice input[type="checkbox"]:checked,button,.fill,.fill-double,.easy-basket-filter-info p,.easy-basket-filter-info-double p, .easy-basket-filter-info input, .easy-basket-filter-info-double input,input[type=range]::-webkit-slider-thumb {
+    background-color: rgb(28, 170, 231);
+}
+.choice input[type="checkbox"]{
+    border-color: black; 
+}
+.choice input[type="checkbox"]:checked{
+    border-color: rgb(28, 170, 231);
+}
+button,.example-answer{
+    box-shadow: 0px 1px 4px  rgb(92, 92, 92);
+}
+button,.easy-basket-filter-info p,.easy-basket-filter-info-double p, .easy-basket-filter-info input, .easy-basket-filter-info-double input{
+    color: white;
+}
+button:active{
+    background-color: rgb(18, 108, 146);
+}
+.main2{
+    color: rgb(8, 130, 183);
+}
+input[type=range]::-webkit-slider-thumb {
+    border-color:white;
+    box-shadow: 0 1px 5px -1px rgba(0, 0, 0, 0.5);
+}
+input[type=range]::-webkit-slider-runnable-track, input[type=range].lower-double::-webkit-slider-runnable-track  {
+    background-color: #707D7D;
+}
+.blink-bad{
+    background-color: red;
+}
+.blink-good{
+    background-color: green;
+}
+
+
+
+
+
+
+/* .main1{
     background-color: rgb(234, 234, 234);
     color: black;
 }
+.different-theme{
+    background-color: rgb(28, 170, 231);
+}
 .choice input[type="checkbox"]{
     border: 1px solid #000;
-    background-color: rgb(234, 234, 234); /* Цвет заливки в открытом состоянии */
+    background-color: rgb(234, 234, 234); 
 }
 .choice input[type="checkbox"]:checked{
-    background-color: rgb(28, 170, 231); /* Зеленая заливка */
+    background-color: rgb(28, 170, 231); 
     border-color: rgb(28, 170, 231);
 }
 button{
@@ -23,7 +72,7 @@ button:active {
     color: rgb(8, 130, 183);
 }
 .example-answer{
-    border-bottom: 1px solid rgb(8, 130, 183); /* Толщина, стиль и цвет */
+    box-shadow: 0px 1px 4px  rgb(92, 92, 92); 
 }
 .fill, .fill-double {
     background-color: rgb(28, 170, 231);
@@ -45,4 +94,4 @@ input[type=range]::-webkit-slider-runnable-track, input[type=range].lower-double
 }
 .blink-good{
     background-color: green;
-}
+} */

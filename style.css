@@ -12,7 +12,6 @@
 }
 
 
-
 body{
     width: 100vw;
     height: 100vh;
@@ -29,13 +28,64 @@ body{
     flex-direction: column;
 }
 
-
+.header1{
+    width: 95vw;
+    height: 10vh;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 .win-message{
-    width: 80vw;
+    width: 100%;
     height: 10vh;
     display: flex;
     justify-content: center;
     align-items: end;
+}
+.different-theme{
+    height: 7vh;
+    aspect-ratio: 1 / 1;
+    border-radius: 1vw;
+}
+.different-theme-block{
+    width: 0;
+    height: 100%;
+    position: absolute;
+    right: 0;
+    transition-duration: 0.4s;
+    z-index: 10;
+}
+.conteiner{
+    position: absolute;
+    overflow: hidden;
+    width: 0;
+    right: calc(7vh + 2.5vw);
+    height: 10vh;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    transition-duration: 0.4s;
+}
+.black, .red, .green, .standart{
+    height: 7vh;
+    aspect-ratio: 1 / 1;
+    transition-duration: 0.4s;
+}
+.black{
+    background-color: black;
+}
+.green{
+    background-color: green;
+    border-top-right-radius: 1vw;
+    border-bottom-right-radius: 1vw;
+}
+.red{
+    background-color: red;
+}
+.standart{
+    border-top-left-radius: 1vw;
+    border-bottom-left-radius: 1vw;
+    background-color: rgb(28, 170, 231);;
 }
 
 .choice{
@@ -58,6 +108,8 @@ body{
     border-radius: 1vw;
 }
 .choice input[type="checkbox"]{
+    border: 1px solid;
+    /* border-color: black; */
     /* background-color: rgb(234, 234, 234); */
 }
 .choice input[type="checkbox"]:checked{
@@ -189,16 +241,13 @@ body{
     position: relative;
     display: flex;
     justify-content: center;
+    align-items: center;
     /* border-bottom: 1px solid rgb(8, 130, 183); */
     width: 40vw;
     height: 6vh;
-    background-color: rgb(240, 240, 240);
-    box-shadow: 0px 1px 4px  rgb(92, 92, 92); 
+    /* background-color: rgb(240, 240, 240);
+    box-shadow: 0px 1px 4px  rgb(92, 92, 92);  */
     border-radius: 5px;  
-}
-.example-answer p{
-    position: absolute;
-    bottom: 0;
 }
 
 
@@ -380,6 +429,7 @@ input[type=range] {
 }
 
 input[type=range]::-webkit-slider-thumb {
+    border: 5px solid;
     -webkit-appearance: none;
     cursor: pointer;
     position: relative;

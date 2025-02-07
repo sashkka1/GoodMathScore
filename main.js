@@ -16,12 +16,14 @@ var buttonStop = document.getElementById('button-stop');
 var buttonReset = document.getElementById('button-reset');
 var Interval ;
 
-// document.getElementById('different-color').addEventListener('click', () => { differentColor();});
+// открытие и закрытие блока с цветовыми темами, а так же ловню вбор пользователя насчет темы
+document.getElementById('different-theme').addEventListener('click', () => { differentTheme('open');});
+document.getElementById('different-theme-block').addEventListener('click', () => {differentTheme('close'); });
+document.getElementById('standart').addEventListener('click', () => { themeChange('standart');});
+document.getElementById('black').addEventListener('click', () => { themeChange('black');});
+document.getElementById('green').addEventListener('click', () => { themeChange('green');});
+document.getElementById('red').addEventListener('click', () => { themeChange('red');});
 
-// function differentColor(){
-//     console.log('asdasd');
-//     document.getElementById('theme').href = "./thems/standart.css";
-// }
 // при нажатии на чекбокс вызываю проверку есть ли хоть один закрытый чекбокс
 document.getElementById('checkbox+').addEventListener('click', () => { checkChekBox(document.getElementById('checkbox+').value);});
 document.getElementById('checkbox-').addEventListener('click', () => { checkChekBox(document.getElementById('checkbox-').value);});
@@ -665,6 +667,21 @@ function checkChekBox(value){ // проверка есть ли хоть оди�
     }
 }
 
+function differentTheme(value){ // выдвижение блока с цветавыми темами
+    if(value =='close'){
+        document.getElementById('conteiner').style.width = '0';
+        document.getElementById('different-theme-block').style.width = '0';
+    }else if(value =='open'){
+        document.getElementById('conteiner').style.width = '28vh';
+        document.getElementById('different-theme-block').style.width = '100vw';
+    }
+}
+function themeChange(color){
+    event.stopPropagation(); // Останавливаем обработку для родительского блока при клике на обьект
+    localStorage.setItem('userTheme', color);
+    document.getElementById('theme').href = `./thems/${color}.css`;
+}
+
 
 
 
@@ -672,7 +689,11 @@ function checkChekBox(value){ // проверка есть ли хоть оди�
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
     window.Telegram.WebApp.expand();
     window.Telegram.WebApp.disableVerticalSwipes();
-    document.getElementById('theme').href = "./thems/standart.css";
+    if(localStorage.getItem('userTheme') == null || localStorage.getItem('userTheme') === undefined || localStorage.getItem('userTheme') === "" ){
+        localStorage.setItem('userTheme', 'standart');
+    }else{
+        document.getElementById('theme').href = `./thems/${localStorage.getItem('userTheme')}.css`;
+    }
     // window.Telegram.WebApp.CloudStorage.getItem("values", (err,test) => {
         let test = localStorage.getItem('values');
         let checkboxes = document.querySelectorAll('input[type="checkbox"]');
