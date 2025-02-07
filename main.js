@@ -691,6 +691,7 @@ document.addEventListener('DOMContentLoaded', () => { // первый заход
     window.Telegram.WebApp.disableVerticalSwipes();
     if(localStorage.getItem('userTheme') == null || localStorage.getItem('userTheme') === undefined || localStorage.getItem('userTheme') === "" ){
         localStorage.setItem('userTheme', 'standart');
+        document.getElementById('theme').href = `./thems/standart.css`;
     }else{
         document.getElementById('theme').href = `./thems/${localStorage.getItem('userTheme')}.css`;
     }
