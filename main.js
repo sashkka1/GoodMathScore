@@ -578,7 +578,7 @@ function keyboardClick(value){
             input.outerHTML = `<p id="example-answer"></p>`;
             blink('example-answer-block','good');
             if(score>=(+examplesCount+1)){
-                document.getElementById('win-message').outerHTML = `<p id="win-message" class="win-message ">Ошибоки: ${mistake} Время: ${document.getElementById("seconds").textContent}:${document.getElementById("tens").textContent}</p>`;
+                document.getElementById('win-message').outerHTML = `<p id="win-message" class="win-message ">Ошибки: ${mistake} Время: ${document.getElementById("seconds").textContent}:${document.getElementById("tens").textContent}</p>`;
                 fromExampleToHome();
             }else{
                 setExample();
