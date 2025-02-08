@@ -192,9 +192,6 @@ body{
     justify-content: space-between;
     align-items: center;
 }
-.back-to-home{
-    height: auto;
-}
 
 .keyboard{
     display: flex;
@@ -267,8 +264,8 @@ body{
     .forPSize{
         font-size: 2vw;
     }
-    .back-to-home{
-        width: 70px;
+    span.home{
+        font-size: 10vh;
     }
 }
 @media (max-width: 992px) {
@@ -281,6 +278,9 @@ body{
     .forPSize{
         font-size: 2.5vw;
     }
+    span.home{
+        font-size: 10vh;
+    }
 }
 @media (max-width: 780px) {
     .cssmain1{
@@ -292,8 +292,8 @@ body{
     .forPSize{
         font-size: 3vw;
     }
-    .back-to-home{
-        width: 60px;
+    span.home{
+        font-size: 10vh;
     }
 }
 @media (max-width: 650px) {
@@ -306,8 +306,8 @@ body{
     .forPSize{
         font-size: 4vw;
     }
-    .back-to-home{
-        width: 11vw;
+    span.home{
+        font-size: 10vh;
     }
 }
 @media (max-width: 570px) {
@@ -323,8 +323,8 @@ body{
     .choice input{
         width: 5vw;
     }
-    .back-to-home{
-        width: 13vw;
+    span.home{
+        font-size: 9vh;
     }
 }
 @media (max-width: 400px) {
@@ -340,8 +340,8 @@ body{
     .choice input{
         width: 5.5vw;
     }
-    .back-to-home{
-        width: 15vw;
+    span.home{
+        font-size: 8vh;
     }
 }
 

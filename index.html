@@ -8,6 +8,7 @@
     <link rel="stylesheet" id="theme" href="./style.css" /></link>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js'></script>
     <script src="https://telegram.org/js/telegram-web-app.js?v=1.0.1"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"rel="stylesheet">
 </head>
 <body>
 
@@ -19,7 +20,8 @@
             <div class="green" id="green"></div>
         </div>
     </div>
-    <div   id="main1">
+
+    <div class = "none"  id="main1">
         <div class="main1 cssmain1">
             <div class="header1">
                 <p id="win-message" class="win-message none">Количество ошибок: <br> Время: </p>
@@ -80,10 +82,13 @@
         </div>
     </div>
 
-    <div class = "none" id="main2">
+    <div  id="main2">
         <div class="main2 cssmain2">
             <div class="header">
-                <img class="back-to-home" id="back-to-home" src="./materials/back-to-main.png" alt="">
+                <div class="back-to-home" id="back-to-home">
+                    <!-- <img src="./materials/back-to-main.png" alt=""> -->
+                    <span class="material-icons home">home</span>
+                </div>
                 <div class="time">
                     <div class="wrapper-stopwath">
                         <p><span id="seconds">00</span>:<span id="tens">00</span></p>
