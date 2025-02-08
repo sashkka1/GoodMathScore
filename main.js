@@ -69,7 +69,8 @@ function fromHomeToExample() { // переход с главного экран�
     values[6]= inputLower[1].value;
     values[7]= inputLower[2].value;
     values[8]= inputLower[3].value;
-    
+    values[9]= inputLower[4].value;
+    examplesCount= values[9];
     // window.Telegram.WebApp.CloudStorage.setItem("values",values);
     localStorage.setItem('values',values);
 
@@ -78,7 +79,7 @@ function fromHomeToExample() { // переход с главного экран�
     block.classList.add('none');
     block = document.getElementById('main2');
     block.classList.remove('none');
-
+    dinamicRange();
     // закрываю сообщение о победе
     block = document.getElementById('win-message');
     block.classList.add('none');
@@ -141,7 +142,7 @@ function dinamicRange(){ // изменяет ползунки на сохран�
         let test = localStorage.getItem('values');
 
         let adapter = test.split(',');
-        let forMemery = [adapter[5],adapter[6],adapter[7],adapter[8]] 
+        let forMemery = [adapter[5],adapter[6],adapter[7],adapter[8],adapter[9]] 
         // 1valLower  2valUpper  3lower-double  4upper-double 
         // console.log('8');
         var max = $('.upper').attr('max');
@@ -249,7 +250,62 @@ function dinamicRange(){ // изменяет ползунки на сохран�
             var valUpper = $('.upper-double').val();
             $(this).val(Math.floor(valUpper));
         });
-        // console.log('9');
+
+
+
+
+
+        max = $('.upper-three').attr('max');
+        min = $('.lower-three').attr('min');
+        valLower = forMemery[4];
+        valUpper = forMemery[4];
+        if (parseFloat(valLower) > parseFloat(valUpper)) {
+            var trade = valLower;
+            valLower = valUpper;
+            valUpper = trade;
+        }
+        width = valUpper * 100 / max;
+        left = valLower * 100 / max;
+        $('.fill-three').css('left', 'calc(' + left + '%)');
+        $('.fill-three').css('width', width - left + '%');
+        
+        // Update info
+        if (parseInt(valLower) == min) {
+            $('.easy-basket-lower-three').val('5');
+        } else {
+            $('.easy-basket-lower-three').val(parseInt(valLower));
+        }
+        if (parseInt(valUpper) == max) {
+            $('.easy-basket-upper-three').val('25');
+        } else {
+            $('.easy-basket-upper-three').val(parseInt(valUpper));
+        }
+
+
+        if ( valUpper > 25 ) {
+            var left = max;
+        }
+        if ( valLower < 5 ) {
+            var left = min;
+        } else if ( valLower > max ) {
+            var left = min;
+        }
+        $('.fill-three').css('left', 'calc(' + left + '%)');
+        $('.fill-three').css('width', width - left + '%');
+        // меняем положение ползунков
+        $('.lower-three').val(valLower);
+        $('.upper-three').val(valUpper);
+        $('.easy-basket-filter-info-three p input').focus(function() {
+            $(this).val('');
+        });
+        $('.easy-basket-filter-info-three .iLower-three input').blur(function() {
+            var valLower = $('.lower-three').val();
+            $(this).val(Math.floor(valLower));
+        });
+        $('.easy-basket-filter-info-three .iUpper-three input').blur(function() {
+            var valUpper = $('.upper-three').val();
+            $(this).val(Math.floor(valUpper));
+        });
     // });
 }
 
@@ -521,8 +577,8 @@ function keyboardClick(value){
             score++;
             input.outerHTML = `<p id="example-answer"></p>`;
             blink('example-answer-block','good');
-            if(score>=(examplesCount+1)){
-                document.getElementById('win-message').outerHTML = `<p id="win-message" class="win-message ">Количество ошибок: ${mistake}<br> Время: ${document.getElementById("seconds").textContent}:${document.getElementById("tens").textContent}</p>`;
+            if(score>=(+examplesCount+1)){
+                document.getElementById('win-message').outerHTML = `<p id="win-message" class="win-message ">Ошибоки: ${mistake} Время: ${document.getElementById("seconds").textContent}:${document.getElementById("tens").textContent}</p>`;
                 fromExampleToHome();
             }else{
                 setExample();
@@ -788,7 +844,6 @@ jQuery(document).ready(function() { // код первого ползунка д
 		$(this).val(Math.floor(valUpper));
 	});
 });
-
 jQuery(document).ready(function() {  // код второго ползунка диапозона на старте
 	$('.upper-double').on('input', setFill);
 	$('.lower-double').on('input', setFill);
@@ -853,6 +908,73 @@ jQuery(document).ready(function() {  // код второго ползунка �
 	});
 	$('.easy-basket-filter-info-double .iUpper-double input').blur(function() {
 		var valUpper = $('.upper-double').val();
+		$(this).val(Math.floor(valUpper));
+	});
+});
+jQuery(document).ready(function() {  // код ползунка количества уровней
+	$('.upper-three').on('input', setFill);
+	$('.lower-three').on('input', setFill);
+
+	var max = $('.upper-three').attr('max');
+	var min = $('.lower-three').attr('min');
+
+	function setFill(evt) {
+		var valUpper = $('.upper-three').val();
+		var valLower = $('.lower-three').val();
+		if (parseFloat(valLower) > parseFloat(valUpper)) {
+			var trade = valLower;
+			valLower = valUpper;
+			valUpper = trade;
+		}
+		
+		var width = valUpper * 100 / max;
+		var left = valLower * 100 / max;
+		$('.fill-three').css('left', 'calc(' + left + '%)');
+		$('.fill-three').css('width', width - left + '%');
+		
+		// Update info
+		if (parseInt(valLower) == min) {
+			$('.easy-basket-lower-three').val('5');
+		} else {
+			$('.easy-basket-lower-three').val(parseInt(valLower));
+		}
+		// if (parseInt(valUpper) == max) {
+		// 	$('.easy-basket-upper-three').val('25');
+		// } else {
+		// 	$('.easy-basket-upper-three').val(parseInt(valUpper));
+		// }
+		$('.histogram-list li').removeClass('ui-histogram-active');
+	}
+	
+	// изменяем диапазон цен вручную
+	$('.easy-basket-filter-info-three p input').keyup(function() {
+		var valUpper = $('.easy-basket-upper-three').val();
+		var valLower = $('.easy-basket-lower-three').val();
+		var width = valUpper * 100 / max;
+		var left = valLower * 100 / max;
+		if ( valUpper > 25 ) {
+			var left = max;
+		}
+		if ( valLower < 5 ) {
+			var left = min;
+		} else if ( valLower > max ) {
+			var left = min;
+		}
+		$('.fill-three').css('left', 'calc(' + left + '%)');
+		$('.fill-three').css('width', width - left + '%');
+		// меняем положение ползунков
+		$('.lower-three').val(valLower);
+		$('.upper-three').val(valUpper);
+	});
+	$('.easy-basket-filter-info-three p input').focus(function() {
+		$(this).val('');
+	});
+	$('.easy-basket-filter-info-three .iLower-three input').blur(function() {
+		var valLower = $('.lower-three').val();
+		$(this).val(Math.floor(valLower));
+	});
+	$('.easy-basket-filter-info-three .iUpper-three input').blur(function() {
+		var valUpper = $('.upper-three').val();
 		$(this).val(Math.floor(valUpper));
 	});
 });
