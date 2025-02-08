@@ -545,7 +545,7 @@ function setExample(){ // создаю пример и вывожу на экр�
     numberOne = 0;
     numberTwo = 0;
     let symbol;
-    let symbolArray = ['+', '-', '*', '/',];
+    let symbolArray = ['+', '−', '⋅', '∶',];
     // window.Telegram.WebApp.CloudStorage.getItem("values", (err,test) => {
         // values = test.split(',');
         values = localStorage.getItem('values').split(',');
@@ -676,6 +676,7 @@ function differentTheme(value){ // выдвижение блока с цвета
         document.getElementById('different-theme-block').style.width = '100vw';
     }
 }
+
 function themeChange(color){
     event.stopPropagation(); // Останавливаем обработку для родительского блока при клике на обьект
     localStorage.setItem('userTheme', color);

@@ -3,6 +3,7 @@
 }
 .main1{
     color: black;
+    /* color: rgb(28, 170, 231); */
 }
 .different-theme,.choice input[type="checkbox"]:checked,button,.fill,.fill-double,.easy-basket-filter-info p,.easy-basket-filter-info-double p, .easy-basket-filter-info input, .easy-basket-filter-info-double input,input[type=range]::-webkit-slider-thumb {
     background-color: rgb(28, 170, 231);
@@ -23,7 +24,8 @@ button:active{
     background-color: rgb(18, 108, 146);
 }
 .main2{
-    color: rgb(8, 130, 183);
+    /* color: rgb(28, 170, 231); */
+    color: rgb(12, 154, 215);
 }
 input[type=range]::-webkit-slider-thumb {
     border-color:white;

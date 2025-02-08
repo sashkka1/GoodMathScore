@@ -22,7 +22,7 @@ body{
     width: 100vw;
     height: 100vh;
     /* background-color: rgb(234, 234, 234); */
-
+    /* font-weight: 550; */
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -87,7 +87,6 @@ body{
     border-bottom-left-radius: 1vw;
     background-color: rgb(28, 170, 231);;
 }
-
 .choice{
     width: 80vw;
     height: 15vh;
@@ -193,38 +192,6 @@ body{
     align-items: center;
 }
 
-.keyboard{
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    flex-wrap: wrap;
-    width: 100%;
-    height: 40%;
-    /* position: absolute; */
-    margin-bottom: 2%;
-}
-.keyboard button{
-    width: 30%;
-    height: 21%;
-    /* display: flex; */
-    /* text-align: center; */
-    margin: 3px;
-    border-radius: 5px;
-    /* box-shadow: 0px 1px 4px  rgb(92, 92, 92);
-    background-color: rgb(28, 170, 231);
-    color: white; */
-    font-weight: 600;
-    transition-duration: 0.4s;
-}
-
-.keyboard button:active {
-    transition-duration: 0.4s;
-    /* background-color: rgb(18, 108, 146); */
-}
-.keyboard img{
-    height: 4.5vh;
-}
-
 .example-block{
     /* background-color: aliceblue; */
     height: 15vh;
@@ -247,6 +214,38 @@ body{
     border-radius: 5px;  
 }
 
+.keyboard{
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    width: 100%;
+    height: 40%;
+    margin-bottom: 2%;
+}
+.keyboard button{
+    width: 30%;
+    height: 21%;
+    margin: 3px;
+    border-radius: 5px;
+    /* box-shadow: 0px 1px 4px  rgb(92, 92, 92);
+    background-color: rgb(28, 170, 231);
+    color: white; */
+    font-weight: 600;
+    transition-duration: 0.4s;
+}
+
+.keyboard button:active {
+    transition-duration: 0.4s;
+    /* background-color: rgb(18, 108, 146); */
+}
+.keyboard .cssmain2{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
 
 
 
@@ -267,6 +266,9 @@ body{
     span.home{
         font-size: 10vh;
     }
+    span.keyboard-circle{
+        font-size: 5vw;
+    }
 }
 @media (max-width: 992px) {
     .cssmain1{
@@ -280,6 +282,9 @@ body{
     }
     span.home{
         font-size: 10vh;
+    }
+    span.keyboard-circle{
+        font-size: 5vw;
     }
 }
 @media (max-width: 780px) {
@@ -295,6 +300,9 @@ body{
     span.home{
         font-size: 10vh;
     }
+    span.keyboard-circle{
+        font-size: 7vw;
+    }
 }
 @media (max-width: 650px) {
     .cssmain1{
@@ -308,6 +316,9 @@ body{
     }
     span.home{
         font-size: 10vh;
+    }
+    span.keyboard-circle{
+        font-size: 8vw;
     }
 }
 @media (max-width: 570px) {
@@ -326,6 +337,9 @@ body{
     span.home{
         font-size: 9vh;
     }
+    span.keyboard-circle{
+        font-size: 9vw;
+    }
 }
 @media (max-width: 400px) {
     .cssmain1{
@@ -342,6 +356,9 @@ body{
     }
     span.home{
         font-size: 8vh;
+    }
+    span.keyboard-circle{
+        font-size: 10vw;
     }
 }
 
