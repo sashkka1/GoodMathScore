@@ -20,7 +20,7 @@ var Interval ;
 document.getElementById('different-theme').addEventListener('click', () => { differentTheme('open');});
 document.getElementById('different-theme-block').addEventListener('click', () => {differentTheme('close'); });
 document.getElementById('standart').addEventListener('click', () => { themeChange('standart');});
-document.getElementById('black').addEventListener('click', () => { themeChange('black');});
+document.getElementById('dark').addEventListener('click', () => { themeChange('dark');});
 document.getElementById('green').addEventListener('click', () => { themeChange('green');});
 document.getElementById('red').addEventListener('click', () => { themeChange('red');});
 

@@ -42,6 +42,20 @@ input[type=range]::-webkit-slider-runnable-track, input[type=range].lower-double
 }
 
 
+.dark{
+    background-color: #2f2f2f;
+}
+.green{
+    background-color: green;
+}
+.red{
+    background-color: red;
+}
+.standart{
+    background-color: rgb(28, 170, 231);;
+}
+
+
 
 
 

@@ -66,26 +66,26 @@ body{
     align-items: center;
     transition-duration: 0.4s;
 }
-.black, .red, .green, .standart{
+.dark, .red, .green, .standart{
     height: 7vh;
     aspect-ratio: 1 / 1;
     transition-duration: 0.4s;
 }
-.black{
-    background-color: black;
+.dark{
+    /* background-color: black; */
 }
 .green{
-    background-color: green;
+    /* background-color: green; */
     border-top-right-radius: 1vw;
     border-bottom-right-radius: 1vw;
 }
 .red{
-    background-color: red;
+    /* background-color: red; */
 }
 .standart{
     border-top-left-radius: 1vw;
     border-bottom-left-radius: 1vw;
-    background-color: rgb(28, 170, 231);;
+    /* background-color: rgb(28, 170, 231); */
 }
 .choice{
     width: 80vw;
