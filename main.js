@@ -21,8 +21,8 @@ document.getElementById('different-theme').addEventListener('click', () => { dif
 document.getElementById('different-theme-block').addEventListener('click', () => {differentTheme('close'); });
 document.getElementById('standart').addEventListener('click', () => { themeChange('standart');});
 document.getElementById('dark').addEventListener('click', () => { themeChange('dark');});
-document.getElementById('green').addEventListener('click', () => { themeChange('green');});
-document.getElementById('red').addEventListener('click', () => { themeChange('red');});
+// document.getElementById('green').addEventListener('click', () => { themeChange('green');});
+// document.getElementById('red').addEventListener('click', () => { themeChange('red');});
 
 // при нажатии на чекбокс вызываю проверку есть ли хоть один закрытый чекбокс
 document.getElementById('checkbox+').addEventListener('click', () => { checkChekBox(document.getElementById('checkbox+').value);});
