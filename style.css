@@ -101,7 +101,7 @@ body{
 }
 .choice input{
     appearance: none; /* Убираем стандартное оформление */
-    width: 4vw;
+    width: 6vw;
     aspect-ratio: 1 / 1;
     /* border: 1px solid #000; */
     border-radius: 1vw;
@@ -332,7 +332,7 @@ body{
         font-size: 4.5vw;
     }
     .choice input{
-        width: 5vw;
+        width: 6vw;
     }
     span.home{
         font-size: 9vh;
@@ -352,7 +352,7 @@ body{
         font-size: 5.5vw;
     }
     .choice input{
-        width: 5.5vw;
+        width: 7vw;
     }
     span.home{
         font-size: 8vh;

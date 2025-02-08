@@ -8,7 +8,7 @@
     background-color: #2f2f2f;
 }
 .choice input[type="checkbox"]{
-    /* border-color: #8e8e8e;  */
+    border-color: #2d2d2d; 
 }
 .choice input[type="checkbox"]:checked{
     border-color: #1E1E1E;
