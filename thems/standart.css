@@ -5,11 +5,11 @@
     color: black;
     /* color: rgb(28, 170, 231); */
 }
-.different-theme,.choice input[type="checkbox"]:checked,button,.fill,.fill-double,.easy-basket-filter-info p,.easy-basket-filter-info-double p,.easy-basket-filter-info-three p, .easy-basket-filter-info input, .easy-basket-filter-info-double input, .easy-basket-filter-info-three input, input[type=range]::-webkit-slider-thumb {
-    background-color: rgb(28, 170, 231);
-}
 .choice input[type="checkbox"]{
     border-color: black; 
+}
+.different-theme,.choice input[type="checkbox"]:checked,button,.fill,.fill-double,.easy-basket-filter-info p,.easy-basket-filter-info-double p,.easy-basket-filter-info-three p, .easy-basket-filter-info input, .easy-basket-filter-info-double input, .easy-basket-filter-info-three input, input[type=range]::-webkit-slider-thumb {
+    background-color: rgb(28, 170, 231);
 }
 .choice input[type="checkbox"]:checked{
     border-color: rgb(28, 170, 231);
