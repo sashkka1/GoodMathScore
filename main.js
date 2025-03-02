@@ -9,8 +9,8 @@ let numberOne,numberTwo,answer;
 //для таймера вводные
 var seconds = 0; 
 var tens = 0; 
-var appendTens = document.getElementById("tens")
-var appendSeconds = document.getElementById("seconds")
+var appendTens = document.getElementById("tens");
+var appendSeconds = document.getElementById("seconds");
 var buttonStart = document.getElementById('button-start');
 var buttonStop = document.getElementById('button-stop');
 var buttonReset = document.getElementById('button-reset');
@@ -85,10 +85,8 @@ function fromHomeToExample() { // переход с главного экран�
     block.classList.add('none');
 
     // запускаю время если пользователь это отметил
-    if(values[4] == "true" || values[4] == true){
-        clearInterval(Interval);
-        Interval = setInterval(startTimer, 10);
-    }
+    clearInterval(Interval);
+    Interval = setInterval(startTimer, 10);
 
     // обнуляю масив примеров, ошибки и количество примеров перед новой итерацией
     examples =[]; 
@@ -127,8 +125,8 @@ function fromExampleToHome() {// переход с экранв с пирмер�
 
     // обнуляю таймер
     clearInterval(Interval);
-    tens = "00";
-    seconds = "00";
+    tens = "";
+    seconds = "";
     appendTens.innerHTML = tens;
     appendSeconds.innerHTML = seconds;
 
@@ -543,25 +541,32 @@ max = $('.upper-double').attr('max');
 
 function startTimer () { // реализация таймера
     tens++; 
-
-    if(tens <= 9){
-        appendTens.innerHTML = "0" + tens;
-    }
+    // if(tens <= 9){
+    //     appendTens.innerHTML = "0" + tens;
+    // }
     
-    if (tens > 9){
-        appendTens.innerHTML = tens;
+    // if (tens > 9){
+    //     appendTens.innerHTML = tens;
         
-    } 
-    
+    // } 
+    if(values[4] == "true" || values[4] == true){
+        if(seconds == 0|| seconds == 'none'){
+            appendSeconds.innerHTML = "00";
+        }
+    }
     if (tens > 99) {
         seconds++;
-        appendSeconds.innerHTML = "0" + seconds;
+        if(values[4] == "true" || values[4] == true){
+            appendSeconds.innerHTML = "0" + seconds;
+        }
         tens = 0;
-        appendTens.innerHTML = "0" + 0;
+        // appendTens.innerHTML = "0" + 0;
     }
 
     if (seconds > 9){
-    appendSeconds.innerHTML = seconds;
+        if(values[4] == "true" || values[4] == true){
+            appendSeconds.innerHTML = seconds;
+        }
     }
 
 }
@@ -578,7 +583,19 @@ function keyboardClick(value){
             input.outerHTML = `<p id="example-answer"></p>`;
             blink('example-answer-block','good');
             if(score>=(+examplesCount+1)){
-                document.getElementById('win-message').outerHTML = `<p id="win-message" class="win-message ">Ошибки: ${mistake} <br> Время: ${document.getElementById("seconds").textContent}:${document.getElementById("tens").textContent}</p>`;
+                let a;
+                if(tens <= 9){
+                    a = "0" + tens;
+                }else{
+                    a=tens;
+                }
+                let b;
+                if (seconds <= 9){
+                    b = "0" + seconds;
+                }else{
+                    b = seconds;
+                }
+                document.getElementById('win-message').outerHTML = `<p id="win-message" class="win-message ">Ошибки: ${mistake} <br> Время: ${b}:${a}</p>`;
                 fromExampleToHome();
             }else{
                 setExample();
