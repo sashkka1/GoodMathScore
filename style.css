@@ -1,4 +1,5 @@
 *{
+    user-select: none;
     padding: 0;
     margin: 0;
     border: 0;
@@ -28,8 +29,6 @@ body{
     align-items: center;
     flex-direction: column;
     justify-content: center;
-    /* background-color: rgb(181, 181, 181);
-    opacity: 50%; */
 }
 .statistic-block{
     width: 85vw;

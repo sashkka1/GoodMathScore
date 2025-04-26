@@ -104,7 +104,7 @@ function fromHomeToExample() { // переход с главного экран�
     values[7]= inputLower[2].value;
     values[8]= inputLower[3].value;
     values[9]= inputLower[4].value;
-    examplesCount= values[9];
+    examplesCount = values[9];
     localStorage.setItem('values',values);
 
     // меняю экраны между собой
