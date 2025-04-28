@@ -161,8 +161,8 @@ function fromExampleToHome() {// переход с экрана с пирмер�
             stats = statsArray;
         }else{
             console.log('in2', stats);
-            stats = JSON.parse(stats);
-            console.log('вывод сохраненного и преобразованного массива');
+            // stats = JSON.parse(stats);
+            console.log('вывод сохраненного ');
             if(stats[0]!= monthIndex){
                 console.log('in21', stats);
                 for(let i=1;i<=daysInMonth;i++){
@@ -182,15 +182,9 @@ function fromExampleToHome() {// переход с экрана с пирмер�
             
             console.log('вывод сохраненного и преобразованного массива');
         }
-        window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(statsArray));
+        window.Telegram.WebApp.CloudStorage.setItem("stats", stats);
 
     });
-    function arrayToSet(){
-
-    }
-    function arrayToGet(){
-        
-    }
     // for(let i=0;i<this._allCards.length;i++){// преобразование в массив для сохранение в облако 
     //     if( this._allCards[i].v == true){this._allCards[i].visible = true }
     //     let a = [this._allCards[i].v, this._allCards[i].p, this._allCards[i].i, this._allCards[i].in];
@@ -837,10 +831,18 @@ function themeChange(color){
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
     
+    // for(let i=1;i<=daysInMonth;i++){
+    //     statsArray[i]= [0,0,0];
+    // };    
+    // statsArray[0] = monthIndex;
+    // statsArray[currentDay][0] = (seconds+(tens*0.01));
+    // statsArray[currentDay][1] = examplesCount;
+    // statsArray[currentDay][2] = mistake;
+    // let stats = statsArray;
 
-// tens =40;
-// seconds=99;
-//     console.log('количество времени', (tens+(seconds*0.01)));
+    // console.log('1', stats);
+    // console.log('2', JSON.stringify(stats));
+    // console.log('23', JSON.parse(stats));
 
     // console.log("Количество дней в месяце:", stats);
     window.Telegram.WebApp.expand();
