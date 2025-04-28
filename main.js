@@ -179,7 +179,7 @@ function fromExampleToHome() {// переход с экрана с пирмер�
                 stats[currentDay][1] += examplesCount;
                 stats[currentDay][2] += mistake;
             }   
-            
+            console.log('in2', stats);
             console.log('вывод сохраненного и преобразованного массива');
         }
         window.Telegram.WebApp.CloudStorage.setItem("stats", stats);
