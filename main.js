@@ -162,7 +162,7 @@ function fromExampleToHome() {// переход с экрана с пирмер�
         }else{
             console.log('in2', stats);
             // stats = JSON.parse(stats);
-            console.log('вывод сохраненного ');
+            console.log('вывод сохраненного ',stats[0]);
             if(stats[0]!= monthIndex){
                 console.log('in21', stats);
                 for(let i=1;i<=daysInMonth;i++){
@@ -178,7 +178,7 @@ function fromExampleToHome() {// переход с экрана с пирмер�
                 stats[currentDay][0] += (seconds+(tens*0.01));
                 stats[currentDay][1] += examplesCount;
                 stats[currentDay][2] += mistake;
-            }
+            }   
             
             console.log('вывод сохраненного и преобразованного массива');
         }
