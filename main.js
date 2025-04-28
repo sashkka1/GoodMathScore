@@ -148,6 +148,7 @@ function fromExampleToHome() {// переход с экрана с пирмер�
     window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
         // let count = localStorage.getItem("countWin");
         // count =0;
+        stats = JSON.parse(stats);
         console.log('in', stats);
         if (stats === null || stats === undefined || stats === "") {
             console.log('in1', stats);
@@ -161,7 +162,6 @@ function fromExampleToHome() {// переход с экрана с пирмер�
             stats = statsArray;
         }else{
             console.log('in2', stats);
-            // stats = JSON.parse(stats);
             console.log('вывод сохраненного ',stats[0]);
             if(stats[0]!= monthIndex){
                 console.log('in21', stats);
@@ -182,8 +182,9 @@ function fromExampleToHome() {// переход с экрана с пирмер�
             console.log('in2', stats);
             console.log('вывод сохраненного и преобразованного массива');
         }
-        window.Telegram.WebApp.CloudStorage.setItem("stats", stats);
-
+        window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
+        // console.log('2', JSON.stringify(stats));
+        // console.log('23', JSON.parse(stats));
     });
     // for(let i=0;i<this._allCards.length;i++){// преобразование в массив для сохранение в облако 
     //     if( this._allCards[i].v == true){this._allCards[i].visible = true }
@@ -830,7 +831,8 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    
+    let a;
+    window.Telegram.WebApp.CloudStorage.setItem("stats", a);
     // for(let i=1;i<=daysInMonth;i++){
     //     statsArray[i]= [0,0,0];
     // };    
@@ -841,6 +843,7 @@ document.addEventListener('DOMContentLoaded', () => { // первый заход
     // let stats = statsArray;
 
     // console.log('1', stats);
+    // stats = JSON.stringify(stats);
     // console.log('2', JSON.stringify(stats));
     // console.log('23', JSON.parse(stats));
 
