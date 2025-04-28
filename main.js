@@ -143,19 +143,14 @@ function fromExampleToHome() {// переход с экрана с пирмер�
     block.classList.remove('none');
     block = document.getElementById('main2');
     block.classList.add('none');
-
-    console.log('количество ошибок', mistake);
-    console.log('количество примеров', examplesCount);
-    console.log('time',seconds,tens)
-    console.log('количество времени', (seconds+(tens*0.01)));
-
     
     // сохраняю результаты в облако
     window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
         // let count = localStorage.getItem("countWin");
         // count =0;
-
+        console.log('in', stats);
         if (stats === null || stats === undefined || stats === "") {
+            console.log('in1', stats);
             for(let i=1;i<=daysInMonth;i++){
                 statsArray[i]= [0,0,0];
             };    
@@ -165,9 +160,11 @@ function fromExampleToHome() {// переход с экрана с пирмер�
             statsArray[currentDay][2] = mistake;
             stats = statsArray;
         }else{
+            console.log('in2', stats);
             stats = JSON.parse(stats);
             console.log('вывод сохраненного и преобразованного массива');
             if(stats[0]!= monthIndex){
+                console.log('in21', stats);
                 for(let i=1;i<=daysInMonth;i++){
                     statsArray[i]= [0,0,0];
                 };    
@@ -177,6 +174,7 @@ function fromExampleToHome() {// переход с экрана с пирмер�
                 statsArray[currentDay][2] = mistake;
                 stats = statsArray;
             }else{
+                console.log('in22', stats);
                 stats[currentDay][0] += (seconds+(tens*0.01));
                 stats[currentDay][1] += examplesCount;
                 stats[currentDay][2] += mistake;
