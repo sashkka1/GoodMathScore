@@ -4,28 +4,7 @@ let examples =[];
 let score = 1, mistake =0,examplesCount=10;
 let block;
 let numberOne,numberTwo,answer;
-    // window.Telegram.WebApp.CloudStorage.getItem("values", (err,test) => {
-        // for(let i=0;i<this._allCards.length;i++){// преобразование в массив для сохранение в облако 
-        //     if( this._allCards[i].v == true){this._allCards[i].visible = true }
-        //     let a = [this._allCards[i].v, this._allCards[i].p, this._allCards[i].i, this._allCards[i].in];
-        //     b[f] = a;
-        //     f++;
-        //   }
-        //   if(whatChange == "stock"){ // только когда перемещение было с стока открываем последнюю карту дискрад
-        //     let asdf = this.placeIdToCardArray['discard'];
-        //     if((this.placeIdToCardArray['discard'].length-1) >=0){
-        //       for(let i=0;i<this._allCards.length;i++){
-        //         if(this._allCards[i] == asdf[asdf.length-1]){
-        //           b[i][0] = true;
-        //         }
-        //       }
-        //     }
-        //   }
-        //   if(whatChange == "table"){
-        //   window.Telegram.WebApp.CloudStorage.setItem("saveCard", JSON.stringify(b));
-          // localStorage.setItem("saveCard", JSON.stringify(b));
-    // });
-        // values = test.split(',');
+
 
 //для таймера вводные
 var seconds = 0; 
@@ -36,6 +15,16 @@ var buttonStart = document.getElementById('button-start');
 var buttonStop = document.getElementById('button-stop');
 var buttonReset = document.getElementById('button-reset');
 var Interval;
+
+// Текущий день месяца
+let currentDay = new Date().getDate();
+// Количество дней в текущем месяце
+let daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();   
+// индекст текущего месяцы
+let monthIndex = new Date().getMonth();
+// массив для сохранения в облако
+let statsArray =[]; //0(время), 1(количество решенных примеров), 2(количество ошибок)
+
 
 // ловлю нажатие на кнопку статистики
 document.getElementById('statistic').addEventListener('click', () => { 
@@ -89,6 +78,7 @@ document.getElementById('number-9').addEventListener('click', () => { keyboardCl
 document.getElementById('number-0').addEventListener('click', () => { keyboardClick(document.getElementById('number-0').value);});
 document.getElementById('number-enter').addEventListener('click', () => { keyboardClick(document.getElementById('number-enter').value);});
 document.getElementById('number-delete').addEventListener('click', () => { keyboardClick(document.getElementById('number-delete').value);});
+
 
 
 function fromHomeToExample() { // переход с главного экрана на экран с пирмером
@@ -153,6 +143,66 @@ function fromExampleToHome() {// переход с экрана с пирмер�
     block.classList.remove('none');
     block = document.getElementById('main2');
     block.classList.add('none');
+
+    console.log('количество ошибок', mistake);
+    console.log('количество примеров', examplesCount);
+    console.log('time',seconds,tens)
+    console.log('количество времени', (seconds+(tens*0.01)));
+
+    
+    // сохраняю результаты в облако
+    window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
+        // let count = localStorage.getItem("countWin");
+        // count =0;
+
+        if (stats === null || stats === undefined || stats === "") {
+            for(let i=1;i<=daysInMonth;i++){
+                statsArray[i]= [0,0,0];
+            };    
+            statsArray[0] = monthIndex;
+            statsArray[currentDay][0] = (seconds+(tens*0.01));
+            statsArray[currentDay][1] = examplesCount;
+            statsArray[currentDay][2] = mistake;
+            stats = statsArray;
+        }else{
+            stats = JSON.parse(stats);
+            console.log('вывод сохраненного и преобразованного массива');
+            if(stats[0]!= monthIndex){
+                for(let i=1;i<=daysInMonth;i++){
+                    statsArray[i]= [0,0,0];
+                };    
+                statsArray[0] = monthIndex;
+                statsArray[currentDay][0] = (seconds+(tens*0.01));
+                statsArray[currentDay][1] = examplesCount;
+                statsArray[currentDay][2] = mistake;
+                stats = statsArray;
+            }else{
+                stats[currentDay][0] += (seconds+(tens*0.01));
+                stats[currentDay][1] += examplesCount;
+                stats[currentDay][2] += mistake;
+            }
+            
+            console.log('вывод сохраненного и преобразованного массива');
+        }
+        window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(statsArray));
+
+    });
+    function arrayToSet(){
+
+    }
+    function arrayToGet(){
+        
+    }
+    // for(let i=0;i<this._allCards.length;i++){// преобразование в массив для сохранение в облако 
+    //     if( this._allCards[i].v == true){this._allCards[i].visible = true }
+    //     let a = [this._allCards[i].v, this._allCards[i].p, this._allCards[i].i, this._allCards[i].in];
+    //     b[f] = a;
+    //     f++;
+    // }
+
+    // window.Telegram.WebApp.CloudStorage.setItem("saveCard", JSON.stringify(b));
+
+
 
     // обнуляю таймер
     clearInterval(Interval);
@@ -788,6 +838,13 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
+    
+
+// tens =40;
+// seconds=99;
+//     console.log('количество времени', (tens+(seconds*0.01)));
+
+    // console.log("Количество дней в месяце:", stats);
     window.Telegram.WebApp.expand();
     window.Telegram.WebApp.disableVerticalSwipes();
     if(localStorage.getItem('userTheme') == null || localStorage.getItem('userTheme') === undefined || localStorage.getItem('userTheme') === "" ){
