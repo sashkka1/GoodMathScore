@@ -148,6 +148,7 @@ function fromExampleToHome() {// переход с экрана с пирмер�
     window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
         // let count = localStorage.getItem("countWin");
         // count =0;
+        console.log('before in', stats);
         stats = JSON.parse(stats);
         console.log('in', stats);
         if (stats === null || stats === undefined || stats === "") {
