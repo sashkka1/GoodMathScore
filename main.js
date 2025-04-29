@@ -189,13 +189,10 @@ function fromExampleToHome() {// переход с экрана с пирмер�
                 stats = statsArray;
             }else{
                 console.log('in22', stats);
-                console.log('in23','stats[currentDay][1] ', Number(stats[currentDay][1]), 'examplesCount', Number(examplesCount));
                 stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
                 stats[currentDay][1] = Number(stats[currentDay][1]) + Number(examplesCount);
                 stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
             }   
-            console.log('in2', stats);
-            console.log('вывод сохраненного и преобразованного массива');
         }
         window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
         // console.log('2', JSON.stringify(stats));
@@ -836,7 +833,7 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 3');
+    console.log('Try 4');
     for(let i=1;i<=daysInMonth;i++){
         statsArray[i]= [0,0,0];
     };    
@@ -845,6 +842,7 @@ document.addEventListener('DOMContentLoaded', () => { // первый заход
     // statsArray[currentDay][1] = examplesCount;
     // statsArray[currentDay][2] = mistake;
     let stats = statsArray;
+    stats[0]=2;
     window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
 
     // console.log('1', stats);
