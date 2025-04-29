@@ -143,7 +143,20 @@ function fromExampleToHome() {// переход с экрана с пирмер�
     block.classList.remove('none');
     block = document.getElementById('main2');
     block.classList.add('none');
-    
+    let TimeForSave = seconds+(tens*0.01);
+
+    // обнуляю таймер
+    clearInterval(Interval);
+    tens = "";
+    seconds = "";
+    appendTens.innerHTML = tens;
+    appendSeconds.innerHTML = seconds;
+
+    let input = document.getElementById('example-answer');
+    input.outerHTML = `<p id="example-answer"></p>`;
+
+
+
     // сохраняю результаты в облако
     window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
         // let count = localStorage.getItem("countWin");
@@ -176,10 +189,10 @@ function fromExampleToHome() {// переход с экрана с пирмер�
                 stats = statsArray;
             }else{
                 console.log('in22', stats);
-                console.log('in23', seconds+(tens*0.01));
-                stats[currentDay][0] += +(seconds+(tens*0.01));
-                stats[currentDay][1] += +examplesCount;
-                stats[currentDay][2] += +mistake;
+                console.log('in23', TimeForSave);
+                stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
+                stats[currentDay][1] = Number(stats[currentDay][1]) + Number(examplesCount);
+                stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
             }   
             console.log('in2', stats);
             console.log('вывод сохраненного и преобразованного массива');
@@ -198,16 +211,6 @@ function fromExampleToHome() {// переход с экрана с пирмер�
     // window.Telegram.WebApp.CloudStorage.setItem("saveCard", JSON.stringify(b));
 
 
-
-    // обнуляю таймер
-    clearInterval(Interval);
-    tens = "";
-    seconds = "";
-    appendTens.innerHTML = tens;
-    appendSeconds.innerHTML = seconds;
-
-    let input = document.getElementById('example-answer');
-    input.outerHTML = `<p id="example-answer"></p>`;
 }
 
 function dinamicRange(){ // изменяет ползунки на сохранненые значения, ничего не менял взял с старого кода
