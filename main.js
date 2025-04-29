@@ -836,7 +836,7 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 1');
+    console.log('Try 2');
     // for(let i=1;i<=daysInMonth;i++){
     //     statsArray[i]= [0,0,0];
     // };    
