@@ -832,17 +832,15 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    // let a;
-    // window.Telegram.WebApp.CloudStorage.setItem("stats", a);
-    // for(let i=1;i<=daysInMonth;i++){
-    //     statsArray[i]= [0,0,0];
-    // };    
-    // statsArray[0] = monthIndex;
-    // statsArray[currentDay][0] = (seconds+(tens*0.01));
-    // statsArray[currentDay][1] = examplesCount;
-    // statsArray[currentDay][2] = mistake;
-    // let stats = statsArray;
-
+    for(let i=1;i<=daysInMonth;i++){
+        statsArray[i]= [0,0,0];
+    };    
+    statsArray[0] = monthIndex;
+    statsArray[currentDay][0] = (seconds+(tens*0.01));
+    statsArray[currentDay][1] = examplesCount;
+    statsArray[currentDay][2] = mistake;
+    let stats = statsArray;
+    window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
     // console.log('1', stats);
     // stats = JSON.stringify(stats);
     // console.log('2', JSON.stringify(stats));
