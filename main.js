@@ -624,8 +624,6 @@ function keyboardClick(value){ // обработка клика на клави�
                 window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
                     // let count = localStorage.getItem("countWin");
                     // count =0;
-                    console.log('before in', stats);
-                    stats = JSON.parse(stats);
                     console.log('in', stats);
                     if (stats === null || stats === undefined || stats === "") {
                         console.log('in1', stats);
@@ -639,7 +637,8 @@ function keyboardClick(value){ // обработка клика на клави�
                         stats = statsArray;
                     }else{
                         console.log('in2', stats);
-                        console.log('вывод сохраненного ',stats[0]);
+                        stats = JSON.parse(stats);
+                        console.log('вывод сохраненного ',stats);
                         if(stats[0]!= monthIndex){
                             console.log('in21', stats);
                             for(let i=1;i<=daysInMonth;i++){
@@ -826,7 +825,7 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 7');
+    console.log('Try 8');
     // for(let i=1;i<=daysInMonth;i++){
     //     statsArray[i]= [0,0,0];
     // };    
