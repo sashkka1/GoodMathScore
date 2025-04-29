@@ -24,7 +24,7 @@ let daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 
 let monthIndex = new Date().getMonth();
 // массив для сохранения в облако
 let statsArray =[]; //0(время), 1(количество решенных примеров), 2(количество ошибок)
-let TimeForSave = seconds+(tens*0.01);
+let TimeForSave;
 
 // ловлю нажатие на кнопку статистики
 document.getElementById('statistic').addEventListener('click', () => { 
@@ -616,9 +616,9 @@ function keyboardClick(value){ // обработка клика на клави�
                     b = seconds;
                 }
                 document.getElementById('win-message').outerHTML = `<p id="win-message" class="win-message ">Ошибки: ${mistake} <br> Время: ${b}:${a}</p>`;
-                fromExampleToHome();
 
 
+                TimeForSave = seconds+(tens*0.01);
                 
                 // сохраняю результаты в облако
                 window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
@@ -661,16 +661,8 @@ function keyboardClick(value){ // обработка клика на клави�
                     // console.log('2', JSON.stringify(stats));
                     // console.log('23', JSON.parse(stats));
                 });
-                // for(let i=0;i<this._allCards.length;i++){// преобразование в массив для сохранение в облако 
-                //     if( this._allCards[i].v == true){this._allCards[i].visible = true }
-                //     let a = [this._allCards[i].v, this._allCards[i].p, this._allCards[i].i, this._allCards[i].in];
-                //     b[f] = a;
-                //     f++;
-                // }
 
-                // window.Telegram.WebApp.CloudStorage.setItem("saveCard", JSON.stringify(b));
-
-
+                fromExampleToHome();
 
             }else{
                 setExample();
