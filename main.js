@@ -170,7 +170,7 @@ function fromExampleToHome() {// переход с экрана с пирмер�
                 statsArray[i]= [0,0,0];
             };    
             statsArray[0] = monthIndex;
-            statsArray[currentDay][0] = (seconds+(tens*0.01));
+            statsArray[currentDay][0] = TimeForSave;
             statsArray[currentDay][1] = examplesCount;
             statsArray[currentDay][2] = mistake;
             stats = statsArray;
@@ -183,13 +183,13 @@ function fromExampleToHome() {// переход с экрана с пирмер�
                     statsArray[i]= [0,0,0];
                 };    
                 statsArray[0] = monthIndex;
-                statsArray[currentDay][0] = (seconds+(tens*0.01));
+                statsArray[currentDay][0] = TimeForSave;
                 statsArray[currentDay][1] = examplesCount;
                 statsArray[currentDay][2] = mistake;
                 stats = statsArray;
             }else{
                 console.log('in22', stats);
-                console.log('in23', TimeForSave);
+                console.log('in23','stats[currentDay][1] ', Number(stats[currentDay][1]), 'examplesCount', Number(examplesCount));
                 stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
                 stats[currentDay][1] = Number(stats[currentDay][1]) + Number(examplesCount);
                 stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
@@ -836,16 +836,16 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 2');
-    // for(let i=1;i<=daysInMonth;i++){
-    //     statsArray[i]= [0,0,0];
-    // };    
-    // statsArray[0] = monthIndex;
+    console.log('Try 3');
+    for(let i=1;i<=daysInMonth;i++){
+        statsArray[i]= [0,0,0];
+    };    
+    statsArray[0] = monthIndex;
     // statsArray[currentDay][0] = (seconds+(tens*0.01));
     // statsArray[currentDay][1] = examplesCount;
     // statsArray[currentDay][2] = mistake;
-    // let stats = statsArray;
-    // window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
+    let stats = statsArray;
+    window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
 
     // console.log('1', stats);
     // stats = JSON.stringify(stats);
