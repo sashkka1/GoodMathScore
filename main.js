@@ -657,7 +657,7 @@ function keyboardClick(value){ // обработка клика на клави�
                         }   
                     }
                     window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
-                    // console.log('2', JSON.stringify(stats));
+                    console.log('2', stats);
                     // console.log('23', JSON.parse(stats));
                 });
 
