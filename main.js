@@ -24,7 +24,7 @@ let daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 
 let monthIndex = new Date().getMonth();
 // массив для сохранения в облако
 let statsArray =[]; //0(время), 1(количество решенных примеров), 2(количество ошибок)
-
+let TimeForSave = seconds+(tens*0.01);
 
 // ловлю нажатие на кнопку статистики
 document.getElementById('statistic').addEventListener('click', () => { 
@@ -143,7 +143,6 @@ function fromExampleToHome() {// переход с экрана с пирмер�
     block.classList.remove('none');
     block = document.getElementById('main2');
     block.classList.add('none');
-    let TimeForSave = seconds+(tens*0.01);
 
     // обнуляю таймер
     clearInterval(Interval);
@@ -154,59 +153,6 @@ function fromExampleToHome() {// переход с экрана с пирмер�
 
     let input = document.getElementById('example-answer');
     input.outerHTML = `<p id="example-answer"></p>`;
-
-
-
-    // сохраняю результаты в облако
-    window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
-        // let count = localStorage.getItem("countWin");
-        // count =0;
-        console.log('before in', stats);
-        stats = JSON.parse(stats);
-        console.log('in', stats);
-        if (stats === null || stats === undefined || stats === "") {
-            console.log('in1', stats);
-            for(let i=1;i<=daysInMonth;i++){
-                statsArray[i]= [0,0,0];
-            };    
-            statsArray[0] = monthIndex;
-            statsArray[currentDay][0] = TimeForSave;
-            statsArray[currentDay][1] = examplesCount;
-            statsArray[currentDay][2] = mistake;
-            stats = statsArray;
-        }else{
-            console.log('in2', stats);
-            console.log('вывод сохраненного ',stats[0]);
-            if(stats[0]!= monthIndex){
-                console.log('in21', stats);
-                for(let i=1;i<=daysInMonth;i++){
-                    statsArray[i]= [0,0,0];
-                };    
-                statsArray[0] = monthIndex;
-                statsArray[currentDay][0] = TimeForSave;
-                statsArray[currentDay][1] = examplesCount;
-                statsArray[currentDay][2] = mistake;
-                stats = statsArray;
-            }else{
-                console.log('in22', stats);
-                stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
-                stats[currentDay][1] = Number(stats[currentDay][1]) + Number(examplesCount);
-                stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
-            }   
-        }
-        window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
-        // console.log('2', JSON.stringify(stats));
-        // console.log('23', JSON.parse(stats));
-    });
-    // for(let i=0;i<this._allCards.length;i++){// преобразование в массив для сохранение в облако 
-    //     if( this._allCards[i].v == true){this._allCards[i].visible = true }
-    //     let a = [this._allCards[i].v, this._allCards[i].p, this._allCards[i].i, this._allCards[i].in];
-    //     b[f] = a;
-    //     f++;
-    // }
-
-    // window.Telegram.WebApp.CloudStorage.setItem("saveCard", JSON.stringify(b));
-
 
 }
 
@@ -671,6 +617,61 @@ function keyboardClick(value){ // обработка клика на клави�
                 }
                 document.getElementById('win-message').outerHTML = `<p id="win-message" class="win-message ">Ошибки: ${mistake} <br> Время: ${b}:${a}</p>`;
                 fromExampleToHome();
+
+
+                
+                // сохраняю результаты в облако
+                window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
+                    // let count = localStorage.getItem("countWin");
+                    // count =0;
+                    console.log('before in', stats);
+                    stats = JSON.parse(stats);
+                    console.log('in', stats);
+                    if (stats === null || stats === undefined || stats === "") {
+                        console.log('in1', stats);
+                        for(let i=1;i<=daysInMonth;i++){
+                            statsArray[i]= [0,0,0];
+                        };    
+                        statsArray[0] = monthIndex;
+                        statsArray[currentDay][0] = TimeForSave;
+                        statsArray[currentDay][1] = examplesCount;
+                        statsArray[currentDay][2] = mistake;
+                        stats = statsArray;
+                    }else{
+                        console.log('in2', stats);
+                        console.log('вывод сохраненного ',stats[0]);
+                        if(stats[0]!= monthIndex){
+                            console.log('in21', stats);
+                            for(let i=1;i<=daysInMonth;i++){
+                                statsArray[i]= [0,0,0];
+                            };    
+                            statsArray[0] = monthIndex;
+                            statsArray[currentDay][0] = TimeForSave;
+                            statsArray[currentDay][1] = examplesCount;
+                            statsArray[currentDay][2] = mistake;
+                            stats = statsArray;
+                        }else{
+                            console.log('in22', stats);
+                            stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
+                            stats[currentDay][1] = Number(stats[currentDay][1]) + Number(examplesCount);
+                            stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
+                        }   
+                    }
+                    window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
+                    // console.log('2', JSON.stringify(stats));
+                    // console.log('23', JSON.parse(stats));
+                });
+                // for(let i=0;i<this._allCards.length;i++){// преобразование в массив для сохранение в облако 
+                //     if( this._allCards[i].v == true){this._allCards[i].visible = true }
+                //     let a = [this._allCards[i].v, this._allCards[i].p, this._allCards[i].i, this._allCards[i].in];
+                //     b[f] = a;
+                //     f++;
+                // }
+
+                // window.Telegram.WebApp.CloudStorage.setItem("saveCard", JSON.stringify(b));
+
+
+
             }else{
                 setExample();
             }
@@ -833,17 +834,17 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 4');
-    for(let i=1;i<=daysInMonth;i++){
-        statsArray[i]= [0,0,0];
-    };    
-    statsArray[0] = monthIndex;
+    console.log('Try 6');
+    // for(let i=1;i<=daysInMonth;i++){
+    //     statsArray[i]= [0,0,0];
+    // };    
+    // statsArray[0] = monthIndex;
     // statsArray[currentDay][0] = (seconds+(tens*0.01));
     // statsArray[currentDay][1] = examplesCount;
     // statsArray[currentDay][2] = mistake;
-    let stats = statsArray;
-    stats[0]=2;
-    window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
+    // let stats = statsArray;
+    // stats[0]=2;
+    window.Telegram.WebApp.CloudStorage.delete("stats");
 
     // console.log('1', stats);
     // stats = JSON.stringify(stats);
