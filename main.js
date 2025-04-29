@@ -176,9 +176,10 @@ function fromExampleToHome() {// переход с экрана с пирмер�
                 stats = statsArray;
             }else{
                 console.log('in22', stats);
-                stats[currentDay][0] += (seconds+(tens*0.01));
-                stats[currentDay][1] += examplesCount;
-                stats[currentDay][2] += mistake;
+                console.log('in23', seconds+(tens*0.01));
+                stats[currentDay][0] += +(seconds+(tens*0.01));
+                stats[currentDay][1] += +examplesCount;
+                stats[currentDay][2] += +mistake;
             }   
             console.log('in2', stats);
             console.log('вывод сохраненного и преобразованного массива');
@@ -832,15 +833,16 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    for(let i=1;i<=daysInMonth;i++){
-        statsArray[i]= [0,0,0];
-    };    
-    statsArray[0] = monthIndex;
-    statsArray[currentDay][0] = (seconds+(tens*0.01));
-    statsArray[currentDay][1] = examplesCount;
-    statsArray[currentDay][2] = mistake;
-    let stats = statsArray;
-    window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
+    // for(let i=1;i<=daysInMonth;i++){
+    //     statsArray[i]= [0,0,0];
+    // };    
+    // statsArray[0] = monthIndex;
+    // statsArray[currentDay][0] = (seconds+(tens*0.01));
+    // statsArray[currentDay][1] = examplesCount;
+    // statsArray[currentDay][2] = mistake;
+    // let stats = statsArray;
+    // window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
+
     // console.log('1', stats);
     // stats = JSON.stringify(stats);
     // console.log('2', JSON.stringify(stats));
