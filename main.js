@@ -826,7 +826,7 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 6');
+    console.log('Try 7');
     // for(let i=1;i<=daysInMonth;i++){
     //     statsArray[i]= [0,0,0];
     // };    
@@ -836,7 +836,8 @@ document.addEventListener('DOMContentLoaded', () => { // первый заход
     // statsArray[currentDay][2] = mistake;
     // let stats = statsArray;
     // stats[0]=2;
-    window.Telegram.WebApp.CloudStorage.delete("stats");
+    let a;
+    window.Telegram.WebApp.CloudStorage.setItem("stats", a);
 
     // console.log('1', stats);
     // stats = JSON.stringify(stats);
