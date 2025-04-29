@@ -624,9 +624,9 @@ function keyboardClick(value){ // обработка клика на клави�
                 window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
                     // let count = localStorage.getItem("countWin");
                     // count =0;
-                    console.log('in', stats);
+                    // console.log('in', stats);
                     if (stats === null || stats === undefined || stats === "") {
-                        console.log('in1', stats);
+                        // console.log('in1', stats);
                         for(let i=1;i<=daysInMonth;i++){
                             statsArray[i]= [0,0,0];
                         };    
@@ -636,11 +636,11 @@ function keyboardClick(value){ // обработка клика на клави�
                         statsArray[currentDay][2] = mistake;
                         stats = statsArray;
                     }else{
-                        console.log('in2', stats);
+                        // console.log('in2', stats);
                         stats = JSON.parse(stats);
-                        console.log('вывод сохраненного ',stats);
+                        // console.log('вывод сохраненного ',stats);
                         if(stats[0]!= monthIndex){
-                            console.log('in21', stats);
+                            // console.log('in21', stats);
                             for(let i=1;i<=daysInMonth;i++){
                                 statsArray[i]= [0,0,0];
                             };    
@@ -650,7 +650,7 @@ function keyboardClick(value){ // обработка клика на клави�
                             statsArray[currentDay][2] = mistake;
                             stats = statsArray;
                         }else{
-                            console.log('in22', stats);
+                            // console.log('in22', stats);
                             stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
                             stats[currentDay][1] = Number(stats[currentDay][1]) + Number(examplesCount);
                             stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
@@ -835,8 +835,8 @@ document.addEventListener('DOMContentLoaded', () => { // первый заход
     // statsArray[currentDay][2] = mistake;
     // let stats = statsArray;
     // stats[0]=2;
-    let a;
-    window.Telegram.WebApp.CloudStorage.setItem("stats", a);
+    // let a;
+    // window.Telegram.WebApp.CloudStorage.setItem("stats", a);
 
     // console.log('1', stats);
     // stats = JSON.stringify(stats);
