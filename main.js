@@ -1,4 +1,3 @@
-
 let values =[]; // 0+   1-   2x   3/  4t  5+-(min)  6+-(max)  7x/(min)  8x/(max) 
 let examples =[];
 let score = 1, mistake =0,examplesCount=10;
@@ -28,14 +27,65 @@ let TimeForSave;
 
 // ловлю нажатие на кнопку статистики
 document.getElementById('statistic').addEventListener('click', () => { 
-    block = document.getElementById('statistic-behind');
+    block = document.getElementById('statistic-icon');
     block.classList.remove('none');
+
+    new Morris.Line({
+        // ID of the element in which to draw the chart.
+        element: 'pushups',
+        // Chart data records -- each entry in this array corresponds to a point on
+        // the chart.
+        data: [
+            { day: '1', pushups: 30, beers: 2, any: 10 },
+            { day: '2', pushups: 10, beers: 2, any: 10  },
+            { day: '3', pushups: 5, beers: 3, any: 10  },
+            { day: '4', pushups: 5, beers: 4, any: 10  },
+            { day: '5', pushups: 30, beers: 1, any: 10  },
+            { day: '6', pushups: 30, beers: 2, any: 10 },
+            { day: '7', pushups: 10, beers: 2, any: 10  },
+            { day: '8', pushups: 5, beers: 3, any: 10  },
+            { day: '9', pushups: 5, beers: 4, any: 10  },
+            { day: '10', pushups: 30, beers: 1, any: 10  },
+            { day: '11', pushups: 30, beers: 2, any: 10 },
+            { day: '12', pushups: 10, beers: 2, any: 10  },
+            { day: '13', pushups: 5, beers: 3, any: 10  },
+            { day: '14', pushups: 5, beers: 4, any: 10  },
+            { day: '15', pushups: 30, beers: 1, any: 10  },
+            { day: '16', pushups: 30, beers: 2, any: 10 },
+            { day: '17', pushups: 10, beers: 2, any: 10  },
+            { day: '18', pushups: 5, beers: 3, any: 10  },
+            { day: '19', pushups: 5, beers: 4, any: 10  },
+            { day: '20', pushups: 30, beers: 1, any: 10  },
+            { day: '21', pushups: 30, beers: 2, any: 10 },
+            { day: '22', pushups: 10, beers: 2, any: 10  },
+            { day: '23', pushups: 5, beers: 3, any: 10  },
+            { day: '24', pushups: 5, beers: 4, any: 10  },
+            { day: '25', pushups: 30, beers: 1, any: 10  },
+            { day: '26', pushups: 30, beers: 2, any: 10 },
+            { day: '27', pushups: 10, beers: 2, any: 10  },
+            { day: '28', pushups: 5, beers: 3, any: 10  },
+            { day: '29', pushups: 5, beers: 4, any: 10  },
+            { day: '30', pushups: 30, beers: 1, any: 10  }
+        ],
+        // The name of the data record attribute that contains x-values.
+        xkey: 'day',
+        parseTime: false,
+        // A list of names of data record attributes that contain y-values.
+        ykeys: ['pushups','beers','any'],
+        // Labels for the ykeys -- will be displayed when you hover over the
+        // chart.
+        // labels: ['Pushups','Beers','Any'],
+        lineColors: ['#373651','#E65A26']
+    });
+
+
+
 });
 document.getElementById('statistic-block').addEventListener('click', () => { 
     event.stopPropagation(); // Останавливаем обработку для родительского блока при клике на обьект
 });
 document.getElementById('statistic-behind').addEventListener('click', () => { 
-    block = document.getElementById('statistic-behind');
+    block = document.getElementById('statistic-icon');
     block.classList.add('none');
 });
 
@@ -622,11 +672,7 @@ function keyboardClick(value){ // обработка клика на клави�
                 
                 // сохраняю результаты в облако
                 window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
-                    // let count = localStorage.getItem("countWin");
-                    // count =0;
-                    // console.log('in', stats);
                     if (stats === null || stats === undefined || stats === "") {
-                        // console.log('in1', stats);
                         for(let i=1;i<=daysInMonth;i++){
                             statsArray[i]= [0,0,0];
                         };    
@@ -636,11 +682,8 @@ function keyboardClick(value){ // обработка клика на клави�
                         statsArray[currentDay][2] = mistake;
                         stats = statsArray;
                     }else{
-                        // console.log('in2', stats);
                         stats = JSON.parse(stats);
-                        // console.log('вывод сохраненного ',stats);
                         if(stats[0]!= monthIndex){
-                            // console.log('in21', stats);
                             for(let i=1;i<=daysInMonth;i++){
                                 statsArray[i]= [0,0,0];
                             };    
@@ -650,7 +693,6 @@ function keyboardClick(value){ // обработка клика на клави�
                             statsArray[currentDay][2] = mistake;
                             stats = statsArray;
                         }else{
-                            // console.log('in22', stats);
                             stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
                             stats[currentDay][1] = Number(stats[currentDay][1]) + Number(examplesCount);
                             stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
@@ -658,7 +700,6 @@ function keyboardClick(value){ // обработка клика на клави�
                     }
                     window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
                     console.log('2', stats);
-                    // console.log('23', JSON.parse(stats));
                 });
 
                 fromExampleToHome();
@@ -819,8 +860,6 @@ function themeChange(color){
     localStorage.setItem('userTheme', color);
     document.getElementById('theme').href = `./thems/${color}.css`;
 }
-
-
 
 
 

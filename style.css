@@ -31,6 +31,7 @@ body{
     justify-content: center;
 }
 .statistic-block{
+    position: relative;
     width: 85vw;
     height: 60vh;
     background-color: rgb(234, 234, 234);
@@ -50,6 +51,22 @@ span.statistic{
     position: absolute;
     background-color: rgba(37, 37, 37, 0.7); /* Цвет затемнения с прозрачностью */
 }
+
+
+.graph-wrapper {
+    height: 100%;
+    width: 100%;
+}
+
+.graph {
+    height: 100%;
+    width: 100%;
+    background-color: #FFF;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+
 
 .main1{
     width: 100vw;
