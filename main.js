@@ -85,6 +85,8 @@ function statisticOpen(){
     block.classList.add('none');
 
     window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
+        
+
         if (stats === null || stats === undefined || stats === "") {
 
         }else{
@@ -93,72 +95,151 @@ function statisticOpen(){
             let totalMonthExamples = 0;
             let totalMonthMistake = 0;
             stats = JSON.parse(stats);
-            for (let i = 1; i <= daysInMonth; i++) {
-                arrayGraphMonth.push({
-                    day: String(i),
-                    time: stats[i][0],
-                    mistake: stats[i][1],
-                    examples: stats[i][2]
+            if(stats[0]!= monthIndex){
+                window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(stats));
+                for(let i=1;i<=daysInMonth;i++){
+                    statsArray[i]= [0,0,0];
+                };    
+                statsArray[0] = monthIndex;
+                statsArray[currentDay][0] = TimeForSave;
+                statsArray[currentDay][1] = examplesCount;
+                statsArray[currentDay][2] = mistake;
+                stats = statsArray;
+                for (let i = 1; i <= daysInMonth; i++) {
+                    arrayGraphMonth.push({
+                        day: String(i),
+                        time: stats[i][0],
+                        mistake: stats[i][1],
+                        examples: stats[i][2]
+                    });
+                    totalMonthTime = Number(totalMonthTime) + Number(stats[i][0]);
+                    totalMonthExamples = Number(totalMonthExamples) + Number(stats[i][1]);
+                    totalMonthMistake = Number(totalMonthMistake) + Number(stats[i][2]);
+                }
+                new Morris.Line({
+                    element: 'month',
+                    data: arrayGraphMonth,
+                    xkey: 'day',
+                    parseTime: false,
+                    ykeys: ['time','mistake','examples'],
+                    hideHover: 'always',
+                    labels: ['time','mistake','examples'],
+                    lineColors: ['blue','red','green']
                 });
-                totalMonthTime = Number(totalMonthTime) + Number(stats[i][0]);
-                totalMonthExamples = Number(totalMonthExamples) + Number(stats[i][1]);
-                totalMonthMistake = Number(totalMonthMistake) + Number(stats[i][2]);
-            }
-            new Morris.Line({
-                element: 'month',
-                data: arrayGraphMonth,
-                xkey: 'day',
-                parseTime: false,
-                ykeys: ['time','mistake','examples'],
-                hideHover: 'always',
-                labels: ['time','mistake','examples'],
-                lineColors: ['blue','red','green']
-            });
-            document.getElementById('total-month').outerHTML = `<p class="total-month" id="total-month">total: time - ${totalMonthTime}, examples - ${totalMonthExamples}, mistake - ${totalMonthMistake}</p>`;
-
-            
-            if(dayIndex == 0){ dayIndex =7;}
-            let arrayGraphWeek =[],a=[];
-            let dateOfStartWeek = currentDay-(dayIndex-1);
-            for (let i = 0; i < 7; i++) {
-                console.log('0',a);
-                if(dateOfStartWeek<0){
-                    console.log('1',a);
-                    if((dateOfStartWeek+i)<=0){
-                        a[i] = stats[daysInLastMonth -(Math.abs(dateOfStartWeek)) +i];
-                        console.log('11',a);
-                        // заполняется массив старым месяцем
+                document.getElementById('total-month').outerHTML = `<p class="total-month" id="total-month">total: time - ${totalMonthTime}, examples - ${totalMonthExamples}, mistake - ${totalMonthMistake}</p>`;
+    
+                
+                if(dayIndex == 0){ dayIndex =7;}
+                let arrayGraphWeek =[],a=[];
+                let dateOfStartWeek = currentDay-(dayIndex-1);
+                for (let i = 0; i < 7; i++) {
+                    console.log('0',a);
+                    if(dateOfStartWeek<0){
+                        console.log('1',a);
+                        if((dateOfStartWeek+i)<=0){
+                            a[i] = stats[daysInLastMonth -(Math.abs(dateOfStartWeek)) +i];
+                            console.log('11',a);
+                            // заполняется массив старым месяцем
+                        }else{
+                            a[i]= stats[dateOfStartWeek +i];
+                            console.log('12',a);
+                            // заполняется массив новым месяцем
+                        }
                     }else{
                         a[i]= stats[dateOfStartWeek +i];
-                        console.log('12',a);
-                        // заполняется массив новым месяцем
+                        console.log('21',a);
+                        if(dateOfStartWeek +i >daysInMonth){
+                            a[i] = stats[dateOfStartWeek +i-daysInMonth];
+                            console.log('22',a);
+                        }
                     }
-                }else{
-                    a[i]= stats[dateOfStartWeek +i];
-                    console.log('21',a);
-                    if(dateOfStartWeek +i >daysInMonth){
-                        a[i] = stats[dateOfStartWeek +i-daysInMonth];
-                        console.log('22',a);
-                    }
+                    arrayGraphWeek.push({
+                        day: String(i),
+                        time: a[i][0],
+                        mistake: a[i][1],
+                        examples: a[i][2]
+                    });
                 }
-                arrayGraphWeek.push({
-                    day: String(i),
-                    time: a[i][0],
-                    mistake: a[i][1],
-                    examples: a[i][2]
+                console.log('3',arrayGraphWeek);
+                new Morris.Line({
+                    element: 'week',
+                    data: arrayGraphWeek,
+                    xkey: 'day',
+                    parseTime: false,
+                    ykeys: ['time','mistake','examples'],
+                    hideHover: 'always',
+                    labels: ['time','mistake','examples'],
+                    lineColors: ['blue','red','green']
                 });
-            }
-            console.log('3',arrayGraphWeek);
-            new Morris.Line({
-                element: 'week',
-                data: arrayGraphWeek,
-                xkey: 'day',
-                parseTime: false,
-                ykeys: ['time','mistake','examples'],
-                hideHover: 'always',
-                labels: ['time','mistake','examples'],
-                lineColors: ['blue','red','green']
-            });
+            }else{
+                for (let i = 1; i <= daysInMonth; i++) {
+                    arrayGraphMonth.push({
+                        day: String(i),
+                        time: stats[i][0],
+                        mistake: stats[i][1],
+                        examples: stats[i][2]
+                    });
+                    totalMonthTime = Number(totalMonthTime) + Number(stats[i][0]);
+                    totalMonthExamples = Number(totalMonthExamples) + Number(stats[i][1]);
+                    totalMonthMistake = Number(totalMonthMistake) + Number(stats[i][2]);
+                }
+                new Morris.Line({
+                    element: 'month',
+                    data: arrayGraphMonth,
+                    xkey: 'day',
+                    parseTime: false,
+                    ykeys: ['time','mistake','examples'],
+                    hideHover: 'always',
+                    labels: ['time','mistake','examples'],
+                    lineColors: ['blue','red','green']
+                });
+                document.getElementById('total-month').outerHTML = `<p class="total-month" id="total-month">total: time - ${totalMonthTime}, examples - ${totalMonthExamples}, mistake - ${totalMonthMistake}</p>`;
+    
+                
+                if(dayIndex == 0){ dayIndex =7;}
+                let arrayGraphWeek =[],a=[];
+                let dateOfStartWeek = currentDay-(dayIndex-1);
+                for (let i = 0; i < 7; i++) {
+                    console.log('0',a);
+                    if(dateOfStartWeek<0){
+                        console.log('1',a);
+                        if((dateOfStartWeek+i)<=0){
+                            a[i] = stats[daysInLastMonth -(Math.abs(dateOfStartWeek)) +i];
+                            console.log('11',a);
+                            // заполняется массив старым месяцем
+                        }else{
+                            a[i]= stats[dateOfStartWeek +i];
+                            console.log('12',a);
+                            // заполняется массив новым месяцем
+                        }
+                    }else{
+                        a[i]= stats[dateOfStartWeek +i];
+                        console.log('21',a);
+                        if(dateOfStartWeek +i >daysInMonth){
+                            a[i] = stats[dateOfStartWeek +i-daysInMonth];
+                            console.log('22',a);
+                        }
+                    }
+                    arrayGraphWeek.push({
+                        day: String(i),
+                        time: a[i][0],
+                        mistake: a[i][1],
+                        examples: a[i][2]
+                    });
+                }
+                console.log('3',arrayGraphWeek);
+                new Morris.Line({
+                    element: 'week',
+                    data: arrayGraphWeek,
+                    xkey: 'day',
+                    parseTime: false,
+                    ykeys: ['time','mistake','examples'],
+                    hideHover: 'always',
+                    labels: ['time','mistake','examples'],
+                    lineColors: ['blue','red','green']
+                });
+            }   
+            
         }
 
     });
@@ -726,6 +807,7 @@ function keyboardClick(value){ // обработка клика на клави�
                     }else{
                         stats = JSON.parse(stats);
                         if(stats[0]!= monthIndex){
+                            window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(stats));
                             for(let i=1;i<=daysInMonth;i++){
                                 statsArray[i]= [0,0,0];
                             };    
@@ -906,7 +988,7 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 14');
+    console.log('Try 15');
 
     // for(let i=1;i<=30;i++){
     //     statsArray[i]= [0,0,0];
