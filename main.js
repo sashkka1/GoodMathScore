@@ -90,7 +90,7 @@ function statisticOpen(){
         console.log('внутри проверки1',oldstats);
         window.Telegram.WebApp.CloudStorage.getItem("oldstats", (err, old) => {
             console.log('внутри проверки2',old);
-            if (stats === null || stats === undefined || stats === "") {
+            if (old === null || old === undefined || old === "") {
                 for(let i=1;i<=daysInLastMonth;i++){
                     oldstats[i]= [0,0,0];
                 };   
@@ -1006,15 +1006,15 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 19');
+    console.log('Try 20');
 
     // for(let i=1;i<=30;i++){
     //     statsArray[i]= [0,0,0];
     // };    
 
-    let statArray= [[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0]]; 
-    console.log('statArray',statArray);
-    window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(statArray));
+    // let statArray= [[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0]]; 
+    // console.log('statArray',statArray);
+    // window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(statArray));
 
     window.Telegram.WebApp.expand();
     window.Telegram.WebApp.disableVerticalSwipes();
