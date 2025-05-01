@@ -214,9 +214,11 @@ function statisticOpen(){
                 });
                 document.getElementById('total-month').outerHTML = `<p class="total-month" id="total-month">total: time - ${totalMonthTime}, examples - ${totalMonthExamples}, mistake - ${totalMonthMistake}</p>`;
                 console.log('oldstats',oldstats);
+                console.log('dayIndex',dayIndex,'currentDay',currentDay);
                 if(dayIndex == 0){ dayIndex =7;}
                 let arrayGraphWeek =[],a=[], dayName=[Mon, Tue, Wed, Thu, Fri, Sat, Sun];
                 let dateOfStartWeek = currentDay-(dayIndex-1);
+                console.log('dateOfStartWeek',dateOfStartWeek);
                 for (let i = 0; i < 7; i++) {
                     console.log('0',a);
                     if(dateOfStartWeek<0){
@@ -1006,7 +1008,7 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 20');
+    console.log('Try 21');
 
     // for(let i=1;i<=30;i++){
     //     statsArray[i]= [0,0,0];
