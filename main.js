@@ -85,9 +85,10 @@ function statisticOpen(){
 
         }else{
             let arrayGraph =[];
+            let totalMonthTime = 0;
+            let totalMonthExamples = 0;
+            let totalMonthMistake = 0;
             stats = JSON.parse(stats);
-            console.log('stats',stats);
-            console.log('daysInMonth',daysInMonth);
             for (let i = 1; i <= daysInMonth; i++) {
                 console.log('i',i);
                 arrayGraph.push({
@@ -96,8 +97,10 @@ function statisticOpen(){
                     mistake: stats[i][1],
                     examples: stats[i][2]
                 });
+                totalMonthTime = Number(totalMonthTime) + Number(stats[i][0]);
+                totalMonthExamples = Number(totalMonthExamples) + Number(stats[i][1]);
+                totalMonthMistake = Number(totalMonthMistake) + Number(stats[i][2]);
             }
-            console.log('arrayGraph',arrayGraph);
             new Morris.Line({
                 element: 'month',
                 data: arrayGraph,
@@ -108,24 +111,26 @@ function statisticOpen(){
                 labels: ['time','mistake','examples'],
                 lineColors: ['blue','red','green']
             });
-            new Morris.Line({
-                element: 'week',
-                data: [
-                    { day: 'Mon', time: 30, mistake: 2, examples: 10 },
-                    { day: 'Tue', time: 10, mistake: 2, examples: 10  },
-                    { day: 'Wed', time: 5, mistake: 3, examples: 10  },
-                    { day: 'Thu', time: 5, mistake: 4, examples: 10  },
-                    { day: 'Fri', time: 30, mistake: 1, examples: 10  },
-                    { day: 'Sat', time: 30, mistake: 2, examples: 10 },
-                    { day: 'Sun', time: 10, mistake: 2, examples: 10  }
-                ],
-                xkey: 'day',
-                parseTime: false,
-                ykeys: ['time','mistake','examples'],
-                hideHover: 'always',
-                labels: ['time','mistake','examples'],
-                lineColors: ['blue','red','green']
-            });
+            
+            document.getElementById('total-month').outerHTML = `<p class="total-month" id="total-month">total: time - ${totalMonthTime}, examples - ${totalMonthExamples}, mistake - ${totalMonthMistake}</p>`;
+            // new Morris.Line({
+            //     element: 'week',
+            //     data: [
+            //         { day: 'Mon', time: 30, mistake: 2, examples: 10 },
+            //         { day: 'Tue', time: 10, mistake: 2, examples: 10  },
+            //         { day: 'Wed', time: 5, mistake: 3, examples: 10  },
+            //         { day: 'Thu', time: 5, mistake: 4, examples: 10  },
+            //         { day: 'Fri', time: 30, mistake: 1, examples: 10  },
+            //         { day: 'Sat', time: 30, mistake: 2, examples: 10 },
+            //         { day: 'Sun', time: 10, mistake: 2, examples: 10  }
+            //     ],
+            //     xkey: 'day',
+            //     parseTime: false,
+            //     ykeys: ['time','mistake','examples'],
+            //     hideHover: 'always',
+            //     labels: ['time','mistake','examples'],
+            //     lineColors: ['blue','red','green']
+            // });
         }
 
     });
@@ -872,7 +877,7 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 12');
+    console.log('Try 13');
     // for(let i=1;i<=daysInMonth;i++){
     //     statsArray[i]= [0,0,0];
     // };    
