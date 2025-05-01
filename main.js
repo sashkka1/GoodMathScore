@@ -92,9 +92,9 @@ function statisticOpen(){
                 console.log('i',i);
                 arrayGraph.push({
                     day: String(i),
-                    time: statsArray[i][0],
-                    mistake: statsArray[i][1],
-                    examples: statsArray[i][2]
+                    time: stats[i][0],
+                    mistake: stats[i][1],
+                    examples: stats[i][2]
                 });
             }
             console.log('arrayGraph',arrayGraph);
@@ -872,7 +872,7 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 11');
+    console.log('Try 12');
     // for(let i=1;i<=daysInMonth;i++){
     //     statsArray[i]= [0,0,0];
     // };    
