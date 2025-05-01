@@ -196,7 +196,7 @@ function statisticOpen(){
                 document.getElementById('total-month').outerHTML = `<p class="total-month" id="total-month">total: time - ${totalMonthTime}, examples - ${totalMonthExamples}, mistake - ${totalMonthMistake}</p>`;
                 console.log('before fun',);
                 let oldstats=[];
-                if((currentDay-(dayIndex-1)+i)<=0){
+                if(currentDay-(dayIndex-1)<0){
                     console.log('внутри проверки1',oldstats);
                     window.Telegram.WebApp.CloudStorage.getItem("oldstats", (err, old) => {
                         old = JSON.parse(old);
@@ -1004,7 +1004,7 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 17');
+    console.log('Try 18');
 
     // for(let i=1;i<=30;i++){
     //     statsArray[i]= [0,0,0];
