@@ -25,69 +25,12 @@ let monthIndex = new Date().getMonth();
 let statsArray =[]; //0(время), 1(количество решенных примеров), 2(количество ошибок)
 let TimeForSave;
 
-// ловлю нажатие на кнопку статистики
-document.getElementById('statistic').addEventListener('click', () => { 
-    block = document.getElementById('statistic-icon');
-    block.classList.remove('none');
-
-    new Morris.Line({
-        // ID of the element in which to draw the chart.
-        element: 'pushups',
-        // Chart data records -- each entry in this array corresponds to a point on
-        // the chart.
-        data: [
-            { day: '1', pushups: 30, beers: 2, any: 10 },
-            { day: '2', pushups: 10, beers: 2, any: 10  },
-            { day: '3', pushups: 5, beers: 3, any: 10  },
-            { day: '4', pushups: 5, beers: 4, any: 10  },
-            { day: '5', pushups: 30, beers: 1, any: 10  },
-            { day: '6', pushups: 30, beers: 2, any: 10 },
-            { day: '7', pushups: 10, beers: 2, any: 10  },
-            { day: '8', pushups: 5, beers: 3, any: 10  },
-            { day: '9', pushups: 5, beers: 4, any: 10  },
-            { day: '10', pushups: 30, beers: 1, any: 10  },
-            { day: '11', pushups: 30, beers: 2, any: 10 },
-            { day: '12', pushups: 10, beers: 2, any: 10  },
-            { day: '13', pushups: 5, beers: 3, any: 10  },
-            { day: '14', pushups: 5, beers: 4, any: 10  },
-            { day: '15', pushups: 30, beers: 1, any: 10  },
-            { day: '16', pushups: 30, beers: 2, any: 10 },
-            { day: '17', pushups: 10, beers: 2, any: 10  },
-            { day: '18', pushups: 5, beers: 3, any: 10  },
-            { day: '19', pushups: 5, beers: 4, any: 10  },
-            { day: '20', pushups: 30, beers: 1, any: 10  },
-            { day: '21', pushups: 30, beers: 2, any: 10 },
-            { day: '22', pushups: 10, beers: 2, any: 10  },
-            { day: '23', pushups: 5, beers: 3, any: 10  },
-            { day: '24', pushups: 5, beers: 4, any: 10  },
-            { day: '25', pushups: 30, beers: 1, any: 10  },
-            { day: '26', pushups: 30, beers: 2, any: 10 },
-            { day: '27', pushups: 10, beers: 2, any: 10  },
-            { day: '28', pushups: 5, beers: 3, any: 10  },
-            { day: '29', pushups: 5, beers: 4, any: 10  },
-            { day: '30', pushups: 30, beers: 1, any: 10  }
-        ],
-        // The name of the data record attribute that contains x-values.
-        xkey: 'day',
-        parseTime: false,
-        // A list of names of data record attributes that contain y-values.
-        ykeys: ['pushups','beers','any'],
-        // Labels for the ykeys -- will be displayed when you hover over the
-        // chart.
-        // labels: ['Pushups','Beers','Any'],
-        lineColors: ['#373651','#E65A26']
-    });
-
-
-
-});
-document.getElementById('statistic-block').addEventListener('click', () => { 
-    event.stopPropagation(); // Останавливаем обработку для родительского блока при клике на обьект
-});
-document.getElementById('statistic-behind').addEventListener('click', () => { 
-    block = document.getElementById('statistic-icon');
-    block.classList.add('none');
-});
+// ловлю нажатие на иконку статистики
+document.getElementById('statistic-icon').addEventListener('click', () => {statisticOpen();});
+// document.getElementById('statistic-behind').addEventListener('click', () => { 
+//     block = document.getElementById('statistic-icon');
+//     block.classList.add('none');
+// });
 
 // открытие и закрытие блока с цветовыми темами, а так же ловню вбор пользователя насчет темы
 document.getElementById('different-theme').addEventListener('click', () => { differentTheme('open');});
@@ -114,6 +57,8 @@ document.getElementById('start-button').addEventListener('click', () => {fromHom
 
 // клик на возврат на главную
 document.getElementById('back-to-home').addEventListener('click', () => { fromExampleToHome();});
+// клик на возврат на главную
+document.getElementById('back-to-home-statistic').addEventListener('click', () => { statisticClose();});
 
 // обработка кликов на клавиатуру, на каждую из клавиш
 document.getElementById('number-1').addEventListener('click', () => { keyboardClick(document.getElementById('number-1').value);});
@@ -129,7 +74,91 @@ document.getElementById('number-0').addEventListener('click', () => { keyboardCl
 document.getElementById('number-enter').addEventListener('click', () => { keyboardClick(document.getElementById('number-enter').value);});
 document.getElementById('number-delete').addEventListener('click', () => { keyboardClick(document.getElementById('number-delete').value);});
 
+function statisticOpen(){
+    block = document.getElementById('statistic');
+    block.classList.remove('none');
+    block = document.getElementById('main1');
+    block.classList.add('none');
 
+    new Morris.Line({
+        // ID of the element in which to draw the chart.
+        element: 'month',
+        // Chart data records -- each entry in this array corresponds to a point on
+        // the chart.
+        data: [
+            { day: '1', time: 30, mistake: 2, examples: 10 },
+            { day: '2', time: 10, mistake: 2, examples: 10  },
+            { day: '3', time: 5, mistake: 3, examples: 10  },
+            { day: '4', time: 5, mistake: 4, examples: 10  },
+            { day: '5', time: 30, mistake: 1, examples: 10  },
+            { day: '6', time: 30, mistake: 2, examples: 10 },
+            { day: '7', time: 10, mistake: 2, examples: 10  },
+            { day: '8', time: 5, mistake: 3, examples: 10  },
+            { day: '9', time: 5, mistake: 4, examples: 10  },
+            { day: '10', time: 30, mistake: 1, examples: 10  },
+            { day: '11', time: 30, mistake: 2, examples: 10 },
+            { day: '12', time: 10, mistake: 2, examples: 10  },
+            { day: '13', time: 5, mistake: 3, examples: 10  },
+            { day: '14', time: 5, mistake: 4, examples: 10  },
+            { day: '15', time: 30, mistake: 1, examples: 10  },
+            { day: '16', time: 30, mistake: 2, examples: 10 },
+            { day: '17', time: 10, mistake: 2, examples: 10  },
+            { day: '18', time: 5, mistake: 3, examples: 10  },
+            { day: '19', time: 5, mistake: 4, examples: 10  },
+            { day: '20', time: 30, mistake: 1, examples: 10  },
+            { day: '21', time: 30, mistake: 2, examples: 10 },
+            { day: '22', time: 10, mistake: 2, examples: 10  },
+            { day: '23', time: 5, mistake: 3, examples: 10  },
+            { day: '24', time: 5, mistake: 4, examples: 10  },
+            { day: '25', time: 30, mistake: 1, examples: 10  },
+            { day: '26', time: 30, mistake: 2, examples: 10 },
+            { day: '27', time: 10, mistake: 2, examples: 10  },
+            { day: '28', time: 5, mistake: 3, examples: 10  },
+            { day: '29', time: 5, mistake: 4, examples: 10  },
+            { day: '30', time: 30, mistake: 1, examples: 10  },
+            { day: '31', time: 30, mistake: 2, examples: 10 }
+        ],
+        // The name of the data record attribute that contains x-values.
+        xkey: 'day',
+        parseTime: false,
+        // A list of names of data record attributes that contain y-values.
+        ykeys: ['time','mistake','examples'],
+        // Labels for the ykeys -- will be displayed when you hover over the
+        // chart.
+        labels: ['time','mistake','examples'],
+        lineColors: ['blue','red','green']
+    });
+    new Morris.Line({
+        // ID of the element in which to draw the chart.
+        element: 'week',
+        // Chart data records -- each entry in this array corresponds to a point on
+        // the chart.
+        data: [
+            { day: 'Mon', time: 30, mistake: 2, examples: 10 },
+            { day: 'Tue', time: 10, mistake: 2, examples: 10  },
+            { day: 'Wed', time: 5, mistake: 3, examples: 10  },
+            { day: 'Thu', time: 5, mistake: 4, examples: 10  },
+            { day: 'Fri', time: 30, mistake: 1, examples: 10  },
+            { day: 'Sat', time: 30, mistake: 2, examples: 10 },
+            { day: 'Sun', time: 10, mistake: 2, examples: 10  }
+        ],
+        // The name of the data record attribute that contains x-values.
+        xkey: 'day',
+        parseTime: false,
+        // A list of names of data record attributes that contain y-values.
+        ykeys: ['time','mistake','examples'],
+        // Labels for the ykeys -- will be displayed when you hover over the
+        // chart.
+        labels: ['time','mistake','examples'],
+        lineColors: ['blue','red','green']
+    });
+}
+function statisticClose(){
+    block = document.getElementById('main1');
+    block.classList.remove('none');
+    block = document.getElementById('statistic');
+    block.classList.add('none');
+}
 
 function fromHomeToExample() { // переход с главного экрана на экран с пирмером
     
@@ -883,6 +912,9 @@ document.addEventListener('DOMContentLoaded', () => { // первый заход
     // console.log('23', JSON.parse(stats));
 
     // console.log("Количество дней в месяце:", stats);
+
+    
+
     window.Telegram.WebApp.expand();
     window.Telegram.WebApp.disableVerticalSwipes();
     if(localStorage.getItem('userTheme') == null || localStorage.getItem('userTheme') === undefined || localStorage.getItem('userTheme') === "" ){

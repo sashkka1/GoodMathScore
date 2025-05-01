@@ -26,7 +26,7 @@ button,.easy-basket-filter-info p,.easy-basket-filter-info-double p,.easy-basket
 button:active{
     background-color: rgb(18, 108, 146);
 }
-.main2{
+.main2,.statistic-header{
     /* color: rgb(28, 170, 231); */
     color: rgb(12, 154, 215);
 }

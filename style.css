@@ -19,51 +19,65 @@ body{
     display: flex;
     justify-content: center;
 }
-
-.statistic-behind{
-    position: absolute;
-    z-index: 10;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    justify-content: center;
-}
-.statistic-block{
-    position: relative;
-    width: 85vw;
-    height: 60vh;
-    background-color: rgb(234, 234, 234);
-    border-radius: 10px;
-    box-shadow: 0px 1px 5px  rgb(70, 70, 70);
-}
-.statistic{
+.statistic-icon{
     height: 7vh;
     aspect-ratio: 1 / 1;
 }
 span.statistic{
     font-size: 7vh;
 }
-.backk{
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    background-color: rgba(37, 37, 37, 0.7); /* Цвет затемнения с прозрачностью */
+
+.statistic{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+.statistic-header{
+    position: relative;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 90vw;
+    height: 13vh;
+    /* background-color: bisque; */
+}
+.statistic-header .time{color: blue;}
+.statistic-header .mistake{color: red;}
+.statistic-header .examples{color: green;}
+
+.statistic-block{
+    /* background-color: beige; */
+    width: 100vw;
+    height: 87vh;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: space-around;
 }
 
-
-.graph-wrapper {
-    height: 100%;
-    width: 100%;
+.graph-conteiner {
+    height: 35vh;
+    width: 90vw;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    overflow: auto;
+    scrollbar-width: none;       /* Firefox */
+    -ms-overflow-style: none; 
+}
+.graph-wrapper-month {
+    height: 35vh;
+    min-width: 1250px;
+}
+.graph-wrapper-week {
+    height: 35vh;
+    min-width: 400px;
+    /* background-color: aqua; */
 }
 
 .graph {
-    height: 100%;
+    height: 34vh;
     width: 100%;
-    background-color: #FFF;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 
@@ -309,7 +323,7 @@ span.statistic{
     .cssmain2{
         font-size: 3vw;
     }
-    .forPSize{
+    .forPSize,.statistic-header p{
         font-size: 2vw;
     }
     span.home{
@@ -326,7 +340,7 @@ span.statistic{
     .cssmain2{
         font-size: 4vw;
     }
-    .forPSize{
+    .forPSize,.statistic-header p{
         font-size: 2.5vw;
     }
     span.home{
@@ -343,7 +357,7 @@ span.statistic{
     .cssmain2{
         font-size: 5vw;
     }
-    .forPSize{
+    .forPSize,.statistic-header p{
         font-size: 3vw;
     }
     span.home{
@@ -360,7 +374,7 @@ span.statistic{
     .cssmain2{
         font-size: 6vw;
     }
-    .forPSize{
+    .forPSize,.statistic-header p{
         font-size: 4vw;
     }
     span.home{
@@ -377,7 +391,7 @@ span.statistic{
     .cssmain2{
         font-size: 7vw;
     }
-    .forPSize{
+    .forPSize,.statistic-header p{
         font-size: 4.5vw;
     }
     .choice input{
@@ -397,7 +411,7 @@ span.statistic{
     .cssmain2{
         font-size: 8vw;
     }
-    .forPSize{
+    .forPSize,.statistic-header p{
         font-size: 5.5vw;
     }
     .choice input{
