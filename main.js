@@ -195,16 +195,27 @@ function statisticOpen(){
                 });
                 document.getElementById('total-month').outerHTML = `<p class="total-month" id="total-month">total: time - ${totalMonthTime}, examples - ${totalMonthExamples}, mistake - ${totalMonthMistake}</p>`;
     
-                
+                let oldstats=[];
+                if((currentDay-(dayIndex-1)+i)<=0){
+                    window.Telegram.WebApp.CloudStorage.getItem("oldstats", (err, old) => {
+                        if (stats === null || stats === undefined || stats === "") {
+                            for(let i=1;i<=daysInLastMonth;i++){
+                                oldstats[i]= [0,0,0];
+                            };   
+                        }else{
+                            oldstats=old;
+                        }
+                    });
+                }
                 if(dayIndex == 0){ dayIndex =7;}
-                let arrayGraphWeek =[],a=[];
+                let arrayGraphWeek =[],a=[], dayName=[Mon, Tue, Wed, Thu, Fri, Sat, Sun];
                 let dateOfStartWeek = currentDay-(dayIndex-1);
                 for (let i = 0; i < 7; i++) {
                     console.log('0',a);
                     if(dateOfStartWeek<0){
                         console.log('1',a);
                         if((dateOfStartWeek+i)<=0){
-                            a[i] = stats[daysInLastMonth -(Math.abs(dateOfStartWeek)) +i];
+                            a[i] = oldstats[daysInLastMonth -(Math.abs(dateOfStartWeek)) +i];
                             console.log('11',a);
                             // заполняется массив старым месяцем
                         }else{
@@ -221,7 +232,7 @@ function statisticOpen(){
                         }
                     }
                     arrayGraphWeek.push({
-                        day: String(i),
+                        day: dayName[i],
                         time: a[i][0],
                         mistake: a[i][1],
                         examples: a[i][2]
@@ -988,12 +999,14 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 15');
+    console.log('Try 16');
 
     // for(let i=1;i<=30;i++){
     //     statsArray[i]= [0,0,0];
     // };    
 
+    let statArray= [[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0]]; 
+    window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(statArray));
 
     window.Telegram.WebApp.expand();
     window.Telegram.WebApp.disableVerticalSwipes();
