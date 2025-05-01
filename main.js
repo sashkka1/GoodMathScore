@@ -84,6 +84,25 @@ function statisticOpen(){
     block = document.getElementById('main1');
     block.classList.add('none');
 
+    console.log('before fun',);
+    let oldstats=[];
+    if(currentDay-(dayIndex-1)<0){
+        console.log('внутри проверки1',oldstats);
+        window.Telegram.WebApp.CloudStorage.getItem("oldstats", (err, old) => {
+            console.log('внутри проверки2',old);
+            if (stats === null || stats === undefined || stats === "") {
+                for(let i=1;i<=daysInLastMonth;i++){
+                    oldstats[i]= [0,0,0];
+                };   
+                console.log('внутри проверки если пусто',oldstats);
+            }else{
+                old = JSON.parse(old);
+                oldstats=old;
+                console.log('внутри проверки копирую',old);
+            }
+        });
+    }    
+
     window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
         
 
@@ -194,23 +213,6 @@ function statisticOpen(){
                     lineColors: ['blue','red','green']
                 });
                 document.getElementById('total-month').outerHTML = `<p class="total-month" id="total-month">total: time - ${totalMonthTime}, examples - ${totalMonthExamples}, mistake - ${totalMonthMistake}</p>`;
-                console.log('before fun',);
-                let oldstats=[];
-                if(currentDay-(dayIndex-1)<0){
-                    console.log('внутри проверки1',oldstats);
-                    window.Telegram.WebApp.CloudStorage.getItem("oldstats", (err, old) => {
-                        old = JSON.parse(old);
-                        if (stats === null || stats === undefined || stats === "") {
-                            for(let i=1;i<=daysInLastMonth;i++){
-                                oldstats[i]= [0,0,0];
-                            };   
-                            console.log('внутри проверки если пусто',oldstats);
-                        }else{
-                            oldstats=old;
-                            console.log('внутри проверки копирую',old);
-                        }
-                    });
-                }
                 console.log('oldstats',oldstats);
                 if(dayIndex == 0){ dayIndex =7;}
                 let arrayGraphWeek =[],a=[], dayName=[Mon, Tue, Wed, Thu, Fri, Sat, Sun];
@@ -1004,14 +1006,15 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 18');
+    console.log('Try 19');
 
     // for(let i=1;i<=30;i++){
     //     statsArray[i]= [0,0,0];
     // };    
 
-    // let statArray= [[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0]]; 
-    // window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(statArray));
+    let statArray= [[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0]]; 
+    console.log('statArray',statArray);
+    window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(statArray));
 
     window.Telegram.WebApp.expand();
     window.Telegram.WebApp.disableVerticalSwipes();
