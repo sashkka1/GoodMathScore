@@ -42,6 +42,7 @@ span.statistic{
     height: 13vh;
     /* background-color: bisque; */
 }
+
 .statistic-header .time{color: blue;}
 .statistic-header .mistake{color: red;}
 .statistic-header .examples{color: green;}
@@ -55,7 +56,6 @@ span.statistic{
     flex-direction: column;
     justify-content: space-around;
 }
-
 .graph-conteiner {
     height: 35vh;
     width: 90vw;
@@ -72,14 +72,15 @@ span.statistic{
 .graph-wrapper-week {
     height: 35vh;
     min-width: 400px;
-    /* background-color: aqua; */
 }
-
 .graph {
     height: 34vh;
     width: 100%;
+    /* background-color: aqua; */
 }
-
+.total-week{
+    padding-bottom: 2vh;
+}
 
 
 .main1{
@@ -323,7 +324,7 @@ span.statistic{
     .cssmain2{
         font-size: 3vw;
     }
-    .forPSize,.statistic-header p{
+    .forPSize,.statistic p{
         font-size: 2vw;
     }
     span.home{
@@ -340,7 +341,7 @@ span.statistic{
     .cssmain2{
         font-size: 4vw;
     }
-    .forPSize,.statistic-header p{
+    .forPSize,.statistic p{
         font-size: 2.5vw;
     }
     span.home{
@@ -357,7 +358,7 @@ span.statistic{
     .cssmain2{
         font-size: 5vw;
     }
-    .forPSize,.statistic-header p{
+    .forPSize,.statistic p{
         font-size: 3vw;
     }
     span.home{
@@ -374,7 +375,7 @@ span.statistic{
     .cssmain2{
         font-size: 6vw;
     }
-    .forPSize,.statistic-header p{
+    .forPSize,.statistic p{
         font-size: 4vw;
     }
     span.home{
@@ -391,7 +392,7 @@ span.statistic{
     .cssmain2{
         font-size: 7vw;
     }
-    .forPSize,.statistic-header p{
+    .forPSize,.statistic p{
         font-size: 4.5vw;
     }
     .choice input{
@@ -411,7 +412,7 @@ span.statistic{
     .cssmain2{
         font-size: 8vw;
     }
-    .forPSize,.statistic-header p{
+    .forPSize,.statistic p{
         font-size: 5.5vw;
     }
     .choice input{

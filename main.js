@@ -80,59 +80,79 @@ function statisticOpen(){
     block = document.getElementById('main1');
     block.classList.add('none');
 
+    window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
+        if (stats === null || stats === undefined || stats === "") {
+
+        }else{
+            let arrayGraph =[];
+            stats = JSON.parse(stats);
+            console.log('stats',stats);
+            for (let i = 1; i <= daysInMonth; i++) {
+                arrayGraph.push({
+                    day: String(i),
+                    time: statsArray[i][0],
+                    mistake: statsArray[i][1],
+                    examples: statsArray[i][2]
+                });
+            }
+            console.log('arrayGraph',arrayGraph);
+            new Morris.Line({
+                element: 'month',
+                data: arrayGraph,
+                xkey: 'day',
+                parseTime: false,
+                ykeys: ['time','mistake','examples'],
+                hideHover: 'always',
+                labels: ['time','mistake','examples'],
+                lineColors: ['blue','red','green']
+            });
+        }
+
+    });
+    // let statsArray =[]; //0(время), 1(количество решенных примеров), 2(количество ошибок)
+    let a = [{ day: '1', time: 30, mistake: 2, examples: 10 },
+        { day: '2', time: 10, mistake: 2, examples: 10  },
+        { day: '3', time: 5, mistake: 3, examples: 10  },
+        { day: '4', time: 5, mistake: 4, examples: 10  },
+        { day: '5', time: 30, mistake: 1, examples: 10  },
+        { day: '6', time: 30, mistake: 2, examples: 10 },
+        { day: '7', time: 10, mistake: 2, examples: 10  },
+        { day: '8', time: 5, mistake: 3, examples: 10  },
+        { day: '9', time: 5, mistake: 4, examples: 10  },
+        { day: '10', time: 30, mistake: 1, examples: 10  },
+        { day: '11', time: 30, mistake: 2, examples: 10 },
+        { day: '12', time: 10, mistake: 2, examples: 10  },
+        { day: '13', time: 5, mistake: 3, examples: 10  },
+        { day: '14', time: 5, mistake: 4, examples: 10  },
+        { day: '15', time: 30, mistake: 1, examples: 10  },
+        { day: '16', time: 30, mistake: 2, examples: 10 },
+        { day: '17', time: 10, mistake: 2, examples: 10  },
+        { day: '18', time: 5, mistake: 3, examples: 10  },
+        { day: '19', time: 5, mistake: 4, examples: 10  },
+        { day: '20', time: 30, mistake: 1, examples: 10  },
+        { day: '21', time: 30, mistake: 2, examples: 10 },
+        { day: '22', time: 10, mistake: 2, examples: 10  },
+        { day: '23', time: 5, mistake: 3, examples: 10  },
+        { day: '24', time: 5, mistake: 4, examples: 10  },
+        { day: '25', time: 30, mistake: 1, examples: 10  },
+        { day: '26', time: 30, mistake: 2, examples: 10 },
+        { day: '27', time: 10, mistake: 2, examples: 10  },
+        { day: '28', time: 5, mistake: 3, examples: 10  },
+        { day: '29', time: 5, mistake: 4, examples: 10  },
+        { day: '30', time: 30, mistake: 1, examples: 10  },
+        { day: '31', time: 30, mistake: 2, examples: 10 }];
     new Morris.Line({
-        // ID of the element in which to draw the chart.
         element: 'month',
-        // Chart data records -- each entry in this array corresponds to a point on
-        // the chart.
-        data: [
-            { day: '1', time: 30, mistake: 2, examples: 10 },
-            { day: '2', time: 10, mistake: 2, examples: 10  },
-            { day: '3', time: 5, mistake: 3, examples: 10  },
-            { day: '4', time: 5, mistake: 4, examples: 10  },
-            { day: '5', time: 30, mistake: 1, examples: 10  },
-            { day: '6', time: 30, mistake: 2, examples: 10 },
-            { day: '7', time: 10, mistake: 2, examples: 10  },
-            { day: '8', time: 5, mistake: 3, examples: 10  },
-            { day: '9', time: 5, mistake: 4, examples: 10  },
-            { day: '10', time: 30, mistake: 1, examples: 10  },
-            { day: '11', time: 30, mistake: 2, examples: 10 },
-            { day: '12', time: 10, mistake: 2, examples: 10  },
-            { day: '13', time: 5, mistake: 3, examples: 10  },
-            { day: '14', time: 5, mistake: 4, examples: 10  },
-            { day: '15', time: 30, mistake: 1, examples: 10  },
-            { day: '16', time: 30, mistake: 2, examples: 10 },
-            { day: '17', time: 10, mistake: 2, examples: 10  },
-            { day: '18', time: 5, mistake: 3, examples: 10  },
-            { day: '19', time: 5, mistake: 4, examples: 10  },
-            { day: '20', time: 30, mistake: 1, examples: 10  },
-            { day: '21', time: 30, mistake: 2, examples: 10 },
-            { day: '22', time: 10, mistake: 2, examples: 10  },
-            { day: '23', time: 5, mistake: 3, examples: 10  },
-            { day: '24', time: 5, mistake: 4, examples: 10  },
-            { day: '25', time: 30, mistake: 1, examples: 10  },
-            { day: '26', time: 30, mistake: 2, examples: 10 },
-            { day: '27', time: 10, mistake: 2, examples: 10  },
-            { day: '28', time: 5, mistake: 3, examples: 10  },
-            { day: '29', time: 5, mistake: 4, examples: 10  },
-            { day: '30', time: 30, mistake: 1, examples: 10  },
-            { day: '31', time: 30, mistake: 2, examples: 10 }
-        ],
-        // The name of the data record attribute that contains x-values.
+        data: a,
         xkey: 'day',
         parseTime: false,
-        // A list of names of data record attributes that contain y-values.
         ykeys: ['time','mistake','examples'],
-        // Labels for the ykeys -- will be displayed when you hover over the
-        // chart.
+        hideHover: 'always',
         labels: ['time','mistake','examples'],
         lineColors: ['blue','red','green']
     });
     new Morris.Line({
-        // ID of the element in which to draw the chart.
         element: 'week',
-        // Chart data records -- each entry in this array corresponds to a point on
-        // the chart.
         data: [
             { day: 'Mon', time: 30, mistake: 2, examples: 10 },
             { day: 'Tue', time: 10, mistake: 2, examples: 10  },
@@ -142,16 +162,15 @@ function statisticOpen(){
             { day: 'Sat', time: 30, mistake: 2, examples: 10 },
             { day: 'Sun', time: 10, mistake: 2, examples: 10  }
         ],
-        // The name of the data record attribute that contains x-values.
         xkey: 'day',
         parseTime: false,
-        // A list of names of data record attributes that contain y-values.
         ykeys: ['time','mistake','examples'],
-        // Labels for the ykeys -- will be displayed when you hover over the
-        // chart.
+        hideHover: 'always',
         labels: ['time','mistake','examples'],
         lineColors: ['blue','red','green']
     });
+
+
 }
 function statisticClose(){
     block = document.getElementById('main1');
@@ -913,7 +932,7 @@ document.addEventListener('DOMContentLoaded', () => { // первый заход
 
     // console.log("Количество дней в месяце:", stats);
 
-    
+
 
     window.Telegram.WebApp.expand();
     window.Telegram.WebApp.disableVerticalSwipes();
