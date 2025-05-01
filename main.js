@@ -87,7 +87,9 @@ function statisticOpen(){
             let arrayGraph =[];
             stats = JSON.parse(stats);
             console.log('stats',stats);
+            console.log('daysInMonth',daysInMonth);
             for (let i = 1; i <= daysInMonth; i++) {
+                console.log('i',i);
                 arrayGraph.push({
                     day: String(i),
                     time: statsArray[i][0],
@@ -912,7 +914,7 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 10');
+    console.log('Try 11');
     // for(let i=1;i<=daysInMonth;i++){
     //     statsArray[i]= [0,0,0];
     // };    
