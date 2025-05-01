@@ -118,29 +118,35 @@ function statisticOpen(){
 
             
             if(dayIndex == 0){ dayIndex =7;}
-            let arrayGraphWeek =[];
+            let arrayGraphWeek =[],a=[];
             let dateOfStartWeek = currentDay-(dayIndex-1);
             for (let i = 0; i < 7; i++) {
-                console.log('0',arrayGraphWeek);
+                console.log('0',a);
                 if(dateOfStartWeek<0){
-                    console.log('1',arrayGraphWeek);
+                    console.log('1',a);
                     if((dateOfStartWeek+i)<=0){
-                        arrayGraphWeek[i] = stats[daysInLastMonth -(Math.abs(dateOfStartWeek)) +i];
-                        console.log('11',arrayGraphWeek);
+                        a[i] = stats[daysInLastMonth -(Math.abs(dateOfStartWeek)) +i];
+                        console.log('11',a);
                         // заполняется массив старым месяцем
                     }else{
-                        arrayGraphWeek[i]= stats[dateOfStartWeek +i];
-                        console.log('12',arrayGraphWeek);
+                        a[i]= stats[dateOfStartWeek +i];
+                        console.log('12',a);
                         // заполняется массив новым месяцем
                     }
                 }else{
-                    arrayGraphWeek[i]= stats[dateOfStartWeek +i];
-                    console.log('21',arrayGraphWeek);
+                    a[i]= stats[dateOfStartWeek +i];
+                    console.log('21',a);
                     if(dateOfStartWeek +i >daysInMonth){
-                        arrayGraphWeek[i] = stats[dateOfStartWeek +i-daysInMonth];
-                        console.log('22',arrayGraphWeek);
+                        a[i] = stats[dateOfStartWeek +i-daysInMonth];
+                        console.log('22',a);
                     }
                 }
+                arrayGraphWeek.push({
+                    day: String(i),
+                    time: a[i][0],
+                    mistake: a[i][1],
+                    examples: a[i][2]
+                });
             }
             console.log('3',arrayGraphWeek);
             new Morris.Line({
