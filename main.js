@@ -108,68 +108,26 @@ function statisticOpen(){
                 labels: ['time','mistake','examples'],
                 lineColors: ['blue','red','green']
             });
+            new Morris.Line({
+                element: 'week',
+                data: [
+                    { day: 'Mon', time: 30, mistake: 2, examples: 10 },
+                    { day: 'Tue', time: 10, mistake: 2, examples: 10  },
+                    { day: 'Wed', time: 5, mistake: 3, examples: 10  },
+                    { day: 'Thu', time: 5, mistake: 4, examples: 10  },
+                    { day: 'Fri', time: 30, mistake: 1, examples: 10  },
+                    { day: 'Sat', time: 30, mistake: 2, examples: 10 },
+                    { day: 'Sun', time: 10, mistake: 2, examples: 10  }
+                ],
+                xkey: 'day',
+                parseTime: false,
+                ykeys: ['time','mistake','examples'],
+                hideHover: 'always',
+                labels: ['time','mistake','examples'],
+                lineColors: ['blue','red','green']
+            });
         }
 
-    });
-    // let statsArray =[]; //0(время), 1(количество решенных примеров), 2(количество ошибок)
-    let a = [{ day: '1', time: 30, mistake: 2, examples: 10 },
-        { day: '2', time: 10, mistake: 2, examples: 10  },
-        { day: '3', time: 5, mistake: 3, examples: 10  },
-        { day: '4', time: 5, mistake: 4, examples: 10  },
-        { day: '5', time: 30, mistake: 1, examples: 10  },
-        { day: '6', time: 30, mistake: 2, examples: 10 },
-        { day: '7', time: 10, mistake: 2, examples: 10  },
-        { day: '8', time: 5, mistake: 3, examples: 10  },
-        { day: '9', time: 5, mistake: 4, examples: 10  },
-        { day: '10', time: 30, mistake: 1, examples: 10  },
-        { day: '11', time: 30, mistake: 2, examples: 10 },
-        { day: '12', time: 10, mistake: 2, examples: 10  },
-        { day: '13', time: 5, mistake: 3, examples: 10  },
-        { day: '14', time: 5, mistake: 4, examples: 10  },
-        { day: '15', time: 30, mistake: 1, examples: 10  },
-        { day: '16', time: 30, mistake: 2, examples: 10 },
-        { day: '17', time: 10, mistake: 2, examples: 10  },
-        { day: '18', time: 5, mistake: 3, examples: 10  },
-        { day: '19', time: 5, mistake: 4, examples: 10  },
-        { day: '20', time: 30, mistake: 1, examples: 10  },
-        { day: '21', time: 30, mistake: 2, examples: 10 },
-        { day: '22', time: 10, mistake: 2, examples: 10  },
-        { day: '23', time: 5, mistake: 3, examples: 10  },
-        { day: '24', time: 5, mistake: 4, examples: 10  },
-        { day: '25', time: 30, mistake: 1, examples: 10  },
-        { day: '26', time: 30, mistake: 2, examples: 10 },
-        { day: '27', time: 10, mistake: 2, examples: 10  },
-        { day: '28', time: 5, mistake: 3, examples: 10  },
-        { day: '29', time: 5, mistake: 4, examples: 10  },
-        { day: '30', time: 30, mistake: 1, examples: 10  },
-        { day: '31', time: 30, mistake: 2, examples: 10 }];
-    new Morris.Line({
-        element: 'month',
-        data: a,
-        xkey: 'day',
-        parseTime: false,
-        ykeys: ['time','mistake','examples'],
-        hideHover: 'always',
-        labels: ['time','mistake','examples'],
-        lineColors: ['blue','red','green']
-    });
-    new Morris.Line({
-        element: 'week',
-        data: [
-            { day: 'Mon', time: 30, mistake: 2, examples: 10 },
-            { day: 'Tue', time: 10, mistake: 2, examples: 10  },
-            { day: 'Wed', time: 5, mistake: 3, examples: 10  },
-            { day: 'Thu', time: 5, mistake: 4, examples: 10  },
-            { day: 'Fri', time: 30, mistake: 1, examples: 10  },
-            { day: 'Sat', time: 30, mistake: 2, examples: 10 },
-            { day: 'Sun', time: 10, mistake: 2, examples: 10  }
-        ],
-        xkey: 'day',
-        parseTime: false,
-        ykeys: ['time','mistake','examples'],
-        hideHover: 'always',
-        labels: ['time','mistake','examples'],
-        lineColors: ['blue','red','green']
     });
 
 
