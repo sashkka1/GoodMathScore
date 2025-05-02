@@ -198,7 +198,7 @@ function statisticOpen(){
                     lineColors: ['blue','red','green']
                 });
                 // изменяю сумму за период
-                document.getElementById('total-month').outerHTML = `<p class="total-month" id="total-month">total: time(min) - ${totalMonthTime}, examples(/10) - ${totalMonthExamples}, mistake - ${totalMonthMistake}</p>`;
+                document.getElementById('total-month').outerHTML = `<p class="total-month" id="total-month">total: time - ${totalMonthTime}, examples - ${totalMonthExamples}, mistake - ${totalMonthMistake}</p>`;
 
                 totalMonthTime = 0;
                 totalMonthExamples = 0;
@@ -232,6 +232,7 @@ function statisticOpen(){
                     totalMonthExamples = Number(totalMonthExamples) + Number(a[i][1]);
                     totalMonthMistake = Number(totalMonthMistake) + Number(a[i][2]);
                 }
+                console.log('arrayGraphWeek',arrayGraphWeek);
                 // рисую недельный график
                 new Morris.Line({
                     element: 'week',
@@ -244,7 +245,7 @@ function statisticOpen(){
                     lineColors: ['blue','red','green']
                 });
                 // изменяю сумму за период
-                document.getElementById('total-month').outerHTML = `<p class="total-month" id="total-month">total: time(min) - ${totalMonthTime}, examples(/10) - ${totalMonthExamples}, mistake - ${totalMonthMistake}</p>`;
+                document.getElementById('total-week').outerHTML = `<p class="total-month" id="total-month">total: time - ${totalMonthTime}, examples - ${totalMonthExamples}, mistake - ${totalMonthMistake}</p>`;
             }   
         }
     });
@@ -993,7 +994,7 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 25');
+    console.log('Try 26');
 
 
     window.Telegram.WebApp.expand();
