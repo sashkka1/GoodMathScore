@@ -81,6 +81,9 @@ span.statistic{
 .total-week{
     padding-bottom: 2vh;
 }
+.statistic-block p{
+    margin-left: 5vw;
+}
 
 
 .main1{

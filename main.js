@@ -182,7 +182,7 @@ function statisticOpen(){
                         examples: (stats[i][1]/10).toFixed(2),
                         mistake: stats[i][2],
                     });
-                    totalMonthTime = Number(totalMonthTime) + Number(stats[i][0]);
+                    totalMonthTime = Number(totalMonthTime) + Number((stats[i][0]/60).toFixed(2));
                     totalMonthExamples = Number(totalMonthExamples) + Number(stats[i][1]);
                     totalMonthMistake = Number(totalMonthMistake) + Number(stats[i][2]);
                 }
@@ -994,8 +994,9 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 26');
+    console.log('Try 27');
 
+    
 
     window.Telegram.WebApp.expand();
     window.Telegram.WebApp.disableVerticalSwipes();
@@ -1024,18 +1025,14 @@ document.addEventListener('DOMContentLoaded', () => { // первый заход
 
     // если сейчас переходная неделя то заранее подгружаю данные для статистики
     if(currentDay-(dayIndex-1)<0){
-        console.log('внутри проверки1',oldstats);
         window.Telegram.WebApp.CloudStorage.getItem("oldstats", (err, old) => {
-            console.log('внутри проверки2',old);
             if (old === null || old === undefined || old === "") {
                 for(let i=1;i<=daysInLastMonth;i++){
                     oldstats[i]= [0,0,0];
                 };   
-                console.log('внутри проверки если пусто',oldstats);
             }else{
                 old = JSON.parse(old);
                 oldstats=old;
-                console.log('внутри проверки копирую',old);
             }
         });
     }    
