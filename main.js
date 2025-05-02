@@ -90,7 +90,6 @@ function statisticOpen(){
         
 
         if (stats === null || stats === undefined || stats === "") {
-
         }else{
             let arrayGraphMonth =[];
             let totalMonthTime = 0;
@@ -150,6 +149,7 @@ function statisticOpen(){
                     a[i]= stats[dateOfStartWeek +i];
                     if(dateOfStartWeek +i >daysInMonth){
                         a[i] = stats[dateOfStartWeek +i-daysInMonth];
+                        // заполняется массив будующим месяцем
                     }
                 }
                 arrayGraphWeek.push({
@@ -176,13 +176,10 @@ function statisticOpen(){
             });
             // изменяю сумму за период
             document.getElementById('total-week').outerHTML = `<p class="total-month" id="total-month">total: time - ${totalMonthTime}, examples - ${totalMonthExamples}, mistake - ${totalMonthMistake}</p>`;
-            
         }
     });
-
-
-
 }
+
 function statisticClose(){
     block = document.getElementById('main1');
     block.classList.remove('none');
