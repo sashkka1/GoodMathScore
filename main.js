@@ -174,17 +174,19 @@ function statisticOpen(){
                     lineColors: ['blue','red','green']
                 });
             }else{
+                // заполняю массив для рисования месячного графика
                 for (let i = 1; i <= daysInMonth; i++) {
                     arrayGraphMonth.push({
                         day: String(i),
-                        time: stats[i][0],
-                        mistake: stats[i][1],
-                        examples: stats[i][2]
+                        time: (stats[i][0]/60).toFixed(2),
+                        examples: (stats[i][1]/10).toFixed(2),
+                        mistake: stats[i][2],
                     });
                     totalMonthTime = Number(totalMonthTime) + Number(stats[i][0]);
                     totalMonthExamples = Number(totalMonthExamples) + Number(stats[i][1]);
                     totalMonthMistake = Number(totalMonthMistake) + Number(stats[i][2]);
                 }
+                // рисую месячный график
                 new Morris.Line({
                     element: 'month',
                     data: arrayGraphMonth,
@@ -195,42 +197,42 @@ function statisticOpen(){
                     labels: ['time','mistake','examples'],
                     lineColors: ['blue','red','green']
                 });
-                document.getElementById('total-month').outerHTML = `<p class="total-month" id="total-month">total: time - ${totalMonthTime}, examples - ${totalMonthExamples}, mistake - ${totalMonthMistake}</p>`;
-                console.log('oldstats',oldstats);
-                console.log('dayIndex',dayIndex,'currentDay',currentDay);
+                // изменяю сумму за период
+                document.getElementById('total-month').outerHTML = `<p class="total-month" id="total-month">total: time(min) - ${totalMonthTime}, examples(/10) - ${totalMonthExamples}, mistake - ${totalMonthMistake}</p>`;
+
+                totalMonthTime = 0;
+                totalMonthExamples = 0;
+                totalMonthMistake = 0;
                 if(dayIndex == 0){ dayIndex =7;}
                 let arrayGraphWeek =[],a=[], dayName=['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
                 let dateOfStartWeek = currentDay-(dayIndex-1);
-                console.log('dateOfStartWeek',dateOfStartWeek);
+                // заполняю массив для рисования недельного графика
                 for (let i = 0; i < 7; i++) {
-                    console.log('0',a);
                     if(dateOfStartWeek<0){
-                        console.log('1',a);
                         if((dateOfStartWeek+i)<=0){
                             a[i] = oldstats[daysInLastMonth -(Math.abs(dateOfStartWeek)) +i];
-                            console.log('11',a);
                             // заполняется массив старым месяцем
                         }else{
                             a[i]= stats[dateOfStartWeek +i];
-                            console.log('12',a);
                             // заполняется массив новым месяцем
                         }
                     }else{
                         a[i]= stats[dateOfStartWeek +i];
-                        console.log('21',a);
                         if(dateOfStartWeek +i >daysInMonth){
                             a[i] = stats[dateOfStartWeek +i-daysInMonth];
-                            console.log('22',a);
                         }
                     }
                     arrayGraphWeek.push({
                         day: dayName[i],
-                        time: a[i][0],
-                        mistake: a[i][1],
-                        examples: a[i][2]
+                        time: (a[i][0]/60).toFixed(2),
+                        examples: (a[i][1]/10).toFixed(2),
+                        mistake: a[i][2],
                     });
+                    totalMonthTime = Number(totalMonthTime) + Number((a[i][0]/60).toFixed(2));
+                    totalMonthExamples = Number(totalMonthExamples) + Number(a[i][1]);
+                    totalMonthMistake = Number(totalMonthMistake) + Number(a[i][2]);
                 }
-                console.log('3',arrayGraphWeek);
+                // рисую недельный график
                 new Morris.Line({
                     element: 'week',
                     data: arrayGraphWeek,
@@ -241,10 +243,10 @@ function statisticOpen(){
                     labels: ['time','mistake','examples'],
                     lineColors: ['blue','red','green']
                 });
+                // изменяю сумму за период
+                document.getElementById('total-month').outerHTML = `<p class="total-month" id="total-month">total: time(min) - ${totalMonthTime}, examples(/10) - ${totalMonthExamples}, mistake - ${totalMonthMistake}</p>`;
             }   
-            
         }
-
     });
 
 
@@ -991,15 +993,8 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 24');
+    console.log('Try 25');
 
-    // for(let i=1;i<=30;i++){
-    //     statsArray[i]= [0,0,0];
-    // };    
-
-    // let statArray= [[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[10,0,0]]; 
-    // console.log('statArray',statArray);
-    // window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(statArray));
 
     window.Telegram.WebApp.expand();
     window.Telegram.WebApp.disableVerticalSwipes();
@@ -1026,6 +1021,7 @@ document.addEventListener('DOMContentLoaded', () => { // первый заход
         dinamicRange();
     }
 
+    // если сейчас переходная неделя то заранее подгружаю данные для статистики
     if(currentDay-(dayIndex-1)<0){
         console.log('внутри проверки1',oldstats);
         window.Telegram.WebApp.CloudStorage.getItem("oldstats", (err, old) => {
