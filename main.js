@@ -123,7 +123,7 @@ function statisticOpen(){
                 xkey: 'day',
                 parseTime: false,
                 ykeys: ['time','mistake','examples'],
-                hideHover: 'always',
+                // hideHover: 'always',
                 labels: ['time','mistake','examples'],
                 lineColors: ['blue','red','green']
             });
@@ -924,7 +924,7 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 28');
+    console.log('Try 29');
 
     
 
