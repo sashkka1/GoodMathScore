@@ -27,6 +27,7 @@ let monthIndex = new Date().getMonth();
 let statsArray =[]; //0(время), 1(количество решенных примеров), 2(количество ошибок)
 let TimeForSave; // запоминаю время перед его обнулением
 let dayIndex = new Date().getDay();  // индекс дня недели
+let oldstats=[];
 
 
 // ловлю нажатие на иконку статистики
@@ -84,24 +85,6 @@ function statisticOpen(){
     block = document.getElementById('main1');
     block.classList.add('none');
 
-    console.log('before fun',);
-    let oldstats=[];
-    if(currentDay-(dayIndex-1)<0){
-        console.log('внутри проверки1',oldstats);
-        window.Telegram.WebApp.CloudStorage.getItem("oldstats", (err, old) => {
-            console.log('внутри проверки2',old);
-            if (old === null || old === undefined || old === "") {
-                for(let i=1;i<=daysInLastMonth;i++){
-                    oldstats[i]= [0,0,0];
-                };   
-                console.log('внутри проверки если пусто',oldstats);
-            }else{
-                old = JSON.parse(old);
-                oldstats=old;
-                console.log('внутри проверки копирую',old);
-            }
-        });
-    }    
 
     window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
         
@@ -1008,15 +991,15 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 23');
+    console.log('Try 24');
 
     // for(let i=1;i<=30;i++){
     //     statsArray[i]= [0,0,0];
     // };    
 
-    let statArray= [[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[10,0,0]]; 
-    console.log('statArray',statArray);
-    window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(statArray));
+    // let statArray= [[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[10,0,0]]; 
+    // console.log('statArray',statArray);
+    // window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(statArray));
 
     window.Telegram.WebApp.expand();
     window.Telegram.WebApp.disableVerticalSwipes();
@@ -1042,6 +1025,24 @@ document.addEventListener('DOMContentLoaded', () => { // первый заход
         }
         dinamicRange();
     }
+
+    if(currentDay-(dayIndex-1)<0){
+        console.log('внутри проверки1',oldstats);
+        window.Telegram.WebApp.CloudStorage.getItem("oldstats", (err, old) => {
+            console.log('внутри проверки2',old);
+            if (old === null || old === undefined || old === "") {
+                for(let i=1;i<=daysInLastMonth;i++){
+                    oldstats[i]= [0,0,0];
+                };   
+                console.log('внутри проверки если пусто',oldstats);
+            }else{
+                old = JSON.parse(old);
+                oldstats=old;
+                console.log('внутри проверки копирую',old);
+            }
+        });
+    }    
+
 })
 
 
