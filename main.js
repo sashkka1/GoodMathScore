@@ -973,6 +973,7 @@ document.addEventListener('DOMContentLoaded', () => { // первый заход
             }
         });
     }    
+    console.log('oldstats',oldstats);
 
 })
 
