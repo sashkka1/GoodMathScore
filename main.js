@@ -132,7 +132,7 @@ function statisticOpen(){
             // рисую графики примеров
             new Morris.Line({
                 element: 'examples',
-                data: arrayGraphMonth,
+                data: arrayGraphExamples,
                 xkey: 'day',
                 parseTime: false,
                 ykeys: ['examples'],
@@ -143,7 +143,7 @@ function statisticOpen(){
             // рисую графики времени
             new Morris.Line({
                 element: 'time',
-                data: arrayGraphMonth,
+                data: arrayGraphTime,
                 xkey: 'day',
                 parseTime: false,
                 ykeys: ['time'],
@@ -154,7 +154,7 @@ function statisticOpen(){
             // рисую графики ошибок
             new Morris.Line({
                 element: 'mistake',
-                data: arrayGraphMonth,
+                data: arrayGraphMistake,
                 xkey: 'day',
                 parseTime: false,
                 ykeys: ['mistake'],
