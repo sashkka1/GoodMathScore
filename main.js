@@ -86,17 +86,17 @@ function statisticOpen(){
     block.classList.add('none');
 
 
-    // window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
-        let stats=[];
+    window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
+        // let stats=[];
 
         if (stats === null || stats === undefined || stats === "") {
         }else{
-            for(let i=1;i<=daysInMonth;i++){
-                stats[i]= [0,0,0];
-            }; 
-            stats[0] =1;
-            stats = JSON.stringify(stats);
-            console.log('stats',stats);
+            // for(let i=1;i<=daysInMonth;i++){
+            //     stats[i]= [0,0,0];
+            // }; 
+            // stats[0] =1;
+            // stats = JSON.stringify(stats);
+            // console.log('stats',stats);
             let arrayGraphExamples = [], arrayGraphTime = [], arrayGraphMistake = [];   
             let totalMonthTime = 0;
             let totalMonthExamples = 0;
@@ -226,7 +226,7 @@ function statisticOpen(){
             // // изменяю сумму за период
             // document.getElementById('total-week').outerHTML = `<p class="total-month" id="total-month">total: time - ${totalMonthTime}, examples - ${totalMonthExamples}, mistake - ${totalMonthMistake}</p>`;
         }
-    // });
+    });
 }
 
 function statisticClose(){
