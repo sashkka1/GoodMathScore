@@ -50,7 +50,7 @@ span.statistic{
 .statistic-block{
     /* background-color: beige; */
     width: 100vw;
-    height: 87vh;
+    /* height: 87vh; */
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -64,23 +64,24 @@ span.statistic{
     overflow: auto;
     scrollbar-width: none;       /* Firefox */
     -ms-overflow-style: none; 
+    margin-bottom: 2vh;
 }
-.graph-wrapper-month {
+/* .graph-wrapper-month {
     height: 35vh;
     min-width: 1250px;
-}
-.graph-wrapper-week {
+} */
+/* .graph-wrapper-week {
     height: 35vh;
     min-width: 400px;
-}
+} */
 .graph {
-    height: 34vh;
-    width: 100%;
+    height: 30vh;
+    min-width: 1250px;
     /* background-color: aqua; */
 }
-.total-week{
+/* .total-week{
     padding-bottom: 2vh;
-}
+} */
 .statistic-block p{
     margin-left: 5vw;
 }
