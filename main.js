@@ -972,8 +972,8 @@ function themeChange(color){
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
     console.log('Try 31');
 
-    
 
+    
     window.Telegram.WebApp.expand();
     window.Telegram.WebApp.disableVerticalSwipes();
     if(localStorage.getItem('userTheme') == null || localStorage.getItem('userTheme') === undefined || localStorage.getItem('userTheme') === "" ){

@@ -28,6 +28,8 @@ span.statistic{
 }
 
 .statistic{
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -49,8 +51,8 @@ span.statistic{
 
 .statistic-block{
     /* background-color: beige; */
-    width: 100%;
-    /* height: 87vh; */
+    width: 100vw;
+    /* height: 88vh; */
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -58,7 +60,7 @@ span.statistic{
 }
 .graph-conteiner {
     height: 25vh;
-    width: 90%;
+    width: 90vw;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     overflow: auto;
@@ -66,10 +68,10 @@ span.statistic{
     -ms-overflow-style: none; 
     margin-bottom: 2vh;
 }
-/* .graph-wrapper-month {
-    height: 35vh;
+.graph-wrapper-examples,.graph-wrapper-time,.graph-wrapper-mistake {
+    /* height: 35vh; */
     min-width: 1250px;
-} */
+}
 /* .graph-wrapper-week {
     height: 35vh;
     min-width: 400px;
