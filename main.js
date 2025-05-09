@@ -1021,7 +1021,7 @@ function forStatisticSafe(){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 39');
+    console.log('Try 40');
 
 
     

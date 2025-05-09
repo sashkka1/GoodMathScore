@@ -69,7 +69,7 @@ span.statistic{
     margin-bottom: 2vh;
 }
 .graph-wrapper-examples,.graph-wrapper-time,.graph-wrapper-mistake {
-    height: 100%;
+    height: 98%;
     /* height: 25vh; */
     min-width: 1250px;
 }
