@@ -971,7 +971,7 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 31');
+    console.log('Try 32');
 
 
     
