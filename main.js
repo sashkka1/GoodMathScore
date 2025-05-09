@@ -112,7 +112,6 @@ function statisticOpen(){
             }
             // заполняю массив для рисования месячного графика
             for (let i = 1; i <= daysInMonth; i++) {
-                console.log('ss',(((stats[i][1] - stats[i][2])/stats[i][1])*100).toFixed(0));
                 arrayGraphExamples.push({
                     day: String(i),
                     examples: stats[i][1],
@@ -121,9 +120,10 @@ function statisticOpen(){
                     day: String(i),
                     time: (stats[i][0]/60).toFixed(2),
                 });
-                let number=100;
+                let number=0;
                 if(stats[i][2] != 0){
-                    number = (((stats[i][1] - stats[i][2])/stats[i][1])*100).toFixed(0);
+                    // number = (((stats[i][1] - stats[i][2])/stats[i][1])*100).toFixed(0);
+                    number = ((stats[i][1] - stats[i][2])/stats[i][1]).toFixed(0);
                 }
                 arrayGraphMistake.push({
                     day: String(i),
@@ -1015,7 +1015,7 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 34');
+    console.log('Try 35');
 
 
     
