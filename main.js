@@ -765,11 +765,12 @@ function keyboardClick(value){ // обработка клика на клави�
 
 
             if(TimeForSaveOld == 0){
-                TimeForSaveOld = TimeForSave = seconds+(tens*0.01);
+                TimeForSave = seconds+(tens*0.01);
+                TimeForSaveOld = TimeForSave;
             }else{
                 TimeForSave = (seconds+(tens*0.01)) - TimeForSaveOld;
             }
-            console.log('TimeForSaveOld - ',TimeForSave);
+            console.log('TimeForSave - ',TimeForSave);
                 
 
             // сохраняю результаты в облако
@@ -782,6 +783,7 @@ function keyboardClick(value){ // обработка клика на клави�
                     stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
                     stats[currentDay][1] = Number(stats[currentDay][1]) + 1;
                     stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
+                    console.log('mistake1 - ',Number(mistake));
                 }else{
                     stats = JSON.parse(stats);
                     if(stats[0]!= monthIndex){
@@ -793,10 +795,12 @@ function keyboardClick(value){ // обработка клика на клави�
                         stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
                         stats[currentDay][1] = Number(stats[currentDay][1]) + 1;
                         stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
+                        console.log('mistake2 - ',Number(mistake));
                     }else{
                         stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
                         stats[currentDay][1] = Number(stats[currentDay][1]) + 1;
                         stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
+                        console.log('mistake3 - ',Number(mistake));
                     }   
                 }
                 window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
