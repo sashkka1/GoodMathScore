@@ -121,9 +121,13 @@ function statisticOpen(){
                     day: String(i),
                     time: (stats[i][0]/60).toFixed(2),
                 });
+                let number=1;
+                if(stats[i][2] != 0){
+                    number = (((stats[i][1] - stats[i][2])/stats[i][1])*100).toFixed(0);
+                }
                 arrayGraphMistake.push({
                     day: String(i),
-                    mistake: (((stats[i][1] - stats[i][2])/stats[i][1])*100).toFixed(0),
+                    mistake: number,
                     // mistake: ((stats[i][1]/(stats[i][2]))*100).toFixed(0),
                 });
                 totalMonthTime = Number(totalMonthTime) + Number((stats[i][0]/60).toFixed(2));
@@ -971,7 +975,7 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 32');
+    console.log('Try 33');
 
 
     
