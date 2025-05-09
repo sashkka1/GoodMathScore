@@ -123,7 +123,7 @@ function statisticOpen(){
                 let number=0;
                 if(stats[i][2] != 0){
                     // number = (((stats[i][1] - stats[i][2])/stats[i][1])*100).toFixed(0);
-                    console.log('1',((stats[i][1] - stats[i][2])/stats[i][1]).toFixed(0)),'2',((stats[i][1] - stats[i][2])/stats[i][1]).toFixed(1);
+                    // console.log('1',((stats[i][1] - stats[i][2])/stats[i][1]).toFixed(0)),'2',((stats[i][1] - stats[i][2])/stats[i][1]).toFixed(1);
                     number = ((stats[i][1] - stats[i][2])/stats[i][1]).toFixed(2);
                 }
                 arrayGraphMistake.push({
@@ -772,7 +772,7 @@ function keyboardClick(value){ // обработка клика на клави�
             }
             TimeForSaveOld = seconds+(tens*0.01);
             console.log('TimeForSave - ',TimeForSave);
-            TimeForSave -= (seconds+(tens*0.01));
+            TimeForSave = (seconds+(tens*0.01)) - TimeForSave;
             console.log('TimeForSave2 - ',TimeForSave);
             // сохраняю результаты в облако
             window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
@@ -1021,7 +1021,7 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 36');
+    console.log('Try 37');
 
 
     
