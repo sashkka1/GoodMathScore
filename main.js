@@ -24,8 +24,8 @@ let daysInLastMonth = new Date(new Date().getFullYear(), (new Date().getMonth()-
 // индекст текущего месяцы
 let monthIndex = new Date().getMonth();
 // массив для сохранения в облако
-let statsArray =[]; //0(время), 1(количество решенных примеров), 2(количество ошибок)
-let TimeForSave; // запоминаю время перед его обнулением
+// let statsArray =[]; //0(время), 1(количество решенных примеров), 2(количество ошибок)
+let TimeForSave,TimeForSaveOld=0; // запоминаю время перед его обнулением
 let dayIndex = new Date().getDay();  // индекс дня недели
 let oldstats=[];
 
@@ -121,7 +121,7 @@ function statisticOpen(){
                     day: String(i),
                     time: (stats[i][0]/60).toFixed(2),
                 });
-                let number=1;
+                let number=100;
                 if(stats[i][2] != 0){
                     number = (((stats[i][1] - stats[i][2])/stats[i][1])*100).toFixed(0);
                 }
@@ -764,7 +764,12 @@ function keyboardClick(value){ // обработка клика на клави�
             blink('example-answer-block','good');
 
 
-            TimeForSave = seconds+(tens*0.01);
+            if(TimeForSaveOld == 0){
+                TimeForSaveOld = TimeForSave = seconds+(tens*0.01);
+            }else{
+                TimeForSave = (seconds+(tens*0.01)) - TimeForSaveOld;
+            }
+            console.log('TimeForSaveOld - ',TimeForSave);
                 
 
             // сохраняю результаты в облако
@@ -774,7 +779,7 @@ function keyboardClick(value){ // обработка клика на клави�
                         stats[i]= [0,0,0];
                     };    
                     stats[0] = monthIndex;
-                    // stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
+                    stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
                     stats[currentDay][1] = Number(stats[currentDay][1]) + 1;
                     stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
                 }else{
@@ -785,11 +790,11 @@ function keyboardClick(value){ // обработка клика на клави�
                             stats[i]= [0,0,0];
                         };    
                         stats[0] = monthIndex;
-                        // stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
+                        stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
                         stats[currentDay][1] = Number(stats[currentDay][1]) + 1;
                         stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
                     }else{
-                        // stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
+                        stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
                         stats[currentDay][1] = Number(stats[currentDay][1]) + 1;
                         stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
                     }   
@@ -848,6 +853,7 @@ function keyboardClick(value){ // обработка клика на клави�
                 document.getElementById('win-message').outerHTML = `<p id="win-message" class="win-message ">Ошибки: ${mistake} <br> Время: ${b}:${a}</p>`;
 
                 fromExampleToHome();
+                TimeForSaveOld=0;
             }else{
                 setExample();
             }
@@ -1009,7 +1015,7 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 33');
+    console.log('Try 34');
 
 
     
