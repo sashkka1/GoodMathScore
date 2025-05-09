@@ -123,7 +123,8 @@ function statisticOpen(){
                 let number=0;
                 if(stats[i][2] != 0){
                     // number = (((stats[i][1] - stats[i][2])/stats[i][1])*100).toFixed(0);
-                    number = ((stats[i][1] - stats[i][2])/stats[i][1]).toFixed(0);
+                    console.log('1',((stats[i][1] - stats[i][2])/stats[i][1]).toFixed(0)),'2',((stats[i][1] - stats[i][2])/stats[i][1]).toFixed(1);
+                    number = ((stats[i][1] - stats[i][2])/stats[i][1]).toFixed(2);
                 }
                 arrayGraphMistake.push({
                     day: String(i),
@@ -766,13 +767,13 @@ function keyboardClick(value){ // обработка клика на клави�
 
             if(TimeForSaveOld == 0){
                 TimeForSave = seconds+(tens*0.01);
-                TimeForSaveOld = TimeForSave;
             }else{
                 TimeForSave = (seconds+(tens*0.01)) - TimeForSaveOld;
             }
+            TimeForSaveOld = seconds+(tens*0.01);
             console.log('TimeForSave - ',TimeForSave);
-                
-
+            TimeForSave -= (seconds+(tens*0.01));
+            console.log('TimeForSave2 - ',TimeForSave);
             // сохраняю результаты в облако
             window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
                 if (stats === null || stats === undefined || stats === "") {
@@ -805,6 +806,7 @@ function keyboardClick(value){ // обработка клика на клави�
                 }
                 window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
                 console.log('2', stats);
+                mistake=0;
             });
 
             // сохраняю результаты в облако
@@ -861,9 +863,9 @@ function keyboardClick(value){ // обработка клика на клави�
             }else{
                 setExample();
             }
-            mistake=0;
         }else{
             mistake=1;
+            console.log('mistake4 - ',Number(mistake));
             blink('example-answer-block','bad')
         }
     } else if(answerUser.length < 6){
@@ -1019,7 +1021,7 @@ function themeChange(color){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 35');
+    console.log('Try 36');
 
 
     
