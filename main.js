@@ -1,6 +1,6 @@
 let values =[]; // 0+   1-   2x   3/  4t  5+-(min)  6+-(max)  7x/(min)  8x/(max) 
 let examples =[];
-let score = 1, mistake =0,examplesCount=10;
+let score = 1, mistake =0,totalMistake =0,examplesCount=10;
 let block;
 let numberOne,numberTwo,answer;
 
@@ -266,11 +266,55 @@ function fromHomeToExample() { // переход с главного экран�
     // обнуляю масив примеров, ошибки и количество примеров перед новой итерацией
     examples =[]; 
     mistake=0;
+    totalMistake=0;
     score=1;
     setExample();
 }
 
 function fromExampleToHome() {// переход с экрана с пирмером на главный экран
+
+    if(TimeForSaveOld == 0){
+        TimeForSave = seconds+(tens*0.01);
+    }else{
+        TimeForSave = (seconds+(tens*0.01)) - TimeForSaveOld;
+    }
+    TimeForSaveOld = seconds+(tens*0.01);
+    
+    // сохраняю результаты в облако
+    window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
+        if (stats === null || stats === undefined || stats === "") {
+            for(let i=1;i<=daysInMonth;i++){
+                stats[i]= [0,0,0];
+            };    
+            stats[0] = monthIndex;
+            stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
+            stats[currentDay][1] = Number(stats[currentDay][1]) + 1;
+            stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
+            console.log('mistake1 - ',Number(mistake));
+        }else{
+            stats = JSON.parse(stats);
+            if(stats[0]!= monthIndex){
+                window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(stats));
+                for(let i=1;i<=daysInMonth;i++){
+                    stats[i]= [0,0,0];
+                };    
+                stats[0] = monthIndex;
+                stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
+                stats[currentDay][1] = Number(stats[currentDay][1]) + 1;
+                stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
+                console.log('mistake2 - ',Number(mistake));
+            }else{
+                stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
+                stats[currentDay][1] = Number(stats[currentDay][1]) + 1;
+                stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
+                console.log('mistake3 - ',Number(mistake));
+            }   
+        }
+        window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
+        console.log('2', stats);
+        mistake=0;
+    });
+
 
     //меняю ползунки и чекбоксы на сохраненные значения
     let test = localStorage.getItem('values');
@@ -754,7 +798,27 @@ function keyboardClick(value){ // обработка клика на клави�
             score++;
             input.outerHTML = `<p id="example-answer"></p>`;
             blink('example-answer-block','good');
+            
+            if(score>=(+examplesCount+1)){
+                let a;
+                if(tens <= 9){
+                    a = "0" + tens;
+                }else{
+                    a=tens;
+                }
+                let b;
+                if (seconds <= 9){
+                    b = "0" + seconds;
+                }else{
+                    b = seconds;
+                }
+                document.getElementById('win-message').outerHTML = `<p id="win-message" class="win-message ">Ошибки: ${totalMistake} <br> Время: ${b}:${a}</p>`;
 
+                fromExampleToHome();
+                TimeForSaveOld=0;
+            }else{
+                setExample();
+            }
 
             if(TimeForSaveOld == 0){
                 TimeForSave = seconds+(tens*0.01);
@@ -762,6 +826,7 @@ function keyboardClick(value){ // обработка клика на клави�
                 TimeForSave = (seconds+(tens*0.01)) - TimeForSaveOld;
             }
             TimeForSaveOld = seconds+(tens*0.01);
+            
             // сохраняю результаты в облако
             window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
                 if (stats === null || stats === undefined || stats === "") {
@@ -796,29 +861,12 @@ function keyboardClick(value){ // обработка клика на клави�
                 console.log('2', stats);
                 mistake=0;
             });
-            
-            if(score>=(+examplesCount+1)){
-                let a;
-                if(tens <= 9){
-                    a = "0" + tens;
-                }else{
-                    a=tens;
-                }
-                let b;
-                if (seconds <= 9){
-                    b = "0" + seconds;
-                }else{
-                    b = seconds;
-                }
-                document.getElementById('win-message').outerHTML = `<p id="win-message" class="win-message ">Ошибки: ${mistake} <br> Время: ${b}:${a}</p>`;
 
-                fromExampleToHome();
-                TimeForSaveOld=0;
-            }else{
-                setExample();
-            }
+
+
         }else{
             mistake=1;
+            totalMistake++;
             console.log('mistake4 - ',Number(mistake));
             blink('example-answer-block','bad')
         }
