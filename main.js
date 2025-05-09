@@ -112,6 +112,7 @@ function statisticOpen(){
             }
             // заполняю массив для рисования месячного графика
             for (let i = 1; i <= daysInMonth; i++) {
+                console.log('ss',(((stats[i][1] - stats[i][2])/stats[i][1])*100).toFixed(0));
                 arrayGraphExamples.push({
                     day: String(i),
                     examples: stats[i][1],
