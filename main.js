@@ -1023,7 +1023,6 @@ function forStatisticSafe(){
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
     console.log('Try 40');
 
-
     
     window.Telegram.WebApp.expand();
     window.Telegram.WebApp.disableVerticalSwipes();
