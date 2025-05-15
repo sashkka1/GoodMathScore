@@ -31,12 +31,7 @@ let oldstats=[];
 
 
 // ловлю нажатие на иконку статистики
-document.getElementById('statistic-icon').addEventListener('click', () => {
-    statisticOpen(); // рисую график
-    graphToToday('graph-conteiner-examples','graph-wrapper-examples'); // передвигаю на текущую дату
-    graphToToday('graph-conteiner-time','graph-wrapper-time'); 
-    graphToToday('graph-conteiner-mistake','graph-wrapper-mistake');
-});
+document.getElementById('statistic-icon').addEventListener('click', () => {statisticOpen();});
 // document.getElementById('statistic-behind').addEventListener('click', () => { 
 //     block = document.getElementById('statistic-icon');
 //     block.classList.add('none');
@@ -230,7 +225,11 @@ function statisticOpen(){
             // // изменяю сумму за период
             // document.getElementById('total-week').outerHTML = `<p class="total-month" id="total-month">total: time - ${totalMonthTime}, examples - ${totalMonthExamples}, mistake - ${totalMonthMistake}</p>`;
         }
+        graphToToday('graph-conteiner-examples','graph-wrapper-examples'); // передвигаю на текущую дату
+        graphToToday('graph-conteiner-time','graph-wrapper-time'); 
+        graphToToday('graph-conteiner-mistake','graph-wrapper-mistake');
     });
+
 }
 
 function statisticClose(){
