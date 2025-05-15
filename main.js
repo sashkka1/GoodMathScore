@@ -31,7 +31,12 @@ let oldstats=[];
 
 
 // ловлю нажатие на иконку статистики
-document.getElementById('statistic-icon').addEventListener('click', () => {statisticOpen();});
+document.getElementById('statistic-icon').addEventListener('click', () => {
+    statisticOpen(); // рисую график
+    graphToToday('graph-conteiner-examples','graph-wrapper-examples'); // передвигаю на текущую дату
+    graphToToday('graph-conteiner-time','graph-wrapper-time'); 
+    graphToToday('graph-conteiner-mistake','graph-wrapper-mistake');
+});
 // document.getElementById('statistic-behind').addEventListener('click', () => { 
 //     block = document.getElementById('statistic-icon');
 //     block.classList.add('none');
@@ -87,15 +92,20 @@ function statisticOpen(){
 
 
     window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
-
+        // let stats = [];
+        // for(let i=1;i<=31;i++){
+        //     stats[i] = [];
+        //     stats[i][0] = Math.floor(Math.random() * (20 - 10 + 1)) + 10;
+        //     stats[i][1] = Math.floor(Math.random() * (20 - 10 + 1)) + 10;
+        //     stats[i][2] = Math.floor(Math.random() * (20 - 10 + 1)) + 10;
+        // }
+        // stats = JSON.stringify(stats)
+        // console.log('stats',stats);
         if (stats === null || stats === undefined || stats === "") {
         }else{
             let arrayGraphExamples = [], arrayGraphTime = [], arrayGraphMistake = [];   
-            let totalMonthTime = 0;
-            let totalMonthExamples = 0;
-            let totalMonthMistake = 0;
             stats = JSON.parse(stats);
-            console.log('stats1',stats);
+            // console.log('stats1',stats);
             // если пользователь зашел в новом месяце и сразу посмотрит статистику то она должна быть пустой а не прошлого месяца
             if(stats[0]!= monthIndex){
                 window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(stats));
@@ -122,9 +132,6 @@ function statisticOpen(){
                     day: String(i),
                     mistake: number,
                 });
-                totalMonthTime = Number(totalMonthTime) + Number((stats[i][0]/60).toFixed(2));
-                totalMonthExamples = Number(totalMonthExamples) + Number(stats[i][1]);
-                totalMonthMistake = Number(totalMonthMistake) + Number(stats[i][2]);
             }
             // рисую графики примеров
             new Morris.Line({
@@ -231,6 +238,36 @@ function statisticClose(){
     block.classList.remove('none');
     block = document.getElementById('statistic');
     block.classList.add('none');
+}
+
+function graphToToday(one,two){
+    let today = new Date().getDate(); // получаем текущий день месяца
+    let container = document.getElementById(one);
+    let chart = document.getElementById(two);
+
+    // Ждем небольшой интервал, чтобы график точно успел отрисоваться
+    setTimeout(() => {
+        // Найти все подписи по оси X (Morris генерирует их с классом .x-axis-label или подобным)
+        let labels = chart.querySelectorAll('text');
+
+        let targetLabel = null;
+
+        labels.forEach(label => {
+            if (parseInt(label.textContent) === today) {
+            targetLabel = label;
+            }
+        });
+
+        if (targetLabel) {
+            let labelRect = targetLabel.getBoundingClientRect();
+            let containerRect = container.getBoundingClientRect();
+
+            let offsetLeft = labelRect.left + container.scrollLeft - containerRect.left;
+            let centerScroll = offsetLeft - container.clientWidth / 2 + labelRect.width / 2;
+
+            container.scrollLeft = centerScroll;
+        }
+    }, 100);
 }
 
 function fromHomeToExample() { // переход с главного экрана на экран с пирмером
@@ -1021,7 +1058,7 @@ function forStatisticSafe(){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    console.log('Try 40');
+    // alert("version - 1"); 
 
     
     window.Telegram.WebApp.expand();
@@ -1048,22 +1085,6 @@ document.addEventListener('DOMContentLoaded', () => { // первый заход
         }
         dinamicRange();
     }
-
-    // // если сейчас переходная неделя то заранее подгружаю данные для статистики
-    // if(currentDay-(dayIndex-1)<0){
-    //     window.Telegram.WebApp.CloudStorage.getItem("oldstats", (err, old) => {
-    //         if (old === null || old === undefined || old === "") {
-    //             for(let i=1;i<=daysInLastMonth;i++){
-    //                 oldstats[i]= [0,0,0];
-    //             };   
-    //         }else{
-    //             old = JSON.parse(old);
-    //             oldstats=old;
-    //         }
-    //     });
-    // }    
-    // console.log('oldstats',oldstats);
-
 })
 
 
@@ -1138,6 +1159,7 @@ jQuery(document).ready(function() { // код первого ползунка д
 		$(this).val(Math.floor(valUpper));
 	});
 });
+
 jQuery(document).ready(function() {  // код второго ползунка диапозона на старте
 	$('.upper-double').on('input', setFill);
 	$('.lower-double').on('input', setFill);
@@ -1205,6 +1227,7 @@ jQuery(document).ready(function() {  // код второго ползунка �
 		$(this).val(Math.floor(valUpper));
 	});
 });
+
 jQuery(document).ready(function() {  // код ползунка количества уровней
 	$('.upper-three').on('input', setFill);
 	$('.lower-three').on('input', setFill);
