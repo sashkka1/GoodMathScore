@@ -1059,15 +1059,15 @@ function forStatisticSafe(){
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
     // alert("version - 1"); 
 
-    let screenWidth = window.innerWidth;
-    let screenHeight = window.innerHeight;
-    let input = document.getElementById('for-test1');
-    input.outerHTML = `<p id="for-test1">W ${screenWidth}, H ${screenHeight} viewport</p>`;
+    // let screenWidth = window.innerWidth;
+    // let screenHeight = window.innerHeight;
+    // let input = document.getElementById('for-test1');
+    // input.outerHTML = `<p id="for-test1">W ${screenWidth}, H ${screenHeight} viewport</p>`;
 
-    let fullWidth = screen.width;
-    let fullHeight = screen.height;
-    input = document.getElementById('for-test2');
-    input.outerHTML = `<p id="for-test1">W ${fullWidth}, H ${fullHeight} full</p>`;
+    // let fullWidth = screen.width;
+    // let fullHeight = screen.height;
+    // input = document.getElementById('for-test2');
+    // input.outerHTML = `<p id="for-test1">W ${fullWidth}, H ${fullHeight} full</p>`;
     
 
     window.Telegram.WebApp.expand();
@@ -1094,6 +1094,17 @@ document.addEventListener('DOMContentLoaded', () => { // первый заход
         }
         dinamicRange();
     }
+
+    // const style = document.createElement('style');
+    // style.textContent = `
+    //     .cssmain1 { font-size: 6.5vw; }
+    //     .cssmain2 { font-size: 8vw; }
+    //     .forPSize, .statistic p { font-size: 5.5vw; }
+    //     .choice input { width: 7vw; }
+    //     span.home { font-size: 8vh; }
+    //     span.keyboard-circle { font-size: 10vw; }
+    // `;
+    // document.head.appendChild(style);
 })
 
 
