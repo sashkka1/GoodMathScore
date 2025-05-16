@@ -1057,9 +1057,19 @@ function forStatisticSafe(){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    // alert("version - 1"); 
+    alert("version - 1"); 
 
+    let screenWidth = window.innerWidth;
+    let screenHeight = window.innerHeight;
+    let input = document.getElementById('for-test1');
+    input.outerHTML = `<p id="for-test1">W ${screenWidth}, H ${screenHeight} viewport</p>`;
+
+    let fullWidth = screen.width;
+    let fullHeight = screen.height;
+    input = document.getElementById('for-test2');
+    input.outerHTML = `<p id="for-test1">W ${fullWidth}, H ${fullHeight} full</p>`;
     
+
     window.Telegram.WebApp.expand();
     window.Telegram.WebApp.disableVerticalSwipes();
     if(localStorage.getItem('userTheme') == null || localStorage.getItem('userTheme') === undefined || localStorage.getItem('userTheme') === "" ){
