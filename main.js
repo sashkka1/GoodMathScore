@@ -1057,7 +1057,7 @@ function forStatisticSafe(){
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    alert("version - 1"); 
+    // alert("version - 1"); 
 
     let screenWidth = window.innerWidth;
     let screenHeight = window.innerHeight;
