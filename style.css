@@ -320,7 +320,7 @@ span.statistic{
 
 
 
-.cssmain1{
+/* .cssmain1{
     font-size: 6.5vw;
 }
 .cssmain2{
@@ -337,10 +337,10 @@ span.home{
 }
 span.keyboard-circle{
     font-size: 10vw;
-}
+} */
 
 
-/* 
+
 @media (min-width: 992px) {
     .cssmain1{
         font-size: 2vw;
@@ -448,7 +448,7 @@ span.keyboard-circle{
     span.keyboard-circle{
         font-size: 10vw;
     }
-} */
+}
 
 
 
