@@ -32,10 +32,10 @@ let oldstats=[];
 
 // ловлю нажатие на иконку статистики
 document.getElementById('statistic-icon').addEventListener('click', () => {statisticOpen();});
-document.getElementById('statistic-behind').addEventListener('click', () => { 
-    block = document.getElementById('statistic-icon');
-    block.classList.add('none');
-});
+// document.getElementById('statistic-behind').addEventListener('click', () => { 
+//     block = document.getElementById('statistic-icon');
+//     block.classList.add('none');
+// });
 
 // открытие и закрытие блока с цветовыми темами, а так же ловню вбор пользователя насчет темы
 document.getElementById('different-theme').addEventListener('click', () => { differentTheme('open');});
