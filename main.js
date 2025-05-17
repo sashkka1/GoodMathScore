@@ -31,7 +31,7 @@ let oldstats=[];
 
 
 // ловлю нажатие на иконку статистики
-document.getElementById('statistic-icon').addEventListener('click', () => {statisticOpen();});
+// document.getElementById('statistic-icon').addEventListener('click', () => {statisticOpen();});
 // document.getElementById('statistic-behind').addEventListener('click', () => { 
 //     block = document.getElementById('statistic-icon');
 //     block.classList.add('none');
@@ -63,7 +63,7 @@ document.getElementById('start-button').addEventListener('click', () => {fromHom
 // клик на возврат на главную
 document.getElementById('back-to-home').addEventListener('click', () => { forStatisticSafe(); fromExampleToHome();});
 // клик на возврат на главную
-document.getElementById('back-to-home-statistic').addEventListener('click', () => { statisticClose();});
+// document.getElementById('back-to-home-statistic').addEventListener('click', () => { statisticClose();});
 
 // обработка кликов на клавиатуру, на каждую из клавиш
 document.getElementById('number-1').addEventListener('click', () => { keyboardClick(document.getElementById('number-1').value);});
