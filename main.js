@@ -11,8 +11,6 @@ var seconds = 0;
 var tens = 0; 
 var appendTens = document.getElementById("tens")
 var appendSeconds = document.getElementById("seconds")
-var appendTens = document.getElementById("tens");
-var appendSeconds = document.getElementById("seconds");
 var buttonStart = document.getElementById('button-start');
 var buttonStop = document.getElementById('button-stop');
 var buttonReset = document.getElementById('button-reset');
@@ -91,8 +89,8 @@ function fromHomeToExample() { // переход с главного экран�
         clearInterval(Interval);
         Interval = setInterval(startTimer, 10);
     }
-    clearInterval(Interval);
-    Interval = setInterval(startTimer, 10);
+    // clearInterval(Interval);
+    // Interval = setInterval(startTimer, 10);
 
     // обнуляю масив примеров, ошибки и количество примеров перед новой итерацией
     examples =[]; 
@@ -720,7 +718,7 @@ function setExample(){ // создаю пример и вывожу на экр�
 
     let inputExample = document.getElementById('example');
     inputExample.outerHTML = `<p id="example">${ numberOne } ${ symbolArray[symbol] } ${ numberTwo } = </p>`;
-    console.log("Answer - ",answer);
+    // console.log("Answer - ",answer);
 
     let inputScore = document.getElementById('score');
     inputScore.outerHTML = `<p id="score">${score}/${examplesCount}</p>`;
