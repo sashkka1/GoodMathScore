@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- <meta name="viewport" content="width=device-width, user-scalable=no"> -->
+    <meta name="viewport" content="width=device-width, user-scalable=no">
     <title>MathScore</title>
     <link rel="stylesheet" href="./style.css" /></link>
     <link rel="stylesheet" id="theme" href="./style.css" /></link>
-    <!-- <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css"> -->
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js'></script>
+    <script src="https://telegram.org/js/telegram-web-app.js?v=1.0.1"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Icons+Round">
-    <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,700,0,-25&icon_names=monitoring" /> -->
 </head>
 <body>
 
@@ -20,43 +20,11 @@
             <div class="green" id="green"></div>
         </div>
     </div>
-    <!-- <div class = "none"  id="statistic">
-        <div  class="statistic" id="statistic">
-            <div class="statistic-header">
-                <div class="back-to-home" id="back-to-home-statistic">
-                    <span class="material-icons-round home">home</span>
-                </div>
-                <p class="time" >time</p>
-                <p class="examples" >examples</p>
-                <p class="mistake" >mistake</p>
-                <p></p>
-            </div>
-            <div class="statistic-block" id="statistic-block"> 
-                <div class="graph-conteiner" id="graph-conteiner-examples">
-                    <div class="graph-wrapper-examples" id="graph-wrapper-examples">
-                        <div id="examples" class="graph"></div>
-                    </div>
-                </div>
-                <div class="graph-conteiner" id="graph-conteiner-time">
-                    <div class="graph-wrapper-time" id="graph-wrapper-time">
-                        <div id="time" class="graph"></div>
-                    </div>
-                </div>
-                <div class="graph-conteiner" id="graph-conteiner-mistake">
-                    <div class="graph-wrapper-mistake" id="graph-wrapper-mistake">
-                        <div id="mistake" class="graph"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> -->
-    <!-- <div class = "none" id="main1">  -->
+
     <div  id="main1">
+        <div class="main1 cssmain2">
         <div class="main1 cssmain1">
             <div class="header1">
-                <!-- <div class="statistic-icon" id="statistic-icon">
-                    <span class="material-symbols-rounded statistic">monitoring</span>
-                </div> -->
                 <p id="win-message" class="win-message none">Ошибки: <br> Время: </p>
                 <div class="different-theme" id="different-theme"></div>
             </div>
@@ -69,42 +37,44 @@
             </div>
 
             <div class="tuning-small-big">
+                <button class="small-range cssmain2" id="small-range">Малый</button>
+                <button class="big-range cssmain2" id="big-range">Большой</button>
                 <button class="small-range cssmain1" id="small-range">Малый</button>
                 <button class="big-range cssmain1" id="big-range">Большой</button>
             </div>
 
             <div class="filter">
-                <p id="for-test1">Диапозон для: +, −</p>
+                <p>Диапозон для: +, −</p>
                 <div class="easy-basket-filter">
                     <div class="easy-basket-filter-info">
                         <p class="iLower"><input disabled type="text" id="easy-basket-lower" class="easy-basket-lower forPSize" value="0" min="0" max="300" maxlength=3/></p>
                         <p class="iUpper"><input disabled type="text" class="easy-basket-upper forPSize" value="100" min="0" max="300" maxlength=3/></p>
                     </div>
-                    
+
                     <div class="easy-basket-filter-range">
                         <input type="range" class="lower range" step="1" min="0" max="300" value="0"/>
                         <input type="range" class="upper range" step="1" min="0" max="300" value="100"/>
                         <div class="fill"></div>
                     </div>
-                    
+
                     <div class="easy-basket-filter-ticks">
                     </div>
                 </div>
             </div>
             <div class="filter">
-                <p id="for-test2">Диапозон для: ⋅, ∶</p>
+                <p>Диапозон для: ⋅, ∶</p>
                 <div class="easy-basket-filter-double">
                     <div class="easy-basket-filter-info-double">
                         <p class="iLower-double cssmain2"><input disabled type="text" class="easy-basket-lower-double forPSize" value="0" min="0" max="50" maxlength=2/></p>
                         <p class="iUpper-double cssmain2"><input disabled type="text" class="easy-basket-upper-double forPSize" value="20" min="0" max="50" maxlength=2/></p>
                     </div>
-                    
+
                     <div class="easy-basket-filter-range-double">
                         <input type="range" class="lower-double range-double" step="1" min="0" max="50" value="0"/>
                         <input type="range" class="upper-double range-double" step="1" min="0" max="50" value="20"/>
                         <div class="fill-double"></div>
                     </div>
-                    
+
                     <div class="easy-basket-filter-ticks-double"></div>
                 </div>
             </div>
@@ -115,16 +85,17 @@
                         <p class="iLower-three cssmain2"><input disabled type="text" class="easy-basket-lower-three forPSize" value="10" min="5" max="25" maxlength=2/></p>
                         <!-- <p class="iUpper-three cssmain2"><input disabled type="text" class="easy-basket-lower-three forPSize" value="0" min="5" max="25" maxlength=2/></p> -->
                     </div>
-                    
+
                     <div class="easy-basket-filter-range-three">
                         <input type="range" class="lower-three range-three" step="1" min="5" max="25" value="10"/>
                         <!-- <input type="range" class="upper-three range-three" step="1" min="5" max="25" value="25"/> -->
                     </div>
-                    
+
                     <div class="easy-basket-filter-ticks-three"></div>
                 </div>
             </div>
-            
+
+            <button class="start-button cssmain2" id="start-button">Начать</button>
             <button class="start-button cssmain1" id="start-button">Начать</button>
         </div>
     </div>
@@ -137,6 +108,7 @@
                 </div>
                 <div class="time">
                     <div class="wrapper-stopwath">
+                        <p><span id="seconds">00</span>:<span id="tens">00</span></p>
                         <p><span id="seconds"></span><span id="tens"></span></p>
                     </div> 
                 </div>
@@ -174,13 +146,6 @@
         </div>
     </div>
 
-
-
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-    <!-- <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script> -->
     <script src="./main.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js?v=1.0.1"></script>
 </body>
-</html>

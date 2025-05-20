@@ -1,6 +1,7 @@
+
 let values =[]; // 0+   1-   2x   3/  4t  5+-(min)  6+-(max)  7x/(min)  8x/(max) 
 let examples =[];
-let score = 1, mistake =0,totalMistake =0,examplesCount=10;
+let score = 1, mistake =0,examplesCount=10;
 let block;
 let numberOne,numberTwo,answer;
 
@@ -8,34 +9,14 @@ let numberOne,numberTwo,answer;
 //для таймера вводные
 var seconds = 0; 
 var tens = 0; 
+var appendTens = document.getElementById("tens")
+var appendSeconds = document.getElementById("seconds")
 var appendTens = document.getElementById("tens");
 var appendSeconds = document.getElementById("seconds");
 var buttonStart = document.getElementById('button-start');
 var buttonStop = document.getElementById('button-stop');
 var buttonReset = document.getElementById('button-reset');
-var Interval;
-
-// Текущий день месяца
-let currentDay = new Date().getDate();
-// Количество дней в текущем месяце
-let daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();   
-// Количество дней в прошлом месяце
-let daysInLastMonth = new Date(new Date().getFullYear(), (new Date().getMonth()-1) + 1, 0).getDate();   
-// индекст текущего месяцы
-let monthIndex = new Date().getMonth();
-// массив для сохранения в облако
-// let statsArray =[]; //0(время), 1(количество решенных примеров), 2(количество ошибок)
-let TimeForSave,TimeForSaveOld=0; // запоминаю время перед его обнулением
-let dayIndex = new Date().getDay();  // индекс дня недели
-let oldstats=[];
-
-
-// ловлю нажатие на иконку статистики
-// document.getElementById('statistic-icon').addEventListener('click', () => {statisticOpen();});
-// document.getElementById('statistic-behind').addEventListener('click', () => { 
-//     block = document.getElementById('statistic-icon');
-//     block.classList.add('none');
-// });
+var Interval ;
 
 // открытие и закрытие блока с цветовыми темами, а так же ловню вбор пользователя насчет темы
 document.getElementById('different-theme').addEventListener('click', () => { differentTheme('open');});
@@ -61,11 +42,7 @@ document.getElementById('big-range').addEventListener('click', () => { bigRange(
 document.getElementById('start-button').addEventListener('click', () => {fromHomeToExample();});
 
 // клик на возврат на главную
-document.getElementById('back-to-home').addEventListener('click', () => { 
-    // forStatisticSafe(); 
-    fromExampleToHome();});
-// клик на возврат на главную
-// document.getElementById('back-to-home-statistic').addEventListener('click', () => { statisticClose();});
+document.getElementById('back-to-home').addEventListener('click', () => { fromExampleToHome();});
 
 // обработка кликов на клавиатуру, на каждую из клавиш
 document.getElementById('number-1').addEventListener('click', () => { keyboardClick(document.getElementById('number-1').value);});
@@ -81,198 +58,9 @@ document.getElementById('number-0').addEventListener('click', () => { keyboardCl
 document.getElementById('number-enter').addEventListener('click', () => { keyboardClick(document.getElementById('number-enter').value);});
 document.getElementById('number-delete').addEventListener('click', () => { keyboardClick(document.getElementById('number-delete').value);});
 
-function statisticOpen(){
-    // block = document.getElementById('statistic');
-    // block.classList.remove('none');
-    // block = document.getElementById('main1');
-    // block.classList.add('none');
-
-
-    // window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
-    //     // let stats = [];
-    //     // for(let i=1;i<=31;i++){
-    //     //     stats[i] = [];
-    //     //     stats[i][0] = Math.floor(Math.random() * (20 - 10 + 1)) + 10;
-    //     //     stats[i][1] = Math.floor(Math.random() * (20 - 10 + 1)) + 10;
-    //     //     stats[i][2] = Math.floor(Math.random() * (20 - 10 + 1)) + 10;
-    //     // }
-    //     // stats = JSON.stringify(stats)
-    //     // console.log('stats',stats);
-    //     if (stats === null || stats === undefined || stats === "") {
-    //     }else{
-    //         let arrayGraphExamples = [], arrayGraphTime = [], arrayGraphMistake = [];   
-    //         stats = JSON.parse(stats);
-    //         // console.log('stats1',stats);
-    //         // если пользователь зашел в новом месяце и сразу посмотрит статистику то она должна быть пустой а не прошлого месяца
-    //         if(stats[0]!= monthIndex){
-    //             window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(stats));
-    //             for(let i=1;i<=daysInMonth;i++){
-    //                 stats[i]= [0,0,0];
-    //             };    
-    //         }
-    //         // заполняю массив для рисования месячного графика
-    //         for (let i = 1; i <= daysInMonth; i++) {
-    //             arrayGraphExamples.push({
-    //                 day: String(i),
-    //                 examples: stats[i][1],
-    //             });
-    //             arrayGraphTime.push({
-    //                 day: String(i),
-    //                 time: (stats[i][0]/60).toFixed(2),
-    //             });
-
-    //             let number=0;
-    //             if(stats[i][2] != 0){
-    //                 number = ((stats[i][1] - stats[i][2])/stats[i][1]).toFixed(2);
-    //             }
-    //             arrayGraphMistake.push({
-    //                 day: String(i),
-    //                 mistake: number,
-    //             });
-    //         }
-    //         // рисую графики примеров
-    //         new Morris.Line({
-    //             element: 'examples',
-    //             data: arrayGraphExamples,
-    //             xkey: 'day',
-    //             parseTime: false,
-    //             ykeys: ['examples'],
-    //             // hideHover: 'always',
-    //             labels: ['examples'],
-    //             lineColors: ['green']
-    //         });
-    //         // рисую графики времени
-    //         new Morris.Line({
-    //             element: 'time',
-    //             data: arrayGraphTime,
-    //             xkey: 'day',
-    //             parseTime: false,
-    //             ykeys: ['time'],
-    //             // hideHover: 'always',
-    //             labels: ['time'],
-    //             lineColors: ['blue']
-    //         });
-    //         // рисую графики ошибок
-    //         new Morris.Line({
-    //             element: 'mistake',
-    //             data: arrayGraphMistake,
-    //             xkey: 'day',
-    //             parseTime: false,
-    //             ykeys: ['mistake'],
-    //             // hideHover: 'always',
-    //             labels: ['mistake'],
-    //             lineColors: ['red']
-    //         });
-    //         // изменяю сумму за период
-    //         // document.getElementById('total-month').outerHTML = `<p class="total-month" id="total-month">total: time - ${totalMonthTime}, examples - ${totalMonthExamples}, mistake - ${totalMonthMistake}</p>`;
-
-
-
-
-    //         // рисование недельного графика
-    //         // totalMonthTime = 0;
-    //         // totalMonthExamples = 0;
-    //         // totalMonthMistake = 0;
-    //         // if(dayIndex == 0){ dayIndex =7;}
-    //         // let arrayGraphWeek =[],a=[], dayName=['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    //         // let dateOfStartWeek = currentDay-(dayIndex-1);
-    //         // console.log('dayIndex',dayIndex, 'currentDay',currentDay,'dateOfStartWeek',dateOfStartWeek);
-    //         // // заполняю массив для рисования недельного графика
-    //         // for (let i = 0; i < 7; i++) {
-    //         //     console.log('0',a);
-    //         //     if(dateOfStartWeek<0){
-    //         //         console.log('11',a);
-    //         //         if((dateOfStartWeek+i)<=0){
-    //         //             console.log('12',a);
-    //         //             a[i] = oldstats[daysInLastMonth -(Math.abs(dateOfStartWeek)) +i];
-    //         //             // заполняется массив старым месяцем
-    //         //         }else{
-    //         //             console.log('12',a);
-    //         //             a[i]= stats[dateOfStartWeek +i];
-    //         //             // заполняется массив новым месяцем
-    //         //         }
-    //         //     }else{
-    //         //         console.log('21',a);
-    //         //         a[i]= stats[dateOfStartWeek +i];
-    //         //         if(dateOfStartWeek +i >daysInMonth){
-    //         //             console.log('22',a);
-    //         //             a[i] = stats[dateOfStartWeek +i-daysInMonth];
-    //         //             // заполняется массив будующим месяцем
-    //         //         }
-    //         //     }
-    //         //     console.log('01',a);
-    //         //     arrayGraphWeek.push({
-    //         //         day: dayName[i],
-    //         //         time: (a[i][0]/60).toFixed(2),
-    //         //         examples: (a[i][1]/10).toFixed(2),
-    //         //         mistake: a[i][2],
-    //         //     });
-    //         //     console.log('02',arrayGraphWeek);
-    //         //     totalMonthTime = Number(totalMonthTime) + Number((a[i][0]/60).toFixed(2));
-    //         //     totalMonthExamples = Number(totalMonthExamples) + Number(a[i][1]);
-    //         //     totalMonthMistake = Number(totalMonthMistake) + Number(a[i][2]);
-    //         // }
-    //         // console.log('arrayGraphWeek',arrayGraphWeek);
-    //         // // рисую недельный график
-    //         // new Morris.Line({
-    //         //     element: 'week',
-    //         //     data: arrayGraphWeek,
-    //         //     xkey: 'day',
-    //         //     parseTime: false,
-    //         //     ykeys: ['time','mistake','examples'],
-    //         //     hideHover: 'always',
-    //         //     labels: ['time','mistake','examples'],
-    //         //     lineColors: ['blue','red','green']
-    //         // });
-    //         // // изменяю сумму за период
-    //         // document.getElementById('total-week').outerHTML = `<p class="total-month" id="total-month">total: time - ${totalMonthTime}, examples - ${totalMonthExamples}, mistake - ${totalMonthMistake}</p>`;
-    //     }
-    //     // graphToToday('graph-conteiner-examples','graph-wrapper-examples'); // передвигаю на текущую дату
-    //     // graphToToday('graph-conteiner-time','graph-wrapper-time'); 
-    //     // graphToToday('graph-conteiner-mistake','graph-wrapper-mistake');
-    // });
-
-}
-
-function statisticClose(){
-    block = document.getElementById('main1');
-    block.classList.remove('none');
-    block = document.getElementById('statistic');
-    block.classList.add('none');
-}
-
-// function graphToToday(one,two){
-//     let today = new Date().getDate(); // получаем текущий день месяца
-//     let container = document.getElementById(one);
-//     let chart = document.getElementById(two);
-
-//     // Ждем небольшой интервал, чтобы график точно успел отрисоваться
-//     setTimeout(() => {
-//         // Найти все подписи по оси X (Morris генерирует их с классом .x-axis-label или подобным)
-//         let labels = chart.querySelectorAll('text');
-
-//         let targetLabel = null;
-
-//         labels.forEach(label => {
-//             if (parseInt(label.textContent) === today) {
-//             targetLabel = label;
-//             }
-//         });
-
-//         if (targetLabel) {
-//             let labelRect = targetLabel.getBoundingClientRect();
-//             let containerRect = container.getBoundingClientRect();
-
-//             let offsetLeft = labelRect.left + container.scrollLeft - containerRect.left;
-//             let centerScroll = offsetLeft - container.clientWidth / 2 + labelRect.width / 2;
-
-//             container.scrollLeft = centerScroll;
-//         }
-//     }, 100);
-// }
 
 function fromHomeToExample() { // переход с главного экрана на экран с пирмером
-    
+
     // считываю все пораметры ползункув и чекбоксов
     let checkboxes = document.querySelectorAll('input[type="checkbox"]');
     for(let i =0;i<5;i++){    
@@ -284,7 +72,8 @@ function fromHomeToExample() { // переход с главного экран�
     values[7]= inputLower[2].value;
     values[8]= inputLower[3].value;
     values[9]= inputLower[4].value;
-    examplesCount = values[9];
+    examplesCount= values[9];
+    // window.Telegram.WebApp.CloudStorage.setItem("values",values);
     localStorage.setItem('values',values);
 
     // меняю экраны между собой
@@ -298,35 +87,41 @@ function fromHomeToExample() { // переход с главного экран�
     block.classList.add('none');
 
     // запускаю время если пользователь это отметил
+    if(values[4] == "true" || values[4] == true){
+        clearInterval(Interval);
+        Interval = setInterval(startTimer, 10);
+    }
     clearInterval(Interval);
     Interval = setInterval(startTimer, 10);
 
     // обнуляю масив примеров, ошибки и количество примеров перед новой итерацией
     examples =[]; 
     mistake=0;
-    totalMistake=0;
     score=1;
     setExample();
 }
 
-function fromExampleToHome() {// переход с экрана с пирмером на главный экран
-    //меняю ползунки и чекбоксы на сохраненные значения
-    let test = localStorage.getItem('values');
+function fromExampleToHome() {// переход с экранв с пирмером на главный экран
 
-    let checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    if (test === null || test === undefined || test === "") {
-        for(let i =0;i<5;i++){    
-            checkboxes[i].checked = true;
-        }
-    }else{
-        let forMemery = test.split(',');
-        for(let i =0;i<5;i++){  
-            if(forMemery[i] == "true"){
+    //меняю ползунки и чекбоксы на сохраненные значения
+    // window.Telegram.WebApp.CloudStorage.getItem("values", (err,test) => {
+        let test = localStorage.getItem('values');
+
+        let checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        if (test === null || test === undefined || test === "") {
+            for(let i =0;i<5;i++){    
                 checkboxes[i].checked = true;
             }
+        }else{
+            let forMemery = test.split(',');
+            for(let i =0;i<5;i++){  
+                if(forMemery[i] == "true"){
+                    checkboxes[i].checked = true;
+                }
+            }
+            dinamicRange();
         }
-        dinamicRange();
-    }
+    // });
 
     // меняю страницы местами
     block = document.getElementById('main1');
@@ -336,6 +131,8 @@ function fromExampleToHome() {// переход с экрана с пирмер�
 
     // обнуляю таймер
     clearInterval(Interval);
+    tens = "00";
+    seconds = "00";
     tens = "";
     seconds = "";
     appendTens.innerHTML = tens;
@@ -343,178 +140,179 @@ function fromExampleToHome() {// переход с экрана с пирмер�
 
     let input = document.getElementById('example-answer');
     input.outerHTML = `<p id="example-answer"></p>`;
-
 }
 
 function dinamicRange(){ // изменяет ползунки на сохранненые значения, ничего не менял взял с старого кода
     // console.log('7');
-    let test = localStorage.getItem('values');
+    // window.Telegram.WebApp.CloudStorage.getItem("values", (err,test) => {
+        let test = localStorage.getItem('values');
 
-    let adapter = test.split(',');
-    let forMemery = [adapter[5],adapter[6],adapter[7],adapter[8],adapter[9]] 
-    // 1valLower  2valUpper  3lower-double  4upper-double 
-    // console.log('8');
-    var max = $('.upper').attr('max');
-    var min = $('.lower').attr('min');
-    var valLower = forMemery[0];
-    var valUpper = forMemery[1];
+        let adapter = test.split(',');
+        let forMemery = [adapter[5],adapter[6],adapter[7],adapter[8],adapter[9]] 
+        // 1valLower  2valUpper  3lower-double  4upper-double 
+        // console.log('8');
+        var max = $('.upper').attr('max');
+        var min = $('.lower').attr('min');
+        var valLower = forMemery[0];
+        var valUpper = forMemery[1];
 
-    if (parseFloat(valLower) > parseFloat(valUpper)) {
-        var trade = valLower;
-        valLower = valUpper;
-        valUpper = trade;
-    }
-    var width = valUpper * 100 / max;
-    var left = valLower * 100 / max;
-    $('.fill').css('left', 'calc(' + left + '%)');
-    $('.fill').css('width', width - left + '%');
-    
-    // Update info
-    if (parseInt(valLower) == min) {
-        $('.easy-basket-lower').val('0');
-    } else {
-        $('.easy-basket-lower').val(parseInt(valLower));
-    }
-    if (parseInt(valUpper) == max) {
-        $('.easy-basket-upper').val('300');
-    } else {
-        $('.easy-basket-upper').val(parseInt(valUpper));
-    }
+        if (parseFloat(valLower) > parseFloat(valUpper)) {
+            var trade = valLower;
+            valLower = valUpper;
+            valUpper = trade;
+        }
+        var width = valUpper * 100 / max;
+        var left = valLower * 100 / max;
+        $('.fill').css('left', 'calc(' + left + '%)');
+        $('.fill').css('width', width - left + '%');
 
-    // изменяем диапазон цен вручную
-    if ( valUpper > 300 ) {
-        var left = max;
-    }
-    if ( valLower < 0 ) {
-        var left = min;
-    } else if ( valLower > max ) {
-        var left = min;
-    }
-    // меняем положение ползунков
-    $('.lower').val(valLower);
-    $('.upper').val(valUpper);  
-    $('.easy-basket-filter-info p input').focus(function() {
-        $(this).val('');
-    });
-    $('.easy-basket-filter-info .iLower input').blur(function() {
-        var valLower = $('.lower').val();
-        $(this).val(Math.floor(valLower));
-    });
-    $('.easy-basket-filter-info .iUpper input').blur(function() {
-        var valUpper = $('.upper').val();
-        $(this).val(Math.floor(valUpper));
-    });
+        // Update info
+        if (parseInt(valLower) == min) {
+            $('.easy-basket-lower').val('0');
+        } else {
+            $('.easy-basket-lower').val(parseInt(valLower));
+        }
+        if (parseInt(valUpper) == max) {
+            $('.easy-basket-upper').val('300');
+        } else {
+            $('.easy-basket-upper').val(parseInt(valUpper));
+        }
 
-
-
-
-    max = $('.upper-double').attr('max');
-    min = $('.lower-double').attr('min');
-    valLower = forMemery[2];
-    valUpper = forMemery[3];
-    if (parseFloat(valLower) > parseFloat(valUpper)) {
-        var trade = valLower;
-        valLower = valUpper;
-        valUpper = trade;
-    }
-    width = valUpper * 100 / max;
-    left = valLower * 100 / max;
-    $('.fill-double').css('left', 'calc(' + left + '%)');
-    $('.fill-double').css('width', width - left + '%');
-    
-    // Update info
-    if (parseInt(valLower) == min) {
-        $('.easy-basket-lower-double').val('0');
-    } else {
-        $('.easy-basket-lower-double').val(parseInt(valLower));
-    }
-    if (parseInt(valUpper) == max) {
-        $('.easy-basket-upper-double').val('50');
-    } else {
-        $('.easy-basket-upper-double').val(parseInt(valUpper));
-    }
-
-
-    if ( valUpper > 50 ) {
-        var left = max;
-    }
-    if ( valLower < 0 ) {
-        var left = min;
-    } else if ( valLower > max ) {
-        var left = min;
-    }
-    $('.fill-double').css('left', 'calc(' + left + '%)');
-    $('.fill-double').css('width', width - left + '%');
-    // меняем положение ползунков
-    $('.lower-double').val(valLower);
-    $('.upper-double').val(valUpper);
-    $('.easy-basket-filter-info-double p input').focus(function() {
-        $(this).val('');
-    });
-    $('.easy-basket-filter-info-double .iLower-double input').blur(function() {
-        var valLower = $('.lower-double').val();
-        $(this).val(Math.floor(valLower));
-    });
-    $('.easy-basket-filter-info-double .iUpper-double input').blur(function() {
-        var valUpper = $('.upper-double').val();
-        $(this).val(Math.floor(valUpper));
-    });
+        // изменяем диапазон цен вручную
+        if ( valUpper > 300 ) {
+            var left = max;
+        }
+        if ( valLower < 0 ) {
+            var left = min;
+        } else if ( valLower > max ) {
+            var left = min;
+        }
+        // меняем положение ползунков
+        $('.lower').val(valLower);
+        $('.upper').val(valUpper);  
+        $('.easy-basket-filter-info p input').focus(function() {
+            $(this).val('');
+        });
+        $('.easy-basket-filter-info .iLower input').blur(function() {
+            var valLower = $('.lower').val();
+            $(this).val(Math.floor(valLower));
+        });
+        $('.easy-basket-filter-info .iUpper input').blur(function() {
+            var valUpper = $('.upper').val();
+            $(this).val(Math.floor(valUpper));
+        });
 
 
 
 
+        max = $('.upper-double').attr('max');
+        min = $('.lower-double').attr('min');
+        valLower = forMemery[2];
+        valUpper = forMemery[3];
+        if (parseFloat(valLower) > parseFloat(valUpper)) {
+            var trade = valLower;
+            valLower = valUpper;
+            valUpper = trade;
+        }
+        width = valUpper * 100 / max;
+        left = valLower * 100 / max;
+        $('.fill-double').css('left', 'calc(' + left + '%)');
+        $('.fill-double').css('width', width - left + '%');
 
-    max = $('.upper-three').attr('max');
-    min = $('.lower-three').attr('min');
-    valLower = forMemery[4];
-    valUpper = forMemery[4];
-    if (parseFloat(valLower) > parseFloat(valUpper)) {
-        var trade = valLower;
-        valLower = valUpper;
-        valUpper = trade;
-    }
-    width = valUpper * 100 / max;
-    left = valLower * 100 / max;
-    $('.fill-three').css('left', 'calc(' + left + '%)');
-    $('.fill-three').css('width', width - left + '%');
-    
-    // Update info
-    if (parseInt(valLower) == min) {
-        $('.easy-basket-lower-three').val('5');
-    } else {
-        $('.easy-basket-lower-three').val(parseInt(valLower));
-    }
-    if (parseInt(valUpper) == max) {
-        $('.easy-basket-upper-three').val('25');
-    } else {
-        $('.easy-basket-upper-three').val(parseInt(valUpper));
-    }
+        // Update info
+        if (parseInt(valLower) == min) {
+            $('.easy-basket-lower-double').val('0');
+        } else {
+            $('.easy-basket-lower-double').val(parseInt(valLower));
+        }
+        if (parseInt(valUpper) == max) {
+            $('.easy-basket-upper-double').val('50');
+        } else {
+            $('.easy-basket-upper-double').val(parseInt(valUpper));
+        }
 
 
-    if ( valUpper > 25 ) {
-        var left = max;
-    }
-    if ( valLower < 5 ) {
-        var left = min;
-    } else if ( valLower > max ) {
-        var left = min;
-    }
-    $('.fill-three').css('left', 'calc(' + left + '%)');
-    $('.fill-three').css('width', width - left + '%');
-    // меняем положение ползунков
-    $('.lower-three').val(valLower);
-    $('.upper-three').val(valUpper);
-    $('.easy-basket-filter-info-three p input').focus(function() {
-        $(this).val('');
-    });
-    $('.easy-basket-filter-info-three .iLower-three input').blur(function() {
-        var valLower = $('.lower-three').val();
-        $(this).val(Math.floor(valLower));
-    });
-    $('.easy-basket-filter-info-three .iUpper-three input').blur(function() {
-        var valUpper = $('.upper-three').val();
-        $(this).val(Math.floor(valUpper));
-    });
+        if ( valUpper > 50 ) {
+            var left = max;
+        }
+        if ( valLower < 0 ) {
+            var left = min;
+        } else if ( valLower > max ) {
+            var left = min;
+        }
+        $('.fill-double').css('left', 'calc(' + left + '%)');
+        $('.fill-double').css('width', width - left + '%');
+        // меняем положение ползунков
+        $('.lower-double').val(valLower);
+        $('.upper-double').val(valUpper);
+        $('.easy-basket-filter-info-double p input').focus(function() {
+            $(this).val('');
+        });
+        $('.easy-basket-filter-info-double .iLower-double input').blur(function() {
+            var valLower = $('.lower-double').val();
+            $(this).val(Math.floor(valLower));
+        });
+        $('.easy-basket-filter-info-double .iUpper-double input').blur(function() {
+            var valUpper = $('.upper-double').val();
+            $(this).val(Math.floor(valUpper));
+        });
+
+
+
+
+
+        max = $('.upper-three').attr('max');
+        min = $('.lower-three').attr('min');
+        valLower = forMemery[4];
+        valUpper = forMemery[4];
+        if (parseFloat(valLower) > parseFloat(valUpper)) {
+            var trade = valLower;
+            valLower = valUpper;
+            valUpper = trade;
+        }
+        width = valUpper * 100 / max;
+        left = valLower * 100 / max;
+        $('.fill-three').css('left', 'calc(' + left + '%)');
+        $('.fill-three').css('width', width - left + '%');
+
+        // Update info
+        if (parseInt(valLower) == min) {
+            $('.easy-basket-lower-three').val('5');
+        } else {
+            $('.easy-basket-lower-three').val(parseInt(valLower));
+        }
+        if (parseInt(valUpper) == max) {
+            $('.easy-basket-upper-three').val('25');
+        } else {
+            $('.easy-basket-upper-three').val(parseInt(valUpper));
+        }
+
+
+        if ( valUpper > 25 ) {
+            var left = max;
+        }
+        if ( valLower < 5 ) {
+            var left = min;
+        } else if ( valLower > max ) {
+            var left = min;
+        }
+        $('.fill-three').css('left', 'calc(' + left + '%)');
+        $('.fill-three').css('width', width - left + '%');
+        // меняем положение ползунков
+        $('.lower-three').val(valLower);
+        $('.upper-three').val(valUpper);
+        $('.easy-basket-filter-info-three p input').focus(function() {
+            $(this).val('');
+        });
+        $('.easy-basket-filter-info-three .iLower-three input').blur(function() {
+            var valLower = $('.lower-three').val();
+            $(this).val(Math.floor(valLower));
+        });
+        $('.easy-basket-filter-info-three .iUpper-three input').blur(function() {
+            var valUpper = $('.upper-three').val();
+            $(this).val(Math.floor(valUpper));
+        });
+    // });
 }
 
 function smallRange(){  // изменяет ползунки и чек боксы на заданное значения, ничего не менял взял с старого кода
@@ -593,7 +391,7 @@ function smallRange(){  // изменяет ползунки и чек бокс�
         left = valLower * 100 / max;
         $('.fill-double').css('left', 'calc(' + left + '%)');
         $('.fill-double').css('width', width - left + '%');
-        
+
         // Update info
         if (parseInt(valLower) == min) {
             $('.easy-basket-lower-double').val('0');
@@ -709,7 +507,7 @@ max = $('.upper-double').attr('max');
     left = valLower * 100 / max;
     $('.fill-double').css('left', 'calc(' + left + '%)');
     $('.fill-double').css('width', width - left + '%');
-    
+
     // Update info
     if (parseInt(valLower) == min) {
         $('.easy-basket-lower-double').val('0');
@@ -751,13 +549,21 @@ max = $('.upper-double').attr('max');
 
 function startTimer () { // реализация таймера
     tens++; 
+
+    if(tens <= 9){
+        appendTens.innerHTML = "0" + tens;
+    }
     // if(tens <= 9){
     //     appendTens.innerHTML = "0" + tens;
     // }
-    
+
+    if (tens > 9){
+        appendTens.innerHTML = tens;
     // if (tens > 9){
     //     appendTens.innerHTML = tens;
-        
+
+    } 
+    
     // } 
     if(values[4] == "true" || values[4] == true){
         if(seconds == 0|| seconds == 'none'){
@@ -766,14 +572,17 @@ function startTimer () { // реализация таймера
     }
     if (tens > 99) {
         seconds++;
+        appendSeconds.innerHTML = "0" + seconds;
         if(values[4] == "true" || values[4] == true){
             appendSeconds.innerHTML = "0" + seconds;
         }
         tens = 0;
+        appendTens.innerHTML = "0" + 0;
         // appendTens.innerHTML = "0" + 0;
     }
 
     if (seconds > 9){
+    appendSeconds.innerHTML = seconds;
         if(values[4] == "true" || values[4] == true){
             appendSeconds.innerHTML = seconds;
         }
@@ -781,7 +590,7 @@ function startTimer () { // реализация таймера
 
 }
 
-function keyboardClick(value){ // обработка клика на клавиатуру
+function keyboardClick(value){
     let input = document.getElementById('example-answer');
     let answerUser = input.textContent ;
     if(value == "delete"){
@@ -789,56 +598,11 @@ function keyboardClick(value){ // обработка клика на клави�
         input.outerHTML = `<p id="example-answer">${ answerUser }</p>`;
     } else if(value == "enter"){
         if(answerUser == answer){
-            totalMistake = Number(totalMistake) + Number(mistake);
             score++;
             input.outerHTML = `<p id="example-answer"></p>`;
             blink('example-answer-block','good');
-            
-            if(TimeForSaveOld == 0){
-                TimeForSave = seconds+(tens*0.01);
-            }else{
-                TimeForSave = (seconds+(tens*0.01)) - TimeForSaveOld;
-            }
-            TimeForSaveOld = seconds+(tens*0.01);
-            console.log('TimeForSave2',TimeForSave)
-            
-            // сохраняю результаты в облако
-            window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
-                if (stats === null || stats === undefined || stats === "") {
-                    for(let i=1;i<=daysInMonth;i++){
-                        stats[i]= [0,0,0];
-                    };    
-                    stats[0] = monthIndex;
-                    stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
-                    stats[currentDay][1] = Number(stats[currentDay][1]) + 1;
-                    stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
-                    console.log('mistake1 - ',Number(mistake));
-                }else{
-                    stats = JSON.parse(stats);
-                    if(stats[0]!= monthIndex){
-                        window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(stats));
-                        for(let i=1;i<=daysInMonth;i++){
-                            stats[i]= [0,0,0];
-                        };    
-                        stats[0] = monthIndex;
-                        stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
-                        stats[currentDay][1] = Number(stats[currentDay][1]) + 1;
-                        stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
-                        console.log('mistake2 - ',Number(mistake));
-                    }else{
-                        stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
-                        stats[currentDay][1] = Number(stats[currentDay][1]) + 1;
-                        stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
-                        console.log('mistake3 - ',Number(mistake));
-                    }   
-                }
-                window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
-                console.log('2', stats);
-                mistake=0;
-            });
-
-
             if(score>=(+examplesCount+1)){
+                document.getElementById('win-message').outerHTML = `<p id="win-message" class="win-message ">Ошибки: ${mistake} <br> Время: ${document.getElementById("seconds").textContent}:${document.getElementById("tens").textContent}</p>`;
                 let a;
                 if(tens <= 9){
                     a = "0" + tens;
@@ -851,17 +615,13 @@ function keyboardClick(value){ // обработка клика на клави�
                 }else{
                     b = seconds;
                 }
-                document.getElementById('win-message').outerHTML = `<p id="win-message" class="win-message ">Ошибки: ${totalMistake} <br> Время: ${b}:${a}</p>`;
-
+                document.getElementById('win-message').outerHTML = `<p id="win-message" class="win-message ">Ошибки: ${mistake} <br> Время: ${b}:${a}</p>`;
                 fromExampleToHome();
-                TimeForSaveOld=0;
             }else{
                 setExample();
             }
-
         }else{
-            mistake=1;
-            console.log('mistake4 - ',Number(mistake));
+            mistake++;
             blink('example-answer-block','bad')
         }
     } else if(answerUser.length < 6){
@@ -879,82 +639,84 @@ function setExample(){ // создаю пример и вывожу на экр�
     numberTwo = 0;
     let symbol;
     let symbolArray = ['+', '−', '⋅', '∶',];
+    // window.Telegram.WebApp.CloudStorage.getItem("values", (err,test) => {
+        // values = test.split(',');
+        values = localStorage.getItem('values').split(',');
 
-    values = localStorage.getItem('values').split(',');
-
-    for(let exit=0;exit<10;exit++){ // проверка на то были ли уже в предыдущих примерах подобные ответы или операнды
-        let a =0;
-        for(let i=0;i<5;){ // рандомлю знак из тех что доступны
-            symbol = randomNumber(0, 3);
-            if(values[symbol] == "true"){
-                i=10;
+        for(let exit=0;exit<10;exit++){ // проверка на то были ли уже в предыдущих примерах подобные ответы или операнды
+            let a =0;
+            for(let i=0;i<5;){ // рандомлю знак из тех что доступны
+                symbol = randomNumber(0, 3);
+                if(values[symbol] == "true"){
+                    i=10;
+                }
             }
-        }
 
-        switch(symbol){ // создаю числа для примера
-            case 0: // '+'
-                numberOne = randomNumber(+values[5],+values[6]);
-                numberTwo = randomNumber(+values[5],+values[6]);
-                answer = numberOne + numberTwo;
-            break;
-            case 1:// '-'
-                for(let exit=0;exit<10;){
+            switch(symbol){ // создаю числа для примера
+                case 0: // '+'
                     numberOne = randomNumber(+values[5],+values[6]);
                     numberTwo = randomNumber(+values[5],+values[6]);
-                    let a;
-                    if(numberOne < numberTwo){
-                        answer = numberTwo - numberOne;
-                        a=numberTwo;
-                        numberTwo = numberOne;
-                        numberOne = a;
-                        exit= 100;
-                    } else if(numberOne = numberTwo){
-                    } else {
-                        answer = numberOne - numberTwo;
-                        exit= 100;
+                    answer = numberOne + numberTwo;
+                break;
+                case 1:// '-'
+                    for(let exit=0;exit<10;){
+                        numberOne = randomNumber(+values[5],+values[6]);
+                        numberTwo = randomNumber(+values[5],+values[6]);
+                        let a;
+                        if(numberOne < numberTwo){
+                            answer = numberTwo - numberOne;
+                            a=numberTwo;
+                            numberTwo = numberOne;
+                            numberOne = a;
+                            exit= 100;
+                        } else if(numberOne = numberTwo){
+                        } else {
+                            answer = numberOne - numberTwo;
+                            exit= 100;
+                        }
                     }
-                }
-            break;
-            case 2:// '*'
-                numberOne = randomNumber(+values[7],+values[8]);
-                numberTwo = randomNumber(+values[7],+values[8]);
-                answer = numberOne * numberTwo;
-            break;
-            case 3:// '/'
-                let forSort;
-                for(let i =0;i < 1;){
+                break;
+                case 2:// '*'
                     numberOne = randomNumber(+values[7],+values[8]);
                     numberTwo = randomNumber(+values[7],+values[8]);
-                    if(numberOne == numberTwo || numberOne == 0 ||numberTwo == 0 || numberOne == 1 ||numberTwo == 1){
-                    } else{
-                        forSort = numberOne * numberTwo;
-                        numberOne =forSort;
-                        answer = forSort / numberTwo;
-                        i++;
+                    answer = numberOne * numberTwo;
+                break;
+                case 3:// '/'
+                    let forSort;
+                    for(let i =0;i < 1;){
+                        numberOne = randomNumber(+values[7],+values[8]);
+                        numberTwo = randomNumber(+values[7],+values[8]);
+                        if(numberOne == numberTwo || numberOne == 0 ||numberTwo == 0 || numberOne == 1 ||numberTwo == 1){
+                        } else{
+                            forSort = numberOne * numberTwo;
+                            numberOne =forSort;
+                            answer = forSort / numberTwo;
+                            i++;
+                        }
                     }
-                }
-            break;
-        }
-        for(let i=1;i<=examplesCount;i++){
-            if(symbol == examples[(i-1)*4]){
-                if(examples[(i-1)*4+3] == answer  || examples[(i-1)*4+1] == numberOne || examples[(i-1)*4+1] == numberTwo || examples[(i-1)*4+2] == numberOne || examples[(i-1)*4+2] == numberTwo){
-                    i=100;
+                break;
+            }
+            for(let i=1;i<=examplesCount;i++){
+                if(symbol == examples[(i-1)*4]){
+                    if(examples[(i-1)*4+3] == answer  || examples[(i-1)*4+1] == numberOne || examples[(i-1)*4+1] == numberTwo || examples[(i-1)*4+2] == numberOne || examples[(i-1)*4+2] == numberTwo){
+                        i=100;
+                    }else{
+                        a++;
+                    }
                 }else{
                     a++;
                 }
-            }else{
-                a++;
             }
+            if(a ==examplesCount ){exit=100;} // если прошло сверку со всеми 10 примерами то 
+            examples[(score-1)*4]=symbol;
+            examples[(score-1)*4+1]=numberOne;
+            examples[(score-1)*4+2]=numberTwo;
+            examples[(score-1)*4+3]=answer;
+            // console.log(examples);
+            // console.log(a,'a', exit, 'exit');
+            // exit=0;
         }
-        if(a ==examplesCount ){exit=100;} // если прошло сверку со всеми 10 примерами то 
-        examples[(score-1)*4]=symbol;
-        examples[(score-1)*4+1]=numberOne;
-        examples[(score-1)*4+2]=numberTwo;
-        examples[(score-1)*4+3]=answer;
-        // console.log(examples);
-        // console.log(a,'a', exit, 'exit');
-        // exit=0;
-    }
+    // });
 
     let inputExample = document.getElementById('example');
     inputExample.outerHTML = `<p id="example">${ numberOne } ${ symbolArray[symbol] } ${ numberTwo } = </p>`;
@@ -1014,64 +776,11 @@ function themeChange(color){
     document.getElementById('theme').href = `./thems/${color}.css`;
 }
 
-function forStatisticSafe(){
-    if(TimeForSaveOld == 0){
-        TimeForSave = seconds+(tens*0.01);
-    }else{
-        TimeForSave = (seconds+(tens*0.01)) - TimeForSaveOld;
-    }
-    TimeForSaveOld = seconds+(tens*0.01);
-    console.log('TimeForSave3',TimeForSave)
-    
-    // сохраняю результаты в облако
-    window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
-        if (stats === null || stats === undefined || stats === "") {
-            for(let i=1;i<=daysInMonth;i++){
-                stats[i]= [0,0,0];
-            };    
-            stats[0] = monthIndex;
-            stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
-            stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
-            console.log('mistake11 - ',Number(mistake));
-        }else{
-            stats = JSON.parse(stats);
-            if(stats[0]!= monthIndex){
-                window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(stats));
-                for(let i=1;i<=daysInMonth;i++){
-                    stats[i]= [0,0,0];
-                };    
-                stats[0] = monthIndex;
-                stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
-                stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
-                console.log('mistake21 - ',Number(mistake));
-            }else{
-                stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
-                stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
-                console.log('mistake31 - ',Number(mistake));
-            }   
-        }
-        window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
-        console.log('3', stats);
-        mistake=0;
-    });
-}
+
 
 
 
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
-    // alert("version - 1"); 
-
-    // let screenWidth = window.innerWidth;
-    // let screenHeight = window.innerHeight;
-    // let input = document.getElementById('for-test1');
-    // input.outerHTML = `<p id="for-test1">W ${screenWidth}, H ${screenHeight} viewport</p>`;
-
-    // let fullWidth = screen.width;
-    // let fullHeight = screen.height;
-    // input = document.getElementById('for-test2');
-    // input.outerHTML = `<p id="for-test1">W ${fullWidth}, H ${fullHeight} full</p>`;
-    
-
     window.Telegram.WebApp.expand();
     window.Telegram.WebApp.disableVerticalSwipes();
     if(localStorage.getItem('userTheme') == null || localStorage.getItem('userTheme') === undefined || localStorage.getItem('userTheme') === "" ){
@@ -1080,33 +789,24 @@ document.addEventListener('DOMContentLoaded', () => { // первый заход
     }else{
         document.getElementById('theme').href = `./thems/${localStorage.getItem('userTheme')}.css`;
     }
-    let test = localStorage.getItem('values');
-    let checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    // console.log(test);
-    if (test === null || test === undefined || test === "") {
-        for(let i =0;i<5;i++){    
-            checkboxes[i].checked = true;
-        }
-    }else{
-        let forMemery = test.split(',');
-        for(let i =0;i<5;i++){  
-            if(forMemery[i] == "true"){
+    // window.Telegram.WebApp.CloudStorage.getItem("values", (err,test) => {
+        let test = localStorage.getItem('values');
+        let checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        // console.log(test);
+        if (test === null || test === undefined || test === "") {
+            for(let i =0;i<5;i++){    
                 checkboxes[i].checked = true;
             }
+        }else{
+            let forMemery = test.split(',');
+            for(let i =0;i<5;i++){  
+                if(forMemery[i] == "true"){
+                    checkboxes[i].checked = true;
+                }
+            }
+            dinamicRange();
         }
-        dinamicRange();
-    }
-
-    // const style = document.createElement('style');
-    // style.textContent = `
-    //     .cssmain1 { font-size: 6.5vw; }
-    //     .cssmain2 { font-size: 8vw; }
-    //     .forPSize, .statistic p { font-size: 5.5vw; }
-    //     .choice input { width: 7vw; }
-    //     span.home { font-size: 8vh; }
-    //     span.keyboard-circle { font-size: 10vw; }
-    // `;
-    // document.head.appendChild(style);
+    // });
 })
 
 

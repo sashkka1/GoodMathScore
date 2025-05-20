@@ -19,77 +19,6 @@ body{
     display: flex;
     justify-content: center;
 }
-.statistic-icon{
-    height: 7vh;
-    aspect-ratio: 1 / 1;
-}
-span.statistic{
-    font-size: 7vh;
-}
-
-.statistic{
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-}
-.statistic-header{
-    position: relative;
-    top: 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 90vw;
-    height: 13vh;
-    /* background-color: bisque; */
-}
-
-.statistic-header .time{color: blue;}
-.statistic-header .mistake{color: red;}
-.statistic-header .examples{color: green;}
-
-.statistic-block{
-    /* background-color: beige; */
-    width: 100vw;
-    /* height: 88vh; */
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    justify-content: space-around;
-}
-.graph-conteiner {
-    height: 28vh;
-    width: 90vw;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    overflow: auto;
-    scrollbar-width: none;       /* Firefox */
-    -ms-overflow-style: none; 
-    margin-bottom: 2vh;
-}
-.graph-wrapper-examples,.graph-wrapper-time,.graph-wrapper-mistake {
-    height: 97%;
-    /* height: 25vh; */
-    min-width: 1250px;
-}
-/* .graph-wrapper-week {
-    height: 35vh;
-    min-width: 400px;
-} */
-.graph {
-    height: 100%;
-    min-width: 1250px;
-    /* background-color: aqua; */
-}
-/* .total-week{
-    padding-bottom: 2vh;
-} */
-.statistic-block p{
-    margin-left: 5vw;
-}
-
-
 .main1{
     width: 100vw;
     height: 100vh;
@@ -99,6 +28,7 @@ span.statistic{
     align-items: center;
     flex-direction: column;
 }
+
 .header1{
     width: 95vw;
     height: 13vh;
@@ -320,35 +250,18 @@ span.statistic{
 
 
 
-.cssmain1{
-    font-size: 6.5vw;
-}
-.cssmain2{
-    font-size: 8vw;
-}
-.forPSize,.statistic p{
-    font-size: 5.5vw;
-}
-.choice input{
-    width: 7vw;
-}
-span.home{
-    font-size: 8vh;
-}
-span.keyboard-circle{
-    font-size: 10vw;
-}
 
 
 
-/* @media (min-width: 992px) {
+
+@media (min-width: 992px) {
     .cssmain1{
         font-size: 2vw;
     }
     .cssmain2{
         font-size: 3vw;
     }
-    .forPSize,.statistic p{
+    .forPSize{
         font-size: 2vw;
     }
     span.home{
@@ -365,7 +278,7 @@ span.keyboard-circle{
     .cssmain2{
         font-size: 4vw;
     }
-    .forPSize,.statistic p{
+    .forPSize{
         font-size: 2.5vw;
     }
     span.home{
@@ -382,7 +295,7 @@ span.keyboard-circle{
     .cssmain2{
         font-size: 5vw;
     }
-    .forPSize,.statistic p{
+    .forPSize{
         font-size: 3vw;
     }
     span.home{
@@ -399,7 +312,7 @@ span.keyboard-circle{
     .cssmain2{
         font-size: 6vw;
     }
-    .forPSize,.statistic p{
+    .forPSize{
         font-size: 4vw;
     }
     span.home{
@@ -416,7 +329,7 @@ span.keyboard-circle{
     .cssmain2{
         font-size: 7vw;
     }
-    .forPSize,.statistic p{
+    .forPSize{
         font-size: 4.5vw;
     }
     .choice input{
@@ -436,7 +349,7 @@ span.keyboard-circle{
     .cssmain2{
         font-size: 8vw;
     }
-    .forPSize,.statistic p{
+    .forPSize{
         font-size: 5.5vw;
     }
     .choice input{
@@ -448,7 +361,9 @@ span.keyboard-circle{
     span.keyboard-circle{
         font-size: 10vw;
     }
-} */
+}
+
+
 
 
 
