@@ -153,9 +153,9 @@ function statisticOpen(){
                 lineColors: ['red']
             });
         }
-        // graphToToday('graph-conteiner-examples','graph-wrapper-examples'); // передвигаю на текущую дату
-        // graphToToday('graph-conteiner-time','graph-wrapper-time'); 
-        // graphToToday('graph-conteiner-mistake','graph-wrapper-mistake');
+        graphToToday('graph-conteiner-examples','graph-wrapper-examples'); // передвигаю на текущую дату
+        graphToToday('graph-conteiner-time','graph-wrapper-time'); 
+        graphToToday('graph-conteiner-mistake','graph-wrapper-mistake');
     });
 
 }
