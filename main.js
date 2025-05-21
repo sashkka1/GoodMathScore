@@ -14,7 +14,26 @@ var appendSeconds = document.getElementById("seconds")
 var buttonStart = document.getElementById('button-start');
 var buttonStop = document.getElementById('button-stop');
 var buttonReset = document.getElementById('button-reset');
-var Interval ;
+var Interval;
+
+// Текущий день месяца
+let currentDay = new Date().getDate();
+// Количество дней в текущем месяце
+let daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();   
+// Количество дней в прошлом месяце
+let daysInLastMonth = new Date(new Date().getFullYear(), (new Date().getMonth()-1) + 1, 0).getDate();   
+// индекст текущего месяцы
+let monthIndex = new Date().getMonth();
+// массив для сохранения в облако
+// let statsArray =[]; //0(время), 1(количество решенных примеров), 2(количество ошибок)
+let TimeForSave,TimeForSaveOld=0; // запоминаю время перед его обнулением
+let dayIndex = new Date().getDay();  // индекс дня недели
+let oldstats=[];
+
+
+// ловлю нажатие на иконку статистики
+document.getElementById('statistic-icon').addEventListener('click', () => {statisticOpen();});
+
 
 // открытие и закрытие блока с цветовыми темами, а так же ловню вбор пользователя насчет темы
 document.getElementById('different-theme').addEventListener('click', () => { differentTheme('open');});
@@ -40,6 +59,7 @@ document.getElementById('big-range').addEventListener('click', () => { bigRange(
 document.getElementById('start-button').addEventListener('click', () => {fromHomeToExample();});
 
 // клик на возврат на главную
+document.getElementById('back-to-home-statistic').addEventListener('click', () => { statisticClose();});
 document.getElementById('back-to-home').addEventListener('click', () => { fromExampleToHome();});
 
 // обработка кликов на клавиатуру, на каждую из клавиш
@@ -55,6 +75,138 @@ document.getElementById('number-9').addEventListener('click', () => { keyboardCl
 document.getElementById('number-0').addEventListener('click', () => { keyboardClick(document.getElementById('number-0').value);});
 document.getElementById('number-enter').addEventListener('click', () => { keyboardClick(document.getElementById('number-enter').value);});
 document.getElementById('number-delete').addEventListener('click', () => { keyboardClick(document.getElementById('number-delete').value);});
+
+
+
+function statisticOpen(){
+    block = document.getElementById('statistic');
+    block.classList.remove('none');
+    block = document.getElementById('main1');
+    block.classList.add('none');
+
+
+    // window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
+        // let stats = [];
+        // for(let i=1;i<=31;i++){
+        //     stats[i] = [];
+        //     stats[i][0] = Math.floor(Math.random() * (20 - 10 + 1)) + 10;
+        //     stats[i][1] = Math.floor(Math.random() * (20 - 10 + 1)) + 10;
+        //     stats[i][2] = Math.floor(Math.random() * (20 - 10 + 1)) + 10;
+        // }
+        // stats = JSON.stringify(stats)
+        // console.log('stats',stats);
+
+        // if (stats === null || stats === undefined || stats === "") {
+        // }else{
+        //     let arrayGraphExamples = [], arrayGraphTime = [], arrayGraphMistake = [];   
+        //     stats = JSON.parse(stats);
+        //     // console.log('stats1',stats);
+        //     // если пользователь зашел в новом месяце и сразу посмотрит статистику то она должна быть пустой а не прошлого месяца
+        //     if(stats[0]!= monthIndex){
+        //         window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(stats));
+        //         for(let i=1;i<=daysInMonth;i++){
+        //             stats[i]= [0,0,0];
+        //         };    
+        //     }
+        //     // заполняю массив для рисования месячных графиков
+        //     for (let i = 1; i <= daysInMonth; i++) {
+        //         arrayGraphExamples.push({
+        //             day: String(i),
+        //             examples: stats[i][1],
+        //         });
+        //         arrayGraphTime.push({
+        //             day: String(i),
+        //             time: (stats[i][0]/60).toFixed(2),
+        //         });
+
+        //         let number=0;
+        //         if(stats[i][2] != 0){
+        //             number = ((stats[i][1] - stats[i][2])/stats[i][1]).toFixed(2);
+        //         }
+        //         arrayGraphMistake.push({
+        //             day: String(i),
+        //             mistake: number,
+        //         });
+        //     }
+        //     // рисую графики примеров
+        //     new Morris.Line({
+        //         element: 'examples',
+        //         data: arrayGraphExamples,
+        //         xkey: 'day',
+        //         parseTime: false,
+        //         ykeys: ['examples'],
+        //         // hideHover: 'always',
+        //         labels: ['examples'],
+        //         lineColors: ['green']
+        //     });
+        //     // рисую графики времени
+        //     new Morris.Line({
+        //         element: 'time',
+        //         data: arrayGraphTime,
+        //         xkey: 'day',
+        //         parseTime: false,
+        //         ykeys: ['time'],
+        //         // hideHover: 'always',
+        //         labels: ['time'],
+        //         lineColors: ['blue']
+        //     });
+        //     // рисую графики ошибок
+        //     new Morris.Line({
+        //         element: 'mistake',
+        //         data: arrayGraphMistake,
+        //         xkey: 'day',
+        //         parseTime: false,
+        //         ykeys: ['mistake'],
+        //         // hideHover: 'always',
+        //         labels: ['mistake'],
+        //         lineColors: ['red']
+        //     });
+
+        // }
+        // graphToToday('graph-conteiner-examples','graph-wrapper-examples'); // передвигаю на текущую дату
+        // graphToToday('graph-conteiner-time','graph-wrapper-time'); 
+        // graphToToday('graph-conteiner-mistake','graph-wrapper-mistake');
+    // });
+
+}
+
+function statisticClose(){
+    block = document.getElementById('main1');
+    block.classList.remove('none');
+    block = document.getElementById('statistic');
+    block.classList.add('none');
+}
+
+// function graphToToday(one,two){
+//     let today = new Date().getDate(); // получаем текущий день месяца
+//     let container = document.getElementById(one);
+//     let chart = document.getElementById(two);
+
+//     // Ждем небольшой интервал, чтобы график точно успел отрисоваться
+//     setTimeout(() => {
+//         // Найти все подписи по оси X (Morris генерирует их с классом .x-axis-label или подобным)
+//         let labels = chart.querySelectorAll('text');
+
+//         let targetLabel = null;
+
+//         labels.forEach(label => {
+//             if (parseInt(label.textContent) === today) {
+//             targetLabel = label;
+//             }
+//         });
+
+//         if (targetLabel) {
+//             let labelRect = targetLabel.getBoundingClientRect();
+//             let containerRect = container.getBoundingClientRect();
+
+//             let offsetLeft = labelRect.left + container.scrollLeft - containerRect.left;
+//             let centerScroll = offsetLeft - container.clientWidth / 2 + labelRect.width / 2;
+
+//             container.scrollLeft = centerScroll;
+//         }
+//     }, 100);
+// }
+
 
 
 function fromHomeToExample() { // переход с главного экрана на экран с пирмером
@@ -84,13 +236,8 @@ function fromHomeToExample() { // переход с главного экран�
     block = document.getElementById('win-message');
     block.classList.add('none');
 
-    // запускаю время если пользователь это отметил
-    if(values[4] == "true" || values[4] == true){
-        clearInterval(Interval);
-        Interval = setInterval(startTimer, 10);
-    }
-    // clearInterval(Interval);
-    // Interval = setInterval(startTimer, 10);
+    clearInterval(Interval);
+    Interval = setInterval(startTimer, 10);
 
     // обнуляю масив примеров, ошибки и количество примеров перед новой итерацией
     examples =[]; 
@@ -102,24 +249,22 @@ function fromHomeToExample() { // переход с главного экран�
 function fromExampleToHome() {// переход с экранв с пирмером на главный экран
 
     //меняю ползунки и чекбоксы на сохраненные значения
-    // window.Telegram.WebApp.CloudStorage.getItem("values", (err,test) => {
-        let test = localStorage.getItem('values');
+    let test = localStorage.getItem('values');
 
-        let checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        if (test === null || test === undefined || test === "") {
-            for(let i =0;i<5;i++){    
+    let checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    if (test === null || test === undefined || test === "") {
+        for(let i =0;i<5;i++){    
+            checkboxes[i].checked = true;
+        }
+    }else{
+        let forMemery = test.split(',');
+        for(let i =0;i<5;i++){  
+            if(forMemery[i] == "true"){
                 checkboxes[i].checked = true;
             }
-        }else{
-            let forMemery = test.split(',');
-            for(let i =0;i<5;i++){  
-                if(forMemery[i] == "true"){
-                    checkboxes[i].checked = true;
-                }
-            }
-            dinamicRange();
         }
-    // });
+        dinamicRange();
+    }
 
     // меняю страницы местами
     block = document.getElementById('main1');
@@ -127,10 +272,9 @@ function fromExampleToHome() {// переход с экранв с пирмер�
     block = document.getElementById('main2');
     block.classList.add('none');
 
+    console.log('tens',tens,'seconds',seconds);
     // обнуляю таймер
     clearInterval(Interval);
-    tens = "00";
-    seconds = "00";
     tens = "";
     seconds = "";
     appendTens.innerHTML = tens;
@@ -547,22 +691,6 @@ max = $('.upper-double').attr('max');
 
 function startTimer () { // реализация таймера
     tens++; 
-
-    if(tens <= 9){
-        appendTens.innerHTML = "0" + tens;
-    }
-    // if(tens <= 9){
-    //     appendTens.innerHTML = "0" + tens;
-    // }
-
-    if (tens > 9){
-        appendTens.innerHTML = tens;
-    // if (tens > 9){
-    //     appendTens.innerHTML = tens;
-
-    } 
-    
-    // } 
     if(values[4] == "true" || values[4] == true){
         if(seconds == 0|| seconds == 'none'){
             appendSeconds.innerHTML = "00";
@@ -570,22 +698,17 @@ function startTimer () { // реализация таймера
     }
     if (tens > 99) {
         seconds++;
-        appendSeconds.innerHTML = "0" + seconds;
         if(values[4] == "true" || values[4] == true){
             appendSeconds.innerHTML = "0" + seconds;
         }
         tens = 0;
-        appendTens.innerHTML = "0" + 0;
-        // appendTens.innerHTML = "0" + 0;
     }
 
     if (seconds > 9){
-    appendSeconds.innerHTML = seconds;
         if(values[4] == "true" || values[4] == true){
             appendSeconds.innerHTML = seconds;
         }
     }
-
 }
 
 function keyboardClick(value){
@@ -718,7 +841,7 @@ function setExample(){ // создаю пример и вывожу на экр�
 
     let inputExample = document.getElementById('example');
     inputExample.outerHTML = `<p id="example">${ numberOne } ${ symbolArray[symbol] } ${ numberTwo } = </p>`;
-    // console.log("Answer - ",answer);
+    console.log("Answer - ",answer);
 
     let inputScore = document.getElementById('score');
     inputScore.outerHTML = `<p id="score">${score}/${examplesCount}</p>`;

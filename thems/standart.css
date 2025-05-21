@@ -5,9 +5,9 @@
     color: black;
     /* color: rgb(28, 170, 231); */
 }
-/* .statistic{
+.statistic{
     color: rgb(28, 170, 231);
-} */
+}
 .choice input[type="checkbox"]{
     border-color: black; 
 }

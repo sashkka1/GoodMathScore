@@ -88,6 +88,83 @@ body{
     border-bottom-left-radius: 1vw;
     /* background-color: rgb(28, 170, 231); */
 }
+
+
+
+.statistic-icon{
+    height: 7vh;
+    aspect-ratio: 1 / 1;
+}
+span.statistic{
+    font-size: 7vh;
+}
+
+.statistic{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+.statistic-header{
+    position: relative;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 90vw;
+    height: 13vh;
+    /* background-color: bisque; */
+}
+
+.statistic-header .time{color: blue;}
+.statistic-header .mistake{color: red;}
+.statistic-header .examples{color: green;}
+
+.statistic-block{
+    /* background-color: beige; */
+    width: 100vw;
+    /* height: 88vh; */
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: space-around;
+}
+.graph-conteiner {
+    height: 28vh;
+    width: 90vw;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    overflow: auto;
+    scrollbar-width: none;       /* Firefox */
+    -ms-overflow-style: none; 
+    margin-bottom: 2vh;
+}
+.graph-wrapper-examples,.graph-wrapper-time,.graph-wrapper-mistake {
+    height: 97%;
+    /* height: 25vh; */
+    min-width: 1250px;
+}
+/* .graph-wrapper-week {
+    height: 35vh;
+    min-width: 400px;
+} */
+.graph {
+    height: 100%;
+    min-width: 1250px;
+    /* background-color: aqua; */
+}
+/* .total-week{
+    padding-bottom: 2vh;
+} */
+.statistic-block p{
+    margin-left: 5vw;
+}
+
+
+
+
+
 .choice{
     width: 80vw;
     height: 13vh;
@@ -261,7 +338,7 @@ body{
     .cssmain2{
         font-size: 3vw;
     }
-    .forPSize{
+    .forPSize,.statistic p{
         font-size: 2vw;
     }
     span.home{
@@ -278,7 +355,7 @@ body{
     .cssmain2{
         font-size: 4vw;
     }
-    .forPSize{
+    .forPSize,.statistic p{
         font-size: 2.5vw;
     }
     span.home{
@@ -295,7 +372,7 @@ body{
     .cssmain2{
         font-size: 5vw;
     }
-    .forPSize{
+    .forPSize,.statistic p{
         font-size: 3vw;
     }
     span.home{
@@ -312,7 +389,7 @@ body{
     .cssmain2{
         font-size: 6vw;
     }
-    .forPSize{
+    .forPSize,.statistic p{
         font-size: 4vw;
     }
     span.home{
@@ -329,7 +406,7 @@ body{
     .cssmain2{
         font-size: 7vw;
     }
-    .forPSize{
+    .forPSize,.statistic p{
         font-size: 4.5vw;
     }
     .choice input{
@@ -349,7 +426,7 @@ body{
     .cssmain2{
         font-size: 8vw;
     }
-    .forPSize{
+    .forPSize,.statistic p{
         font-size: 5.5vw;
     }
     .choice input{
