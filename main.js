@@ -1,7 +1,7 @@
 
 let values =[]; // 0+   1-   2x   3/  4t  5+-(min)  6+-(max)  7x/(min)  8x/(max) 
 let examples =[];
-let score = 1, mistake =0,examplesCount=10;
+let score = 1, mistake =0, totalMistake=0,examplesCount=10;
 let block;
 let numberOne,numberTwo,answer;
 
@@ -85,88 +85,78 @@ function statisticOpen(){
     block.classList.add('none');
 
 
-    // window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
-        // let stats = [];
-        // for(let i=1;i<=31;i++){
-        //     stats[i] = [];
-        //     stats[i][0] = Math.floor(Math.random() * (20 - 10 + 1)) + 10;
-        //     stats[i][1] = Math.floor(Math.random() * (20 - 10 + 1)) + 10;
-        //     stats[i][2] = Math.floor(Math.random() * (20 - 10 + 1)) + 10;
-        // }
-        // stats = JSON.stringify(stats)
-        // console.log('stats',stats);
+    window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
 
-        // if (stats === null || stats === undefined || stats === "") {
-        // }else{
-        //     let arrayGraphExamples = [], arrayGraphTime = [], arrayGraphMistake = [];   
-        //     stats = JSON.parse(stats);
-        //     // console.log('stats1',stats);
-        //     // если пользователь зашел в новом месяце и сразу посмотрит статистику то она должна быть пустой а не прошлого месяца
-        //     if(stats[0]!= monthIndex){
-        //         window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(stats));
-        //         for(let i=1;i<=daysInMonth;i++){
-        //             stats[i]= [0,0,0];
-        //         };    
-        //     }
-        //     // заполняю массив для рисования месячных графиков
-        //     for (let i = 1; i <= daysInMonth; i++) {
-        //         arrayGraphExamples.push({
-        //             day: String(i),
-        //             examples: stats[i][1],
-        //         });
-        //         arrayGraphTime.push({
-        //             day: String(i),
-        //             time: (stats[i][0]/60).toFixed(2),
-        //         });
+        if (stats === null || stats === undefined || stats === "") {
+        }else{
+            let arrayGraphExamples = [], arrayGraphTime = [], arrayGraphMistake = [];   
+            stats = JSON.parse(stats);
+            console.log('stats1',stats);
+            // если пользователь зашел в новом месяце и сразу посмотрит статистику то она должна быть пустой а не прошлого месяца
+            if(stats[0]!= monthIndex){
+                window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(stats));
+                for(let i=1;i<=daysInMonth;i++){
+                    stats[i]= [0,0,0];
+                };    
+            }
+            // заполняю массив для рисования месячных графиков
+            for (let i = 1; i <= daysInMonth; i++) {
+                arrayGraphExamples.push({
+                    day: String(i),
+                    examples: stats[i][1],
+                });
+                arrayGraphTime.push({
+                    day: String(i),
+                    time: (stats[i][0]/60).toFixed(2),
+                });
 
-        //         let number=0;
-        //         if(stats[i][2] != 0){
-        //             number = ((stats[i][1] - stats[i][2])/stats[i][1]).toFixed(2);
-        //         }
-        //         arrayGraphMistake.push({
-        //             day: String(i),
-        //             mistake: number,
-        //         });
-        //     }
-        //     // рисую графики примеров
-        //     new Morris.Line({
-        //         element: 'examples',
-        //         data: arrayGraphExamples,
-        //         xkey: 'day',
-        //         parseTime: false,
-        //         ykeys: ['examples'],
-        //         // hideHover: 'always',
-        //         labels: ['examples'],
-        //         lineColors: ['green']
-        //     });
-        //     // рисую графики времени
-        //     new Morris.Line({
-        //         element: 'time',
-        //         data: arrayGraphTime,
-        //         xkey: 'day',
-        //         parseTime: false,
-        //         ykeys: ['time'],
-        //         // hideHover: 'always',
-        //         labels: ['time'],
-        //         lineColors: ['blue']
-        //     });
-        //     // рисую графики ошибок
-        //     new Morris.Line({
-        //         element: 'mistake',
-        //         data: arrayGraphMistake,
-        //         xkey: 'day',
-        //         parseTime: false,
-        //         ykeys: ['mistake'],
-        //         // hideHover: 'always',
-        //         labels: ['mistake'],
-        //         lineColors: ['red']
-        //     });
-
-        // }
+                let number=0;
+                if(stats[i][2] != 0){
+                    number = ((stats[i][1] - stats[i][2])/stats[i][1]).toFixed(2);
+                }
+                arrayGraphMistake.push({
+                    day: String(i),
+                    mistake: number,
+                });
+            }
+            // рисую графики примеров
+            new Morris.Line({
+                element: 'graph-wrapper-examples',
+                data: arrayGraphExamples,
+                xkey: 'day',
+                parseTime: false,
+                ykeys: ['examples'],
+                // hideHover: 'always',
+                labels: ['examples'],
+                lineColors: ['green']
+            });
+            // рисую графики времени
+            new Morris.Line({
+                element: 'graph-wrapper-time',
+                data: arrayGraphTime,
+                xkey: 'day',
+                parseTime: false,
+                ykeys: ['time'],
+                // hideHover: 'always',
+                labels: ['time'],
+                lineColors: ['blue']
+            });
+            // рисую графики ошибок
+            new Morris.Line({
+                element: 'graph-wrapper-mistake',
+                data: arrayGraphMistake,
+                xkey: 'day',
+                parseTime: false,
+                ykeys: ['mistake'],
+                // hideHover: 'always',
+                labels: ['mistake'],
+                lineColors: ['red']
+            });
+        }
         // graphToToday('graph-conteiner-examples','graph-wrapper-examples'); // передвигаю на текущую дату
         // graphToToday('graph-conteiner-time','graph-wrapper-time'); 
         // graphToToday('graph-conteiner-mistake','graph-wrapper-mistake');
-    // });
+    });
 
 }
 
@@ -177,36 +167,36 @@ function statisticClose(){
     block.classList.add('none');
 }
 
-// function graphToToday(one,two){
-//     let today = new Date().getDate(); // получаем текущий день месяца
-//     let container = document.getElementById(one);
-//     let chart = document.getElementById(two);
 
-//     // Ждем небольшой интервал, чтобы график точно успел отрисоваться
-//     setTimeout(() => {
-//         // Найти все подписи по оси X (Morris генерирует их с классом .x-axis-label или подобным)
-//         let labels = chart.querySelectorAll('text');
+function graphToToday(one,two){
+    let today = new Date().getDate(); // получаем текущий день месяца
+    let container = document.getElementById(one);
+    let chart = document.getElementById(two);
 
-//         let targetLabel = null;
+    // Ждем небольшой интервал, чтобы график точно успел отрисоваться
+    setTimeout(() => {
+        // Найти все подписи по оси X (Morris генерирует их с классом .x-axis-label или подобным)
+        let labels = chart.querySelectorAll('text');
 
-//         labels.forEach(label => {
-//             if (parseInt(label.textContent) === today) {
-//             targetLabel = label;
-//             }
-//         });
+        let targetLabel = null;
 
-//         if (targetLabel) {
-//             let labelRect = targetLabel.getBoundingClientRect();
-//             let containerRect = container.getBoundingClientRect();
+        labels.forEach(label => {
+            if (parseInt(label.textContent) === today) {
+            targetLabel = label;
+            }
+        });
 
-//             let offsetLeft = labelRect.left + container.scrollLeft - containerRect.left;
-//             let centerScroll = offsetLeft - container.clientWidth / 2 + labelRect.width / 2;
+        if (targetLabel) {
+            let labelRect = targetLabel.getBoundingClientRect();
+            let containerRect = container.getBoundingClientRect();
 
-//             container.scrollLeft = centerScroll;
-//         }
-//     }, 100);
-// }
+            let offsetLeft = labelRect.left + container.scrollLeft - containerRect.left;
+            let centerScroll = offsetLeft - container.clientWidth / 2 + labelRect.width / 2;
 
+            container.scrollLeft = centerScroll;
+        }
+    }, 100);
+}
 
 
 function fromHomeToExample() { // переход с главного экрана на экран с пирмером
@@ -242,6 +232,7 @@ function fromHomeToExample() { // переход с главного экран�
     // обнуляю масив примеров, ошибки и количество примеров перед новой итерацией
     examples =[]; 
     mistake=0;
+    totalMistake=0;
     score=1;
     setExample();
 }
@@ -722,8 +713,51 @@ function keyboardClick(value){
             score++;
             input.outerHTML = `<p id="example-answer"></p>`;
             blink('example-answer-block','good');
+
+            if(TimeForSaveOld == 0){
+                TimeForSave = seconds+(tens*0.01);
+            }else{
+                TimeForSave = (seconds+(tens*0.01)) - TimeForSaveOld;
+            }
+            TimeForSaveOld = seconds+(tens*0.01);
+
+
+            // сохраняю результаты в облако
+            window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
+                if (stats === null || stats === undefined || stats === "") {
+                    stats =[];
+                    for(let i=1;i<=daysInMonth;i++){
+                        stats[i]= [0,0,0];
+                    };    
+                    stats[0] = monthIndex;
+                    stats[currentDay][0] = Number(TimeForSave);
+                    stats[currentDay][1] = 1;
+                    stats[currentDay][2] = Number(mistake);
+                }else{
+                    stats = JSON.parse(stats);
+                    if(stats[0]!= monthIndex){
+                        window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(stats));
+                        for(let i=1;i<=daysInMonth;i++){
+                            stats[i]= [0,0,0];
+                        };    
+                        stats[0] = monthIndex;
+                        stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
+                        stats[currentDay][1] = Number(stats[currentDay][1]) + 1;
+                        stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
+                    }else{
+                        stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
+                        stats[currentDay][1] = Number(stats[currentDay][1]) + 1;
+                        stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
+                    }   
+                }
+                window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
+                console.log('2', stats);
+                totalMistake += mistake;
+                mistake=0;
+            });
+
+
             if(score>=(+examplesCount+1)){
-                document.getElementById('win-message').outerHTML = `<p id="win-message" class="win-message ">Ошибки: ${mistake} <br> Время: ${document.getElementById("seconds").textContent}:${document.getElementById("tens").textContent}</p>`;
                 let a;
                 if(tens <= 9){
                     a = "0" + tens;
@@ -736,13 +770,13 @@ function keyboardClick(value){
                 }else{
                     b = seconds;
                 }
-                document.getElementById('win-message').outerHTML = `<p id="win-message" class="win-message ">Ошибки: ${mistake} <br> Время: ${b}:${a}</p>`;
+                document.getElementById('win-message').outerHTML = `<p id="win-message" class="win-message ">Ошибки: ${totalMistake} <br> Время: ${b}:${a}</p>`;
                 fromExampleToHome();
             }else{
                 setExample();
             }
         }else{
-            mistake++;
+            mistake=1;
             blink('example-answer-block','bad')
         }
     } else if(answerUser.length < 6){

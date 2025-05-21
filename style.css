@@ -113,8 +113,7 @@ span.statistic{
     align-items: center;
     justify-content: space-between;
     width: 90vw;
-    height: 13vh;
-    /* background-color: bisque; */
+    height: 10vh;
 }
 
 .statistic-header .time{color: blue;}
@@ -122,9 +121,7 @@ span.statistic{
 .statistic-header .examples{color: green;}
 
 .statistic-block{
-    /* background-color: beige; */
     width: 100vw;
-    /* height: 88vh; */
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -141,24 +138,8 @@ span.statistic{
     margin-bottom: 2vh;
 }
 .graph-wrapper-examples,.graph-wrapper-time,.graph-wrapper-mistake {
-    height: 97%;
-    /* height: 25vh; */
+    height: 95%;
     min-width: 1250px;
-}
-/* .graph-wrapper-week {
-    height: 35vh;
-    min-width: 400px;
-} */
-.graph {
-    height: 100%;
-    min-width: 1250px;
-    /* background-color: aqua; */
-}
-/* .total-week{
-    padding-bottom: 2vh;
-} */
-.statistic-block p{
-    margin-left: 5vw;
 }
 
 
