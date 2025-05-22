@@ -279,9 +279,9 @@ function fromExampleToHome(back) {// переход с экранв с пирм�
             }
             window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
             console.log('2', stats);
-            totalMistake += mistake;
-            mistake=0;
         });
+
+        totalMistake += mistake;
 
         let a;
         if(tens <= 9){
