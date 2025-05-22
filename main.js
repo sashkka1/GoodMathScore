@@ -321,7 +321,6 @@ function fromExampleToHome(back) {// переход с экранв с пирм�
     block = document.getElementById('main2');
     block.classList.add('none');
 
-    console.log('tens',tens,'seconds',seconds);
     // обнуляю таймер
     clearInterval(Interval);
     tens = "";
@@ -810,10 +809,9 @@ function keyboardClick(value){
                 }
                 window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
                 console.log('2', stats);
-                totalMistake += mistake;
                 mistake=0;
             });
-
+            totalMistake += mistake;
 
             if(score>=(+examplesCount+1)){
                 let a;
