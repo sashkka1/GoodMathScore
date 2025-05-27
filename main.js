@@ -87,9 +87,15 @@ function statisticOpen(){
 
     window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
 
+        let arrayGraphExamples = [], arrayGraphTime = [], arrayGraphMistake = [];
         if (stats === null || stats === undefined || stats === "") {
-        }else{
-            let arrayGraphExamples = [], arrayGraphTime = [], arrayGraphMistake = [];   
+            console.log('1',typeof(stats),stats);
+            stats =[];
+            for(let i=1;i<=daysInMonth;i++){
+                stats[i]= [0,0,0];
+            }; 
+                console.log('1',typeof(stats),stats);
+        }else{   
             stats = JSON.parse(stats);
             console.log('stats1',stats);
             // если пользователь зашел в новом месяце и сразу посмотрит статистику то она должна быть пустой а не прошлого месяца
@@ -99,60 +105,61 @@ function statisticOpen(){
                     stats[i]= [0,0,0];
                 };    
             }
-            // заполняю массив для рисования месячных графиков
-            for (let i = 1; i <= daysInMonth; i++) {
-                arrayGraphExamples.push({
-                    day: String(i),
-                    examples: stats[i][1],
-                });
-                arrayGraphTime.push({
-                    day: String(i),
-                    time: (stats[i][0]/60).toFixed(2),
-                });
+        }
 
-                let number=0;
-                if(stats[i][2] != 0){
-                    number = ((stats[i][1] - stats[i][2])/stats[i][1]).toFixed(2);
-                }
-                arrayGraphMistake.push({
-                    day: String(i),
-                    mistake: number,
-                });
+        // заполняю массив для рисования месячных графиков
+        for (let i = 1; i <= daysInMonth; i++) {
+            arrayGraphExamples.push({
+                day: String(i),
+                examples: stats[i][1],
+            });
+            arrayGraphTime.push({
+                day: String(i),
+                time: (stats[i][0]/60).toFixed(2),
+            });
+
+            let number=0;
+            if(stats[i][2] != 0){
+                number = ((stats[i][1] - stats[i][2])/stats[i][1]).toFixed(2);
             }
-            // рисую графики примеров
-            new Morris.Line({
-                element: 'graph-wrapper-examples',
-                data: arrayGraphExamples,
-                xkey: 'day',
-                parseTime: false,
-                ykeys: ['examples'],
-                // hideHover: 'always',
-                labels: ['examples'],
-                lineColors: ['green']
-            });
-            // рисую графики времени
-            new Morris.Line({
-                element: 'graph-wrapper-time',
-                data: arrayGraphTime,
-                xkey: 'day',
-                parseTime: false,
-                ykeys: ['time'],
-                // hideHover: 'always',
-                labels: ['time'],
-                lineColors: ['blue']
-            });
-            // рисую графики ошибок
-            new Morris.Line({
-                element: 'graph-wrapper-mistake',
-                data: arrayGraphMistake,
-                xkey: 'day',
-                parseTime: false,
-                ykeys: ['mistake'],
-                // hideHover: 'always',
-                labels: ['mistake'],
-                lineColors: ['red']
+            arrayGraphMistake.push({
+                day: String(i),
+                mistake: number,
             });
         }
+        // рисую графики примеров
+        new Morris.Line({
+            element: 'graph-wrapper-examples',
+            data: arrayGraphExamples,
+            xkey: 'day',
+            parseTime: false,
+            ykeys: ['examples'],
+            // hideHover: 'always',
+            labels: ['examples'],
+            lineColors: ['green']
+        });
+        // рисую графики времени
+        new Morris.Line({
+            element: 'graph-wrapper-time',
+            data: arrayGraphTime,
+            xkey: 'day',
+            parseTime: false,
+            ykeys: ['time'],
+            // hideHover: 'always',
+            labels: ['time'],
+            lineColors: ['blue']
+        });
+        // рисую графики ошибок
+        new Morris.Line({
+            element: 'graph-wrapper-mistake',
+            data: arrayGraphMistake,
+            xkey: 'day',
+            parseTime: false,
+            ykeys: ['mistake'],
+            // hideHover: 'always',
+            labels: ['mistake'],
+            lineColors: ['red']
+        });
         graphToToday('graph-conteiner-examples','graph-wrapper-examples'); // передвигаю на текущую дату
         graphToToday('graph-conteiner-time','graph-wrapper-time'); 
         graphToToday('graph-conteiner-mistake','graph-wrapper-mistake');
