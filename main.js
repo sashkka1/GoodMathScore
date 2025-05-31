@@ -206,7 +206,6 @@ function statisticOpen(){
     });
 
 }
-    alert('2');
 
 function statisticClose(){
     block = document.getElementById('main1');
