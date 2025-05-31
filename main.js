@@ -76,7 +76,47 @@ document.getElementById('number-0').addEventListener('click', () => { keyboardCl
 document.getElementById('number-enter').addEventListener('click', () => { keyboardClick(document.getElementById('number-enter').value);});
 document.getElementById('number-delete').addEventListener('click', () => { keyboardClick(document.getElementById('number-delete').value);});
 
-
+function addDivForGraph(){
+    // Добавляю и удаляю потому что при нескольких заходов после решения примеров несколько раз hover 
+    // показывает, поэтому перерисовываю график каждый раз при заходе на страницу статистики
+    let examples = document.getElementById('graph-conteiner-examples');
+    let time = document.getElementById('graph-conteiner-time');
+    let mistake = document.getElementById('graph-conteiner-mistake');
+    // Проверяем, что элемент ещё не добавлен
+    if (!document.getElementById('graph-wrapper-examples')) {
+        let newDiv = document.createElement('div');
+        newDiv.className = 'graph-wrapper-examples';
+        newDiv.id = 'graph-wrapper-examples';
+        examples.appendChild(newDiv);
+    }
+    if (!document.getElementById('graph-wrapper-time')) {
+        let newDiv = document.createElement('div');
+        newDiv.className = 'graph-wrapper-time';
+        newDiv.id = 'graph-wrapper-time';
+        time.appendChild(newDiv);
+    }
+    if (!document.getElementById('graph-wrapper-mistake')) {
+        let newDiv = document.createElement('div');
+        newDiv.className = 'graph-wrapper-mistake';
+        newDiv.id = 'graph-wrapper-mistake';
+        mistake.appendChild(newDiv);
+    }
+}
+function deleteDivForGraph(){
+    let examplesDiv = document.getElementById('graph-wrapper-examples');
+    let timeDiv = document.getElementById('graph-wrapper-time');
+    let mistakeDiv = document.getElementById('graph-wrapper-mistake');
+    
+    if (examplesDiv) {
+        examplesDiv.remove();
+    }
+    if (timeDiv) {
+        timeDiv.remove();
+    }
+    if (mistakeDiv) {
+        mistakeDiv.remove();
+    }
+}
 
 function statisticOpen(){
     block = document.getElementById('statistic');
@@ -84,6 +124,7 @@ function statisticOpen(){
     block = document.getElementById('main1');
     block.classList.add('none');
 
+    addDivForGraph();
 
     window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
         let arrayGraphExamples = [], arrayGraphTime = [], arrayGraphMistake = [];
@@ -165,12 +206,14 @@ function statisticOpen(){
     });
 
 }
+    alert('2');
 
 function statisticClose(){
     block = document.getElementById('main1');
     block.classList.remove('none');
     block = document.getElementById('statistic');
     block.classList.add('none');
+    deleteDivForGraph();
 }
 
 
@@ -1066,7 +1109,6 @@ document.addEventListener('DOMContentLoaded', () => { // первый заход
     });
 })
 
-    // alert('7');
 
 
 
