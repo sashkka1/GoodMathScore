@@ -5,6 +5,8 @@ let score = 1, mistake = 0, mistakeTwo = 0, timeForStatsArray = 0, mistakeForSta
 let block;
 let numberOne, numberTwo, answer;
 
+const tg_username = window.Telegram.WebApp.initDataUnsafe.user.username; // Юзернейм
+
 
 //для таймера вводные
 var seconds = 0;
@@ -129,15 +131,12 @@ function statisticOpen() {
     window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
         let arrayGraphExamples = [], arrayGraphTime = [], arrayGraphMistake = [];
         if (stats === null || stats === undefined || stats === "") {
-            console.log('1', typeof (stats), stats);
             stats = [];
             for (let i = 1; i <= daysInMonth; i++) {
                 stats[i] = [0, 0, 0];
             };
-            console.log('1', typeof (stats), stats);
         } else {
             stats = JSON.parse(stats);
-            console.log('stats1', stats);
             // если пользователь зашел в новом месяце и сразу посмотрит статистику то она должна быть пустой а не прошлого месяца
             if (stats[0] != monthIndex) {
                 window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(stats));
@@ -326,7 +325,6 @@ function fromExampleToHome(back) {// переход с экрана с пирм�
                 }
             }
             window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
-            console.log('2', stats);
         });
 
         totalMistake += mistake;
@@ -397,14 +395,11 @@ function fromExampleToHome(back) {// переход с экрана с пирм�
 }
 
 function dinamicRange() { // изменяет ползунки на сохранненые значения, ничего не менял взял с старого кода
-    // console.log('7');
-    // window.Telegram.WebApp.CloudStorage.getItem("values", (err,test) => {
     let test = localStorage.getItem('values');
 
     let adapter = test.split(',');
     let forMemery = [adapter[5], adapter[6], adapter[7], adapter[8], adapter[9]]
     // 1valLower  2valUpper  3lower-double  4upper-double 
-    // console.log('8');
     var max = $('.upper').attr('max');
     var min = $('.lower').attr('min');
     var valLower = forMemery[0];
@@ -581,19 +576,15 @@ function smallRange() {  // изменяет ползунки и чек бокс
 
     var max = $('.upper').attr('max');
     var min = $('.lower').attr('min');
-    var valLower = 2;
-    var valUpper = 20;
+    var valLower, valUpper;
 
-    let tg_username = window.Telegram.WebApp.initDataUnsafe.user.username; // Юзернейм
-    console.log('tg_username - ', tg_username);
-    let user = 'alexander_drozd';
-    if (tg_username == user) {
-        var valLower = 2;
-        var valUpper = 30;
+    if (tg_username == 'alexander_drozd') {
+        valLower = 2;
+        valUpper = 30;
 
     } else {
-        var valLower = 2;
-        var valUpper = 20;
+        valLower = 2;
+        valUpper = 20;
     }
 
     if (parseFloat(valLower) > parseFloat(valUpper)) {
@@ -711,8 +702,16 @@ function bigRange() {// изменяет ползунки и чек боксы �
 
     var max = $('.upper').attr('max');
     var min = $('.lower').attr('min');
-    var valLower = 150;
-    var valUpper = 300;
+    var valLower, valUpper;
+
+    if (tg_username == 'alexander_drozd') {
+        valLower = 200;
+        valUpper = 500;
+
+    } else {
+        valLower = 150;
+        valUpper = 300;
+    }
 
     if (parseFloat(valLower) > parseFloat(valUpper)) {
         var trade = valLower;
@@ -764,8 +763,15 @@ function bigRange() {// изменяет ползунки и чек боксы �
 
     max = $('.upper-double').attr('max');
     min = $('.lower-double').attr('min');
-    valLower = 25;
-    valUpper = 50;
+
+    if (tg_username == 'alexander_drozd') {
+        valLower = 15;
+        valUpper = 35;
+
+    } else {
+        valLower = 25;
+        valUpper = 50;
+    }
     if (parseFloat(valLower) > parseFloat(valUpper)) {
         var trade = valLower;
         valLower = valUpper;
@@ -890,7 +896,6 @@ function keyboardClick(value) {
                     }
                 }
                 window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
-                // console.log('2', stats);
                 mistake = 0;
             });
 
@@ -1015,7 +1020,6 @@ function setExample() { // создаю пример и вывожу на экр
 
     let inputExample = document.getElementById('example');
     inputExample.outerHTML = `<p id="example">${numberOne} ${symbolArray[symbol]} ${numberTwo} = </p>`;
-    console.log("Answer - ", answer);
 
     let inputScore = document.getElementById('score');
     inputScore.outerHTML = `<p id="score">${score}/${examplesCount}</p>`;
@@ -1111,7 +1115,6 @@ document.addEventListener('DOMContentLoaded', () => { // первый заход
             statsArray = [0, 0, 0];
         } else {
             stats = JSON.parse(stats);
-            console.log('stats1', stats);
             statsArray = [stats[currentDay][0], stats[currentDay][1], stats[currentDay][2]];
             if (stats[0] != monthIndex) {
                 window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(stats));
