@@ -218,14 +218,14 @@ span.statistic {
 }
 
 .tuning-small-big button {
-    width: 40%;
+    width: 41.5%;
     height: 80%;
     border-radius: 5px;
     transition-duration: 0.4s;
 }
 
 .tuning-small-big button:active {
-    width: 35%;
+    width: 36.5%;
     height: 75%;
     transition-duration: 0.4s;
     margin-left: 2.5%;
