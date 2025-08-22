@@ -5,7 +5,7 @@ let score = 1, mistake = 0, mistakeTwo = 0, timeForStatsArray = 0, mistakeForSta
 let block;
 let numberOne, numberTwo, answer;
 
-// const tg_username = window.Telegram.WebApp.initDataUnsafe.user.username; // Юзернейм
+const tg_username = window.Telegram.WebApp.initDataUnsafe.user.username; // Юзернейм
 
 
 //для таймера вводные
