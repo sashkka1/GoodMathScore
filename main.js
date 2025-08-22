@@ -577,15 +577,8 @@ function smallRange() {  // изменяет ползунки и чек бокс
     var max = $('.upper').attr('max');
     var min = $('.lower').attr('min');
     var valLower, valUpper;
-
-    if (tg_username == 'alexander_drozd') {
-        valLower = 2;
-        valUpper = 30;
-
-    } else {
-        valLower = 2;
-        valUpper = 20;
-    }
+    valLower = 2;
+    valUpper = 20;
 
     if (parseFloat(valLower) > parseFloat(valUpper)) {
         var trade = valLower;
@@ -707,11 +700,21 @@ function bigRange() {// изменяет ползунки и чек боксы �
     if (tg_username == 'alexander_drozd') {
         valLower = 200;
         valUpper = 500;
-
+        $('.lower-three').val(50);
     } else {
         valLower = 150;
         valUpper = 300;
     }
+
+
+
+
+
+
+
+
+
+
 
     if (parseFloat(valLower) > parseFloat(valUpper)) {
         var trade = valLower;
