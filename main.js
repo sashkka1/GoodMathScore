@@ -16,9 +16,10 @@ document.addEventListener("click", () => {
 });
 
 let tg_username;
-if (window.Telegram.WebApp.initDataUnsafe.user.username == 'alexander_drozd') {
+if (navigator.userAgent.includes("Telegram")) {
     tg_username = window.Telegram.WebApp.initDataUnsafe.user.username; // Юзернейм
 }
+
 
 
 //для таймера вводные
