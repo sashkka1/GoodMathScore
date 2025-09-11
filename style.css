@@ -5,7 +5,10 @@
     border: 0;
 }
 
-
+.conteiner {
+    width: 1000px;
+    height: 100%;
+}
 
 .none {
     z-index: -1;

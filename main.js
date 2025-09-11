@@ -141,84 +141,85 @@ function statisticOpen() {
     block.classList.add('none');
 
     addDivForGraph();
-
-    window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
-        let arrayGraphExamples = [], arrayGraphTime = [], arrayGraphMistake = [];
-        if (stats === null || stats === undefined || stats === "") {
-            stats = [];
-            for (let i = 1; i <= daysInMonth; i++) {
-                stats[i] = [0, 0, 0];
-            };
-        } else {
-            stats = JSON.parse(stats);
-            // если пользователь зашел в новом месяце и сразу посмотрит статистику то она должна быть пустой а не прошлого месяца
-            if (stats[0] != monthIndex) {
-                window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(stats));
+    if (navigator.userAgent.includes("Telegram")) {
+        window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
+            let arrayGraphExamples = [], arrayGraphTime = [], arrayGraphMistake = [];
+            if (stats === null || stats === undefined || stats === "") {
+                stats = [];
                 for (let i = 1; i <= daysInMonth; i++) {
                     stats[i] = [0, 0, 0];
                 };
+            } else {
+                stats = JSON.parse(stats);
+                // если пользователь зашел в новом месяце и сразу посмотрит статистику то она должна быть пустой а не прошлого месяца
+                if (stats[0] != monthIndex) {
+                    window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(stats));
+                    for (let i = 1; i <= daysInMonth; i++) {
+                        stats[i] = [0, 0, 0];
+                    };
+                }
             }
-        }
 
-        // заполняю массив для рисования месячных графиков
-        for (let i = 1; i <= daysInMonth; i++) {
-            arrayGraphExamples.push({
-                day: String(i),
-                examples: stats[i][1],
-            });
-            arrayGraphTime.push({
-                day: String(i),
-                time: (stats[i][0] / 60).toFixed(2),
-            });
+            // заполняю массив для рисования месячных графиков
+            for (let i = 1; i <= daysInMonth; i++) {
+                arrayGraphExamples.push({
+                    day: String(i),
+                    examples: stats[i][1],
+                });
+                arrayGraphTime.push({
+                    day: String(i),
+                    time: (stats[i][0] / 60).toFixed(2),
+                });
 
-            let number = 1;
-            if (stats[i][2] == 0 && stats[i][1] == 0) {
-                number = 0;
-            } else if (stats[i][2] != 0) {
-                number = ((stats[i][1] - stats[i][2]) / stats[i][1]).toFixed(2);
+                let number = 1;
+                if (stats[i][2] == 0 && stats[i][1] == 0) {
+                    number = 0;
+                } else if (stats[i][2] != 0) {
+                    number = ((stats[i][1] - stats[i][2]) / stats[i][1]).toFixed(2);
+                }
+                arrayGraphMistake.push({
+                    day: String(i),
+                    mistake: number,
+                });
             }
-            arrayGraphMistake.push({
-                day: String(i),
-                mistake: number,
+            // рисую графики примеров
+            new Morris.Line({
+                element: 'graph-wrapper-examples',
+                data: arrayGraphExamples,
+                xkey: 'day',
+                parseTime: false,
+                ykeys: ['examples'],
+                // hideHover: 'always',
+                labels: ['examples'],
+                lineColors: ['green']
             });
-        }
-        // рисую графики примеров
-        new Morris.Line({
-            element: 'graph-wrapper-examples',
-            data: arrayGraphExamples,
-            xkey: 'day',
-            parseTime: false,
-            ykeys: ['examples'],
-            // hideHover: 'always',
-            labels: ['examples'],
-            lineColors: ['green']
+            // рисую графики времени
+            new Morris.Line({
+                element: 'graph-wrapper-time',
+                data: arrayGraphTime,
+                xkey: 'day',
+                parseTime: false,
+                ykeys: ['time'],
+                // hideHover: 'always',
+                labels: ['time'],
+                lineColors: ['blue']
+            });
+            // рисую графики ошибок
+            new Morris.Line({
+                element: 'graph-wrapper-mistake',
+                data: arrayGraphMistake,
+                xkey: 'day',
+                parseTime: false,
+                ykeys: ['mistake'],
+                // hideHover: 'always',
+                labels: ['mistake'],
+                lineColors: ['red']
+            });
+            graphToToday('graph-conteiner-examples', 'graph-wrapper-examples'); // передвигаю на текущую дату
+            graphToToday('graph-conteiner-time', 'graph-wrapper-time');
+            graphToToday('graph-conteiner-mistake', 'graph-wrapper-mistake');
         });
-        // рисую графики времени
-        new Morris.Line({
-            element: 'graph-wrapper-time',
-            data: arrayGraphTime,
-            xkey: 'day',
-            parseTime: false,
-            ykeys: ['time'],
-            // hideHover: 'always',
-            labels: ['time'],
-            lineColors: ['blue']
-        });
-        // рисую графики ошибок
-        new Morris.Line({
-            element: 'graph-wrapper-mistake',
-            data: arrayGraphMistake,
-            xkey: 'day',
-            parseTime: false,
-            ykeys: ['mistake'],
-            // hideHover: 'always',
-            labels: ['mistake'],
-            lineColors: ['red']
-        });
-        graphToToday('graph-conteiner-examples', 'graph-wrapper-examples'); // передвигаю на текущую дату
-        graphToToday('graph-conteiner-time', 'graph-wrapper-time');
-        graphToToday('graph-conteiner-mistake', 'graph-wrapper-mistake');
-    });
+    }
 
 }
 
@@ -276,7 +277,7 @@ function fromHomeToExample() { // переход с главного экран�
     values[8] = inputLower[3].value;
     values[9] = inputLower[4].value;
     examplesCount = values[9];
-    // window.Telegram.WebApp.CloudStorage.setItem("values",values);
+
     localStorage.setItem('values', values);
 
     // меняю экраны между собой
@@ -310,36 +311,38 @@ function fromExampleToHome(back) {// переход с экрана с пирм�
         }
         TimeForSaveOld = seconds + (tens * 0.01);
 
-        // сохраняю результаты в облако
-        window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
-            if (stats === null || stats === undefined || stats === "") {
-                stats = [];
-                for (let i = 1; i <= daysInMonth; i++) {
-                    stats[i] = [0, 0, 0];
-                };
-                stats[0] = monthIndex;
-                stats[currentDay][0] = Number(TimeForSave);
-                stats[currentDay][1] = 1;
-                stats[currentDay][2] = Number(mistake);
-            } else {
-                stats = JSON.parse(stats);
-                if (stats[0] != monthIndex) {
-                    window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(stats));
+        if (navigator.userAgent.includes("Telegram")) {
+            // сохраняю результаты в облако
+            window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
+                if (stats === null || stats === undefined || stats === "") {
+                    stats = [];
                     for (let i = 1; i <= daysInMonth; i++) {
                         stats[i] = [0, 0, 0];
                     };
                     stats[0] = monthIndex;
-                    stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
-                    stats[currentDay][1] = Number(stats[currentDay][1]) + 1;
-                    stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
+                    stats[currentDay][0] = Number(TimeForSave);
+                    stats[currentDay][1] = 1;
+                    stats[currentDay][2] = Number(mistake);
                 } else {
-                    stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
-                    stats[currentDay][1] = Number(stats[currentDay][1]) + 1;
-                    stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
+                    stats = JSON.parse(stats);
+                    if (stats[0] != monthIndex) {
+                        window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(stats));
+                        for (let i = 1; i <= daysInMonth; i++) {
+                            stats[i] = [0, 0, 0];
+                        };
+                        stats[0] = monthIndex;
+                        stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
+                        stats[currentDay][1] = Number(stats[currentDay][1]) + 1;
+                        stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
+                    } else {
+                        stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
+                        stats[currentDay][1] = Number(stats[currentDay][1]) + 1;
+                        stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
+                    }
                 }
-            }
-            window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
-        });
+                window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
+            });
+        }
 
         totalMistake += mistake;
 
@@ -363,15 +366,18 @@ function fromExampleToHome(back) {// переход с экрана с пирм�
         document.getElementById('win-message').outerHTML = `<p id="win-message" class="win-message ">Ошибки: ${totalMistake} <br> Время: ${b}:${a}</p>`;
     }
 
-    window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
-        stats = JSON.parse(stats);
-        if (+stats[currentDay][0] != (+statsArray[0] + +timeForStatsArray)) {
-            stats[currentDay][0] = (+statsArray[0] + +timeForStatsArray);
-            stats[currentDay][1] = (+statsArray[1] + +examplesForStatsArray);
-            stats[currentDay][2] = (+statsArray[2] + +mistakeForStatsArray);
-            window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
-        }
-    });
+    if (navigator.userAgent.includes("Telegram")) {
+        window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
+            stats = JSON.parse(stats);
+            if (+stats[currentDay][0] != (+statsArray[0] + +timeForStatsArray)) {
+                stats[currentDay][0] = (+statsArray[0] + +timeForStatsArray);
+                stats[currentDay][1] = (+statsArray[1] + +examplesForStatsArray);
+                stats[currentDay][2] = (+statsArray[2] + +mistakeForStatsArray);
+                window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
+            }
+        });
+    }
+
 
     //меняю ползунки и чекбоксы на сохраненные значения
     let test = localStorage.getItem('values');
@@ -875,37 +881,40 @@ function keyboardClick(value) {
             timeForStatsArray = Number(timeForStatsArray) + Number(TimeForSave);
             mistakeTwo = 0;
 
-            // сохраняю результаты в облако
-            window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
-                if (stats === null || stats === undefined || stats === "") {
-                    stats = [];
-                    for (let i = 1; i <= daysInMonth; i++) {
-                        stats[i] = [0, 0, 0];
-                    };
-                    stats[0] = monthIndex;
-                    stats[currentDay][0] = Number(TimeForSave);
-                    stats[currentDay][1] = 1;
-                    stats[currentDay][2] = Number(mistake);
-                } else {
-                    stats = JSON.parse(stats);
-                    if (stats[0] != monthIndex) {
-                        window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(stats));
+            if (navigator.userAgent.includes("Telegram")) {
+                window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
+                    if (stats === null || stats === undefined || stats === "") {
+                        stats = [];
                         for (let i = 1; i <= daysInMonth; i++) {
                             stats[i] = [0, 0, 0];
                         };
                         stats[0] = monthIndex;
-                        stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
-                        stats[currentDay][1] = Number(stats[currentDay][1]) + 1;
-                        stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
+                        stats[currentDay][0] = Number(TimeForSave);
+                        stats[currentDay][1] = 1;
+                        stats[currentDay][2] = Number(mistake);
                     } else {
-                        stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
-                        stats[currentDay][1] = Number(stats[currentDay][1]) + 1;
-                        stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
+                        stats = JSON.parse(stats);
+                        if (stats[0] != monthIndex) {
+                            window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(stats));
+                            for (let i = 1; i <= daysInMonth; i++) {
+                                stats[i] = [0, 0, 0];
+                            };
+                            stats[0] = monthIndex;
+                            stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
+                            stats[currentDay][1] = Number(stats[currentDay][1]) + 1;
+                            stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
+                        } else {
+                            stats[currentDay][0] = Number(stats[currentDay][0]) + Number(TimeForSave);
+                            stats[currentDay][1] = Number(stats[currentDay][1]) + 1;
+                            stats[currentDay][2] = Number(stats[currentDay][2]) + Number(mistake);
+                        }
                     }
-                }
-                window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
-                mistake = 0;
-            });
+                    window.Telegram.WebApp.CloudStorage.setItem("stats", JSON.stringify(stats));
+                    mistake = 0;
+                });
+            }
+            // сохраняю результаты в облако
+
 
             totalMistake += mistake;
 
@@ -1113,26 +1122,28 @@ document.addEventListener('DOMContentLoaded', () => { // первый заход
         dinamicRange();
     }
 
-    window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
+    if (navigator.userAgent.includes("Telegram")) {
+        window.Telegram.WebApp.CloudStorage.getItem("stats", (err, stats) => {
 
-        if (stats === null || stats === undefined || stats === "") {
-            stats = [];
-            for (let i = 1; i <= daysInMonth; i++) {
-                stats[i] = [0, 0, 0];
-            };
-            statsArray = [0, 0, 0];
-        } else {
-            stats = JSON.parse(stats);
-            statsArray = [stats[currentDay][0], stats[currentDay][1], stats[currentDay][2]];
-            if (stats[0] != monthIndex) {
-                window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(stats));
+            if (stats === null || stats === undefined || stats === "") {
+                stats = [];
                 for (let i = 1; i <= daysInMonth; i++) {
                     stats[i] = [0, 0, 0];
                 };
                 statsArray = [0, 0, 0];
+            } else {
+                stats = JSON.parse(stats);
+                statsArray = [stats[currentDay][0], stats[currentDay][1], stats[currentDay][2]];
+                if (stats[0] != monthIndex) {
+                    window.Telegram.WebApp.CloudStorage.setItem("oldstats", JSON.stringify(stats));
+                    for (let i = 1; i <= daysInMonth; i++) {
+                        stats[i] = [0, 0, 0];
+                    };
+                    statsArray = [0, 0, 0];
+                }
             }
-        }
-    });
+        });
+    }
 })
 
 
