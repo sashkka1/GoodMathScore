@@ -5,7 +5,20 @@ let score = 1, mistake = 0, mistakeTwo = 0, timeForStatsArray = 0, mistakeForSta
 let block;
 let numberOne, numberTwo, answer;
 
-const tg_username = window.Telegram.WebApp.initDataUnsafe.user.username; // Юзернейм
+// for work in my cv
+document.addEventListener("click", () => {
+    // проверяем, открыт ли уже нужный сайт
+
+    if (window.parent.location.href !== "https://sashkka1.github.io/GoodMathScore/") {
+        window.parent.location.href = "https://sashkka1.github.io/GoodMathScore/";
+    }
+    // если совпадает — ничего не делаем
+});
+
+let tg_username;
+if (window.Telegram.WebApp.initDataUnsafe.user.username == 'alexander_drozd') {
+    tg_username = window.Telegram.WebApp.initDataUnsafe.user.username; // Юзернейм
+}
 
 
 //для таймера вводные
