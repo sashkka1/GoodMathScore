@@ -6,14 +6,14 @@ let block;
 let numberOne, numberTwo, answer;
 
 // for work in my cv
-document.addEventListener("click", () => {
-    // проверяем, открыт ли уже нужный сайт
+// document.addEventListener("click", () => {
+//     // проверяем, открыт ли уже нужный сайт
 
-    // if (window.parent.location.href !== "https://sashkka1.github.io/GoodMathScore/") {
-    //     window.parent.location.href = "https://sashkka1.github.io/GoodMathScore/";
-    // }
-    // если совпадает — ничего не делаем
-});
+//     if (window.parent.location.href !== "https://sashkka1.github.io/GoodMathScore/") {
+//         window.parent.location.href = "https://sashkka1.github.io/GoodMathScore/";
+//     }
+//     // если совпадает — ничего не делаем
+// });
 
 let tg_username;
 if (navigator.userAgent.includes("Telegram")) {
