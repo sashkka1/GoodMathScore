@@ -9,9 +9,9 @@ let numberOne, numberTwo, answer;
 document.addEventListener("click", () => {
     // проверяем, открыт ли уже нужный сайт
 
-    if (window.parent.location.href !== "https://sashkka1.github.io/GoodMathScore/") {
-        window.parent.location.href = "https://sashkka1.github.io/GoodMathScore/";
-    }
+    // if (window.parent.location.href !== "https://sashkka1.github.io/GoodMathScore/") {
+    //     window.parent.location.href = "https://sashkka1.github.io/GoodMathScore/";
+    // }
     // если совпадает — ничего не делаем
 });
 
@@ -263,7 +263,7 @@ function graphToToday(one, two) {
 }
 
 
-function fromHomeToExample() { // переход с главного экрана на экран с пирмером
+function fromHomeToExample() { // переход с главного экрана на экран с примером
 
     // считываю все пораметры ползункув и чекбоксов
     let checkboxes = document.querySelectorAll('input[type="checkbox"]');
