@@ -1792,28 +1792,6 @@ function applyTheme(name) {
 
 
 
-// Применяет настройки из localStorage к UI: тема, размеры, границы, пресеты,
-// чекбоксы и позиции ползунков. Идемпотентна — можно дёрнуть и до, и после
-// bootstrapCloudStorage (второй вызов перекинет UI на свежие cloud-значения).
-function applyUIFromLocalStorage() {
-    applyTheme(localStorage.getItem('userTheme'));
-    applySizeSettings(loadSizeSettings());
-    const bounds = loadRangesBounds();
-    applyRangesBounds(bounds);
-    fillRangesInputs(bounds);
-    fillPresetsInputs(loadRangesPresets());
-
-    const stored = localStorage.getItem('values');
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    if (stored === null || stored === undefined || stored === '') {
-        for (let i = 0; i < 5; i++) checkboxes[i].checked = true;
-    } else {
-        const fM = stored.split(',');
-        for (let i = 0; i < 5; i++) checkboxes[i].checked = (fM[i] === 'true');
-        dinamicRange();
-    }
-}
-
 document.addEventListener('DOMContentLoaded', () => { // первый заход и разложение сохраненных значений
 
     // инициализация Swiper: палец-свайп отключён, переходы только программно через slideTo
@@ -1827,21 +1805,33 @@ document.addEventListener('DOMContentLoaded', () => { // первый заход
     window.Telegram.WebApp.expand();
     window.Telegram.WebApp.disableVerticalSwipes();
 
-    // 1) Сразу применяем то, что есть в localStorage — UI не вспыхивает
-    //    дефолтами на первом кадре.
-    applyUIFromLocalStorage();
+    // применяю сохранённую тему (или дефолт). applyTheme сам делает фоллбэк
+    // на THEME_DEFAULT, если localStorage пуст или содержит устаревшее имя.
+    applyTheme(localStorage.getItem('userTheme'));
 
-    // 2) Прогреваем кэш статистики. В Telegram — из CloudStorage + merge
-    //    с localStorage (см. statsLoad), в браузере — sync.
+    // восстанавливаю чекбоксы и позиции ползунков из localStorage
+    const test = localStorage.getItem('values');
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    if (test === null || test === undefined || test === '') {
+        for (let i = 0; i < 5; i++) checkboxes[i].checked = true;
+    } else {
+        const forMemery = test.split(',');
+        for (let i = 0; i < 5; i++) {
+            if (forMemery[i] == 'true') checkboxes[i].checked = true;
+        }
+        dinamicRange();
+    }
+
+    // Прогреваем кэш статистики. В Telegram — из CloudStorage + merge с
+    // localStorage (см. statsLoad), в браузере — sync. Если пользователь
+    // откроет страницу статистики раньше, чем CloudStorage вернёт ответ,
+    // statisticOpen() дождётся той же промиссы.
     statsLoad();
 
-    // 3) Подтягиваем все settings-ключи из CloudStorage и переприменяем UI
-    //    (актуально при заходе с нового устройства / переустановки). В
-    //    браузере вне Telegram bootstrapCloudStorage резолвится сразу,
-    //    повторный applyUIFromLocalStorage даёт идемпотентный no-op.
-    bootstrapCloudStorage().then(() => {
-        applyUIFromLocalStorage();
-    });
+    // bootstrapCloudStorage (подтягивание settings из облака на старте)
+    // временно отключён — вызывал проблемы с инициализацией в Telegram.
+    // Записи настроек по-прежнему уходят в CloudStorage через cloudSet,
+    // так что при следующем заходе значения будут доступны там.
 })
 
 
