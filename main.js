@@ -1064,13 +1064,20 @@ function updateCategoryButtonsVisibility(cat) {
 }
 
 // Категория переключает слайд во внутреннем Swiper и обновляет .active на
-// нужной cat-кнопке. Период (week/month) живёт отдельно — не сбрасываем.
+// нужной cat-кнопке. Период (week/month) живёт отдельно — не сбрасываем
+// (значение statPeriod сохраняется), но подсветку period-кнопок снимаем на
+// «Общей»: в её таблице свои собственные срезы (7д/30д/всё время), к ней
+// глобальный period не применяется, поэтому светящаяся «Неделя»/«Месяц»
+// читалась как баг.
 function setStatCategory(cat) {
     if (!STAT_CATEGORIES.includes(cat)) return;
     const idx = STAT_CATEGORIES.indexOf(cat);
     if (statSwiper) statSwiper.slideTo(idx);
     document.querySelectorAll('.stat-cat-btn').forEach(b => {
         b.classList.toggle('active', b.dataset.cat === cat);
+    });
+    document.querySelectorAll('.stat-period-btn').forEach(b => {
+        b.classList.toggle('active', cat !== 'overall' && b.dataset.period === statPeriod);
     });
     updateCategoryButtonsVisibility(cat);
 }
@@ -1098,6 +1105,9 @@ function statisticOpen() {
                     document.querySelectorAll('.stat-cat-btn').forEach(b => {
                         b.classList.toggle('active', b.dataset.cat === cat);
                     });
+                    document.querySelectorAll('.stat-period-btn').forEach(b => {
+                        b.classList.toggle('active', cat !== 'overall' && b.dataset.period === statPeriod);
+                    });
                     updateCategoryButtonsVisibility(cat);
                 },
             },
@@ -1105,9 +1115,13 @@ function statisticOpen() {
     } else {
         statSwiper.slideTo(0, 0);
     }
-    // Каждое открытие — на «Общая»
+    // Каждое открытие — на «Общая». На «Общей» period-кнопки не подсвечиваем
+    // (см. setStatCategory): глобальный period к её таблице не применяется.
     document.querySelectorAll('.stat-cat-btn').forEach(b => {
         b.classList.toggle('active', b.dataset.cat === 'overall');
+    });
+    document.querySelectorAll('.stat-period-btn').forEach(b => {
+        b.classList.remove('active');
     });
     updateCategoryButtonsVisibility('overall');
 

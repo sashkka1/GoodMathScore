@@ -194,12 +194,13 @@ body {
 }
 
 /* Панель кастомных границ ползунков — сосед theme-dropdown.
-   Шире, чем сама панель settings-menu: занимает 70vw, прижата к правому краю
-   viewport (а не к иконке-триггеру), чтобы на узких экранах помещались
-   inputы с лейблами и текст не наезжал на цифры. */
+   Шире, чем сама панель settings-menu: занимает 70vw, отцентрована
+   по горизонтали (а не привязана к иконке-триггеру), чтобы на узких экранах
+   помещались inputы с лейблами и текст не наезжал на цифры. */
 .ranges-dropdown {
     position: absolute;
-    right: 2vw;
+    left: 50%;
+    transform: translateX(-50%);
     top: calc(3vh + 7vh + 0.8vh);
     width: 70vw;
     background-color: var(--bg);
@@ -301,12 +302,13 @@ body {
     font-size: 6vh;
 }
 
-/* Панель размеров — третий dropdown в overlay-настройках. Прижата к правому
-   краю viewport (а не под иконку format_size), чтобы на узких экранах
-   ползунки имели достаточно места и лейблы «Шрифт» / «Кнопки» не наезжали. */
+/* Панель размеров — третий dropdown в overlay-настройках. Отцентрована по
+   горизонтали (а не под иконку format_size), чтобы на узких экранах ползунки
+   имели достаточно места и лейблы «Шрифт» / «Кнопки» не наезжали. */
 .sizes-dropdown {
     position: absolute;
-    right: 2vw;
+    left: 50%;
+    transform: translateX(-50%);
     top: calc(3vh + 7vh + 0.8vh);
     width: 70vw;
     background-color: var(--bg);
@@ -328,24 +330,35 @@ body {
     pointer-events: auto;
 }
 
+/* Grid (auto 1fr) вместо flex'а с фиксированной шириной лейбла: на узких
+   экранах «Шрифт»/«Кнопки» при font-size 2.6vh шире прежних 11vw и наезжали
+   на ползунок. Auto-колонка отдаёт ровно столько, сколько занимает текст,
+   а ползунок забирает остаток через 1fr (min-width: 0 нужен, иначе thumb
+   на крайних позициях растягивал колонку и снова перекрывал лейбл). */
 .sizes-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr;
     align-items: center;
-    gap: 2vw;
+    gap: 3vw;
 }
 
 .sizes-row-label {
     color: var(--text);
     font-size: 2.6vh;
-    flex-shrink: 0;
-    width: 11vw;
+    white-space: nowrap;
 }
 
 /* Ползунок размеров — наследует общие стили input[type=range], но не получает
-   .lower/.upper-классы (одиночный, без двойного thumb и fill). */
+   .lower/.upper-классы (одиночный, без двойного thumb и fill).
+   padding по бокам резервирует место под половину thumb'а (22px / 2 ≈ 1.5vw),
+   чтобы кружок на крайних значениях не вылазил за границу ячейки и не
+   наезжал на лейбл слева или на стенку панели справа. */
 .sizes-input {
-    flex: 1;
+    width: 100%;
+    min-width: 0;
     height: 5vh;
+    padding: 0 1.5vw;
+    box-sizing: border-box;
 }
 
 /* Свотчи внутри выпадающего — размер триггера (7vh), не 6vh как было в старой сетке.
