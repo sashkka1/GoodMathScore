@@ -498,34 +498,49 @@ function splitInto4(total) {
 // просто не работает (детект по наличию API `window.Telegram.WebApp.CloudStorage`,
 // а не по userAgent: Telegram Desktop не всегда содержит "Telegram" в UA).
 //
-// Схема (key: STATS_KEY_V2):
+// Схема в CloudStorage: одна запись на день, ключ = STATS_KEY_PREFIX + dk
+// (например, `stats_v2_2026-05-21`). Каждый ключ содержит JSON блока:
 //   {
-//     version: 2,
-//     byDate: {
-//       'YYYY-MM-DD': {
-//         overall: {time, examples, mistakes, sessions,
-//                   examplesByOp:[+, −, ×, ÷],
-//                   mistakesByOp:[+, −, ×, ÷]},
-//         big:     {... те же поля ...},
-//         small:   {... те же поля ...}
-//       },
-//       ...
-//     }
+//     overall: {time, examples, mistakes, sessions,
+//               examplesByOp:[+, −, ×, ÷],
+//               mistakesByOp:[+, −, ×, ÷]},
+//     big:     {... те же поля ...},
+//     small:   {... те же поля ...}
 //   }
+// В памяти держим единый _statsCache формата { version: 2, byDate: {...} } —
+// рендер и legacy-парсеры на него рассчитаны. Шарды — только формат
+// хранения, не уровень данных.
 //
 // Категория раунда определяется через localStorage.activePreset (см.
 // setActivePreset) — это локальное состояние UI текущего раунда, не данные
 // статистики, поэтому в облако его синхронизировать не нужно.
 
-const STATS_KEY_V2 = 'stats_v2';
-const STATS_KEY_LEGACY = 'stats';        // старый формат массива по дням
+// Ключи в CloudStorage:
+//   stats_v2_YYYY-MM-DD — JSON одного дня (overall+big+small). Основной формат.
+//   stats_v2            — старый блоб со всей историей (один ключ). Читается
+//                         только для миграции, потом удаляется.
+//   stats               — самый старый legacy (массив за один месяц).
+//                         Тоже только для миграции.
+//
+// Зачем шарды: лимит CloudStorage = 4096 байт на значение. Блоб со всей
+// историей быстро упирался в лимит → setItem возвращал DATA_TOO_LONG, и
+// все новые записи терялись. Шард-на-день ~200-400 байт, помещается с
+// огромным запасом; при решении примера пишется только текущий день.
+const STATS_KEY_PREFIX = 'stats_v2_';
+const STATS_KEY_LEGACY_BLOB = 'stats_v2';
+const STATS_KEY_LEGACY = 'stats';
 
 // Доступ к CloudStorage. Возвращает API или null. Это единственный backend.
+// Проверяем все методы, которые реально используем (getKeys/getItems нужны
+// для шард-загрузки; в очень старых клиентах их могло не быть).
 function _cs() {
     const cs = window && window.Telegram && window.Telegram.WebApp
         ? window.Telegram.WebApp.CloudStorage
         : null;
-    return cs && cs.getItem && cs.setItem ? cs : null;
+    if (!cs) return null;
+    if (!cs.getItem || !cs.setItem || !cs.removeItem) return null;
+    if (!cs.getKeys || !cs.getItems) return null;
+    return cs;
 }
 
 function emptyCatDay() {
@@ -549,21 +564,19 @@ let _statsLoadPromise = null;
 // облаке при первом же successful setItem. Сбрасывается при следующей
 // удачной загрузке.
 let _statsLoadFailed = false;
-// Запись идёт СРАЗУ после мутации (без debounce). Раньше был 500мс
-// debounce — но в Telegram WebApp на мобильных beforeunload/pagehide
-// не всегда триггерится при закрытии (свайп вниз → клиент усыпил
-// WebView, никаких событий не доехало), и последняя пачка просто
-// терялась. Лучше один лишний запрос на каждый пример, чем потерянная
-// серия. Если запись уже в полёте и пришла новая мутация — выставляем
-// _persistDirty=true, и после ответа сервера автоматически шлём ещё
-// один setItem со свежим JSON.
+// Множество дат (YYYY-MM-DD), которые надо записать в CloudStorage.
+// Любая мутация добавляет день в этот сет; пишущая функция вынимает
+// дни по одному и шлёт setItem по соответствующему шарду. Несколько
+// мутаций одного дня подряд складываются в одну запись (естественный
+// dedup). При ошибке setItem день возвращается в сет — следующий retry
+// его подберёт.
+const _dirtyDays = new Set();
 let _persistInflight = false;
-let _persistDirty = false;
-// retry-таймер на случай err от setItem — единственное место, где
-// используется setTimeout: при ошибке делаем паузу ~800мс перед повтором,
-// чтобы не долбить сервер при rate-limit'е.
 let _persistRetryTimer = null;
 const PERSIST_RETRY_MS = 800;
+// Старый блоб stats_v2 (или ещё более старый stats), который нужно
+// удалить после успешного переноса данных в шарды. null = удалять нечего.
+let _legacyBlobToRemove = null;
 
 function _ensureDay(stats, dk) {
     if (!stats.byDate[dk]) stats.byDate[dk] = emptyDayBlock();
@@ -610,75 +623,99 @@ function _normalizeStats(raw) {
     return emptyStats();
 }
 
-// Запросить запись stats в CloudStorage. Если запись уже в полёте — после
-// её ответа автоматически уйдёт ещё один setItem со свежим состоянием
-// (благодаря _persistDirty). Если pending retry-таймер уже взведён —
-// _persistDirty подхватит свежий JSON, отдельно дёргать setItem не надо.
-function _scheduleStatsPersist() {
+// Помечает день dk как требующий записи и запускает запись (если ещё
+// не идёт). При работающей записи новый день просто кладётся в _dirtyDays —
+// текущий цикл его подхватит после завершения активного setItem.
+function _scheduleStatsPersist(dk) {
     if (_statsLoadFailed) {
-        // НЕ пишем поверх облака пока не уверены, что в нём. Иначе пустой
-        // кэш-заглушка после неудачной загрузки затрёт реальные данные.
+        // НЕ пишем поверх облака пока не уверены, что в нём.
         return;
     }
-    if (_persistInflight || _persistRetryTimer) {
-        _persistDirty = true;
-        return;
-    }
-    _persistNow();
+    if (dk) _dirtyDays.add(dk);
+    if (_persistInflight || _persistRetryTimer) return;
+    _persistNextDirty();
 }
 
-function _persistNow() {
-    if (!_statsCache || _statsLoadFailed) return;
+// Берёт один день из _dirtyDays и шлёт setItem по его шарду. На успех —
+// автоматически зовёт себя для следующего дня. На ошибку — возвращает
+// день в сет и ставит retry-таймер.
+function _persistNextDirty() {
+    if (_statsLoadFailed) return;
+    if (_dirtyDays.size === 0) {
+        // Все шарды записаны. Если был старый блоб для удаления — самое
+        // время удалить: новые данные гарантированно лежат в шардах.
+        _maybeRemoveLegacyBlob();
+        return;
+    }
     const cs = _cs();
     if (!cs) return;
     if (_persistRetryTimer) { clearTimeout(_persistRetryTimer); _persistRetryTimer = null; }
-    let json;
-    try { json = JSON.stringify(_statsCache); } catch (_) { return; }
-    // CloudStorage: 4096 байт на значение. Один JSON-блоб со всей историей
-    // упирается в этот лимит относительно быстро (4 категории × N дней ×
-    // массивы по операциям). Когда упрёмся — setItem вернёт err, ретрай
-    // не поможет; нужно шардировать по ключу-на-день (TODO).
-    if (json.length > 3800) {
-        console.warn('[stats] payload size', json.length, 'байт — близко к лимиту CloudStorage (4096)');
+
+    const iter = _dirtyDays.values();
+    const dk = iter.next().value;
+    _dirtyDays.delete(dk);
+
+    const block = _statsCache && _statsCache.byDate ? _statsCache.byDate[dk] : null;
+    if (!block) {
+        _persistNextDirty();
+        return;
     }
+    let json;
+    try { json = JSON.stringify(block); } catch (_) { _persistNextDirty(); return; }
+    if (json.length > 3800) {
+        // Один день не должен пухнуть до 4 KB при обычной игре — это
+        // буквально невозможно при текущей схеме (overall+big+small с
+        // массивами на 4 операции). Если случилось — кричим в консоль.
+        console.warn('[stats] day', dk, 'size', json.length, 'байт — близко к лимиту 4 KB');
+    }
+
     _persistInflight = true;
-    _persistDirty = false;
+    const key = STATS_KEY_PREFIX + dk;
     const t0 = Date.now();
-    console.log('[stats] setItem start, size=' + json.length);
+    console.log('[stats] setItem', key, 'size=' + json.length);
     try {
-        cs.setItem(STATS_KEY_V2, json, (err) => {
+        cs.setItem(key, json, (err) => {
             const dt = Date.now() - t0;
             _persistInflight = false;
             if (err) {
-                console.error('[stats] setItem FAILED after', dt + 'ms:', err);
-                _persistDirty = true;
-                // Retry через паузу — Telegram мог ответить rate-limit'ом
-                // или временным сбоем. Не блокируем UI.
+                console.error('[stats] setItem', key, 'FAILED after', dt + 'ms:', err);
+                _dirtyDays.add(dk);
                 _persistRetryTimer = setTimeout(() => {
                     _persistRetryTimer = null;
-                    if (_persistDirty) _persistNow();
+                    _persistNextDirty();
                 }, PERSIST_RETRY_MS);
                 return;
             }
-            console.log('[stats] setItem OK in', dt + 'ms');
-            // Пока летел этот setItem, могли прийти новые мутации —
-            // отправляем ещё один проход со свежим JSON.
-            if (_persistDirty) _persistNow();
+            console.log('[stats] setItem', key, 'OK in', dt + 'ms');
+            _persistNextDirty();
         });
     } catch (e) {
         _persistInflight = false;
         console.error('[stats] setItem threw:', e);
-        _persistDirty = true;
+        _dirtyDays.add(dk);
     }
 }
 
-// Принудительно сбросить запись (перед закрытием WebApp). Если ничего не
-// в полёте — пишем немедленно. Если уже летит — взводим dirty, чтобы
-// callback дозаписал свежий JSON.
+// Удаляет старый блоб stats_v2 / stats после успешного переноса в шарды.
+// Безопасно вызывать многократно — при null'е молча выходит.
+function _maybeRemoveLegacyBlob() {
+    if (!_legacyBlobToRemove) return;
+    const cs = _cs();
+    if (!cs) return;
+    const key = _legacyBlobToRemove;
+    _legacyBlobToRemove = null;
+    cs.removeItem(key, (err) => {
+        if (err) console.error('[stats] removeItem legacy', key, 'failed:', err);
+        else console.log('[stats] removed legacy', key, '— миграция в шарды завершена');
+    });
+}
+
+// Принудительно сбросить запись (перед закрытием WebApp).
 function _flushStats() {
     if (!_statsCache || _statsLoadFailed) return;
-    if (_persistInflight) { _persistDirty = true; return; }
-    _persistNow();
+    if (_persistInflight) return;  // callback вызовет _persistNextDirty
+    if (_persistRetryTimer) { clearTimeout(_persistRetryTimer); _persistRetryTimer = null; }
+    _persistNextDirty();
 }
 
 // Закрытие WebApp в Telegram плохо детектируется: beforeunload/pagehide
@@ -692,19 +729,27 @@ document.addEventListener('visibilitychange', () => {
 });
 
 // Загрузка из CloudStorage. localStorage больше НЕ читается — это была
-// главная причина «отката» статистики: при сетевом сбое CS возвращал
-// пустой/ошибочный ответ, код брал localStorage и затирал им облако.
-// Теперь: успех CS → кэш установлен; ошибка CS → _statsLoadFailed = true,
-// запись заблокирована до следующей удачной загрузки. Промис всё равно
-// резолвится (с пустым кэшем) — чтобы вызывающий код не висел.
+// одна из старых причин «отката» статистики: при сетевом сбое CS возвращал
+// пустой ответ, код брал localStorage и затирал им облако.
+//
+// Алгоритм:
+//   1. getKeys() — все ключи в облаке для этого пользователя.
+//   2. Если есть шарды stats_v2_YYYY-MM-DD — читаем их батчем через getItems().
+//   3. Иначе если есть старый блоб stats_v2 — парсим, разбиваем на шарды,
+//      помечаем все дни как dirty (запишутся при первом _persistNextDirty),
+//      и старый блоб удалится после успешной записи всех шардов.
+//   4. Иначе если есть очень старый stats (legacy-массив за месяц) — то же.
+//   5. Иначе — чистый аккаунт, пустой кэш.
+//
+// На любую ошибку CloudStorage (err != null) ставим _statsLoadFailed=true,
+// чтобы _statsMutate не записал пустой кэш-заглушку поверх реальных данных
+// (которые в облаке могут быть, мы просто не смогли их прочитать сейчас).
 function statsLoad() {
     if (_statsLoaded && !_statsLoadFailed) return Promise.resolve(_statsCache);
     if (_statsLoadPromise) return _statsLoadPromise;
 
     const cs = _cs();
     if (!cs) {
-        // CloudStorage недоступен (приложение открыто не в Telegram).
-        // Резолвим пустым кэшем, помечаем как failed — запись отключена.
         _statsCache = emptyStats();
         _statsLoaded = true;
         _statsLoadFailed = true;
@@ -728,40 +773,101 @@ function statsLoad() {
             resolve(_statsCache);
         };
 
-        cs.getItem(STATS_KEY_V2, (err, val) => {
+        cs.getKeys((err, keys) => {
             if (err) { fail(err); return; }
-            let parsed = null;
-            if (val) { try { parsed = JSON.parse(val); } catch (_) {} }
-            if (parsed && parsed.version === 2 && parsed.byDate) {
-                succeed(_normalizeStats(parsed));
+            const allKeys = keys || [];
+            const shardKeys = allKeys.filter(k => k.indexOf(STATS_KEY_PREFIX) === 0);
+            const hasLegacyBlob = allKeys.indexOf(STATS_KEY_LEGACY_BLOB) !== -1;
+            const hasLegacyArr  = allKeys.indexOf(STATS_KEY_LEGACY) !== -1;
+            console.log('[stats] keys: shards=' + shardKeys.length,
+                        'legacyBlob=' + hasLegacyBlob,
+                        'legacyArr=' + hasLegacyArr);
+
+            if (shardKeys.length > 0) {
+                // Основной путь: читаем шарды батчем.
+                cs.getItems(shardKeys, (err2, items) => {
+                    if (err2) { fail(err2); return; }
+                    const stats = emptyStats();
+                    for (const k of shardKeys) {
+                        const raw = items ? items[k] : null;
+                        if (!raw) continue;
+                        let block = null;
+                        try { block = JSON.parse(raw); } catch (_) {}
+                        if (block && block.overall) {
+                            const dk = k.slice(STATS_KEY_PREFIX.length);
+                            stats.byDate[dk] = block;
+                            _ensureDay(stats, dk);
+                        }
+                    }
+                    succeed(stats);
+                    // Если рядом ещё лежит старый блоб (бывшая миграция
+                    // не довела до конца удаление) — удалим после успешной
+                    // записи следующего шарда; либо сразу, если шарды есть
+                    // и их данные точно свежее блоба.
+                    if (hasLegacyBlob) {
+                        _legacyBlobToRemove = STATS_KEY_LEGACY_BLOB;
+                        _maybeRemoveLegacyBlob();
+                    }
+                });
                 return;
             }
-            // v2 в облаке нет — возможно есть legacy (старый формат
-            // массива). Пробуем мигрировать.
-            cs.getItem(STATS_KEY_LEGACY, (err2, val2) => {
-                if (err2) { fail(err2); return; }
-                let legacy = null;
-                if (val2) { try { legacy = JSON.parse(val2); } catch (_) {} }
-                if (legacy) {
-                    // Миграция: кладём в кэш и планируем запись в v2.
-                    succeed(_normalizeStats(legacy));
-                    _scheduleStatsPersist();
-                } else {
-                    // Чистый аккаунт — пустая стата, ничего записывать не
-                    // надо до первой мутации.
-                    succeed(emptyStats());
-                }
-            });
+
+            // Шардов нет. Пробуем мигрировать из старого блоба stats_v2.
+            if (hasLegacyBlob) {
+                cs.getItem(STATS_KEY_LEGACY_BLOB, (err3, val) => {
+                    if (err3) { fail(err3); return; }
+                    let parsed = null;
+                    try { parsed = JSON.parse(val); } catch (_) {}
+                    if (parsed && parsed.version === 2 && parsed.byDate) {
+                        const normalized = _normalizeStats(parsed);
+                        succeed(normalized);
+                        // Помечаем все дни как dirty — запишутся как шарды.
+                        // Старый блоб удалим в _maybeRemoveLegacyBlob после
+                        // успешной записи всех шардов.
+                        for (const dk of Object.keys(normalized.byDate)) _dirtyDays.add(dk);
+                        _legacyBlobToRemove = STATS_KEY_LEGACY_BLOB;
+                        console.log('[stats] migrating legacy blob → шарды,',
+                                    Object.keys(normalized.byDate).length, 'дней');
+                        _persistNextDirty();
+                    } else {
+                        succeed(emptyStats());
+                    }
+                });
+                return;
+            }
+
+            // Совсем старый legacy-массив stats.
+            if (hasLegacyArr) {
+                cs.getItem(STATS_KEY_LEGACY, (err3, val) => {
+                    if (err3) { fail(err3); return; }
+                    let legacy = null;
+                    try { legacy = JSON.parse(val); } catch (_) {}
+                    if (legacy) {
+                        const normalized = _normalizeStats(legacy);
+                        succeed(normalized);
+                        for (const dk of Object.keys(normalized.byDate)) _dirtyDays.add(dk);
+                        _legacyBlobToRemove = STATS_KEY_LEGACY;
+                        console.log('[stats] migrating legacy array → шарды');
+                        _persistNextDirty();
+                    } else {
+                        succeed(emptyStats());
+                    }
+                });
+                return;
+            }
+
+            // Пусто. Чистый аккаунт.
+            succeed(emptyStats());
         });
     });
     return _statsLoadPromise;
 }
 
-// Применяет функцию-мутатор и планирует запись. Если кэш в состоянии
-// «failed» (последняя загрузка не удалась), пробуем перезагрузить перед
-// мутацией. Если опять не получилось — мутацию пропускаем (важнее не
-// затереть облако, чем сохранить текущее значение). На следующем старте
-// статистика будет считаться от того, что лежит в облаке.
+// Применяет функцию-мутатор и планирует запись шарда сегодняшнего дня.
+// Если кэш в состоянии «failed» — пробуем перезагрузить перед мутацией.
+// Если опять не получилось — пропускаем мутацию (важнее не затереть
+// облако пустым кэшем). statsRecordSessionStart/statsRecordExample всегда
+// пишут только в сегодняшний день, поэтому одного dk хватает.
 function _statsMutate(fn) {
     if (_statsLoadFailed) {
         _statsLoaded = false;
@@ -769,8 +875,9 @@ function _statsMutate(fn) {
     }
     statsLoad().then(() => {
         if (_statsLoadFailed) return;
+        const dk = dateKey(new Date());
         fn(_statsCache);
-        _scheduleStatsPersist();
+        _scheduleStatsPersist(dk);
     });
 }
 
@@ -1531,14 +1638,33 @@ window.regenerateMockStats = () => {
     _statsCache = out;
     _statsLoaded = true;
     _statsLoadFailed = false;
-    _scheduleStatsPersist();
+    // Помечаем все 35 дней — шарды улетят по одному (это ~35 setItem'ов
+    // подряд, окей для debug).
+    for (const dk of Object.keys(out.byDate)) _dirtyDays.add(dk);
+    _persistNextDirty();
     renderAllStatSlides();
 };
 window.clearMockStats = () => {
     _statsCache = emptyStats();
     _statsLoaded = true;
     _statsLoadFailed = false;
-    _scheduleStatsPersist();
+    // Удаляем все шарды + старый блоб (если ещё лежит) из CloudStorage.
+    const cs = _cs();
+    if (cs) {
+        cs.getKeys((err, keys) => {
+            if (err) { console.error('[stats] clearMockStats: getKeys failed:', err); return; }
+            const toRemove = (keys || []).filter(k =>
+                k === STATS_KEY_LEGACY_BLOB ||
+                k === STATS_KEY_LEGACY ||
+                k.indexOf(STATS_KEY_PREFIX) === 0
+            );
+            if (toRemove.length === 0) { console.log('[stats] clearMockStats: nothing to remove'); return; }
+            cs.removeItems(toRemove, (err2) => {
+                if (err2) console.error('[stats] removeItems failed:', err2);
+                else console.log('[stats] cleared', toRemove.length, 'ключей');
+            });
+        });
+    }
     renderAllStatSlides();
 };
 
