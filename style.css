@@ -119,15 +119,10 @@ body {
    overflow:hidden + flex-end дают эффект "пункт выезжает из-за иконки": правое ребро
    меню зафиксировано, при росте ширины обнажается всё больше левой части пунктов. */
 .settings-menu {
-    /* `right` рассчитан так, чтобы правый край меню стоял ЛЕВЕЕ левого края
-       шестерёнки. Шестерёнка прижата к правому краю .header1 (88vw, центрирован
-       — значит 6vw отступ справа), её ширина 7vh => левый край шестерёнки на
-       6vw + 7vh от правого края viewport. Берём `7vh + 7vw` => 1vw зазор.
-       Раньше было `7vh + 2.5vw`, и пункты меню заезжали на шестерёнку. */
     position: absolute;
     overflow: hidden;
     width: 0;
-    right: calc(7vh + 7vw);
+    right: calc(7vh + 2.5vw);
     top: 3vh;
     height: 7vh;
     display: flex;
@@ -163,7 +158,7 @@ body {
    чтобы центр колонки совпадал с центром индикатора-триггера. */
 .theme-dropdown {
     position: absolute;
-    right: calc(6.3vh + 7vw);
+    right: calc(6.3vh + 2.5vw);
     top: calc(3vh + 7vh + 0.8vh);
     width: 8.4vh;
     display: flex;
@@ -194,15 +189,14 @@ body {
     font-size: 6vh;
 }
 
-/* Панель кастомных границ ползунков. Растягиваем почти на всю ширину экрана —
-   с тремя секциями (Границы / Малый / Большой) и сеткой [label][min][max] узкий
-   60vw делал инпуты тесными. Привязка к viewport (right:4vw), а не к иконке
-   `tune`, потому что под иконкой панель не помещалась в нужную ширину. */
+/* Панель кастомных границ ползунков — сосед theme-dropdown.
+   right-edge привязан к right-edge иконки `tune` (она вторая в settings-menu),
+   панель раскрывается max-height-анимацией вниз. */
 .ranges-dropdown {
     position: absolute;
-    right: 4vw;
+    right: calc(14.8vh + 2.5vw);
     top: calc(3vh + 7vh + 0.8vh);
-    width: 92vw;
+    width: 60vw;
     background-color: var(--bg);
     border-radius: 8px;
     box-shadow: var(--shadow);
@@ -302,14 +296,13 @@ body {
     font-size: 6vh;
 }
 
-/* Панель размеров. Раньше width:50vw + right под иконкой давало настолько
-   узкое поле, что ползунок «Шрифт/Кнопки» заезжал на свою же подпись слева.
-   Растянули почти на всю ширину экрана (как и ranges-dropdown). */
+/* Панель размеров — третий dropdown в overlay-настройках. Right-edge привязан
+   к right-edge иконки `format_size` (она третья в settings-menu). */
 .sizes-dropdown {
     position: absolute;
-    right: 4vw;
+    right: calc(22.6vh + 2.5vw);
     top: calc(3vh + 7vh + 0.8vh);
-    width: 92vw;
+    width: 50vw;
     background-color: var(--bg);
     border-radius: 8px;
     box-shadow: var(--shadow);
@@ -332,17 +325,14 @@ body {
 .sizes-row {
     display: flex;
     align-items: center;
-    gap: 4vw;
+    gap: 2vw;
 }
 
 .sizes-row-label {
     color: var(--text);
     font-size: 2.6vh;
     flex-shrink: 0;
-    /* Раньше 11vw — на узкой панели thumb ползунка в крайнем левом положении
-       визуально наезжал на подпись. Теперь панель ~92vw, подпись ~18vw +
-       gap 4vw дают достаточно воздуха. */
-    width: 18vw;
+    width: 11vw;
 }
 
 /* Ползунок размеров — наследует общие стили input[type=range], но не получает
@@ -616,14 +606,9 @@ span.statistic {
 }
 
 /* Управление видимостью второго ряда кнопок (Большой/Малый): скрывается, когда
-   активна категория «Общая», показывается на категориях big/small.
-   visibility:hidden (а не display:none) — место в layout сохраняется, чтобы при
-   переключении категорий верхний ряд [Общая|Неделя|Месяц] не «прыгал» вверх,
-   когда второй ряд появляется/исчезает (.stat-controls — flex-column в
-   align-items:center шапке: рост его высоты сдвигал бы центр вверх). */
+   активна категория «Общая», показывается на категориях big/small. */
 .stat-row-hidden {
-    visibility: hidden !important;
-    pointer-events: none;
+    display: none !important;
 }
 
 /* В flipped-режиме графики не интерактивны: Morris/Raphael вычисляет
@@ -757,13 +742,12 @@ span.statistic {
 
 .choice-value {
     /* Без обводки: unchecked-плитка — просто пустое место со знаком.
-       Checked-плитка заливается --accent. aspect-ratio:1/1 даёт квадратную
-       плитку (раньше padding 1.9vh + 11vw font-size делало её прямоугольной
-       вытянутой по вертикали). */
+       Checked-плитка заливается --accent. Padding симметричный, чтобы знак
+       центрировался по вертикали. */
     position: relative;
     width: 100%;
-    aspect-ratio: 1 / 1;
     margin: 0;
+    padding: 1.9vh 0;
     border-radius: 14px;
     background-color: transparent;
     display: flex;
@@ -819,10 +803,10 @@ span.statistic {
 }
 
 /* Математический знак внутри плитки — рисуется текстовым символом (+, −, ×, ÷)
-   из системного шрифта Roboto. translateY(0.06em) опускает глиф ВНИЗ — у
-   Roboto math-операторы визуально сидят выше геометрического центра em-box'а
-   (caps живут в верхней половине line-box), поэтому без компенсации они кажутся
-   приподнятыми. Подбирается эмпирически. */
+   из системного шрифта Roboto. translateY(-0.08em) подвигает глиф ВВЕРХ —
+   font-metrics Roboto + line-height: 1 опускают глиф ниже геометрического
+   центра em-box'а (descender добавляет нижнюю часть line-box, поднимая
+   visible-mid). Компенсация подбирается эмпирически. */
 .op-sign {
     font-size: calc(11vw * var(--font-scale));
     font-weight: 700;
@@ -833,15 +817,14 @@ span.statistic {
     pointer-events: none;
     transition: color 0.2s ease;
     display: block;
-    transform: translateY(0.06em);
+    transform: translateY(-0.08em);
 }
 
-/* Иконка таймера — Material Icons глиф. У round-варианта визуальный центр
-   глифа тоже чуть выше геометрического центра em-box'а (есть запас под
-   descender), поэтому слегка опускаем тем же приёмом, что и текстовые знаки. */
+/* Иконка таймера — Material Icons глиф, он дизайнится центрированным в em-box.
+   Отменяем translateY от .op-sign (Material Icons и так в центре). */
 .op-sign-icon {
     font-size: calc(11vw * var(--font-scale));
-    transform: translateY(0.05em);
+    transform: none;
 }
 
 .op-icon-divide {
@@ -879,16 +862,12 @@ span.statistic {
 .filter-icon-divide {
     font-weight: 700;
     font-family: 'Roboto', 'Segoe UI', sans-serif;
-    /* Размер подгоняется так, чтобы визуальная высота ÷ совпадала с высотой
-       Material-иконки `close` (×). При font-size 7.2vw + line-height 0.65 +
-       translateY(-18%) глиф ехал выше ×. Сейчас line-height: 1 и без translate
-       — глиф центрируется в своей line-box так же, как соседний × (5vw,
-       line-height 1), и оба оказываются на одной горизонтали. */
-    font-size: calc(5.4vw * var(--font-scale));
-    line-height: 1;
+    font-size: calc(7.2vw * var(--font-scale));
+    line-height: 0.65;
     display: inline-block;
     width: 1em;
     text-align: center;
+    transform: translateY(-18%);
 }
 
 

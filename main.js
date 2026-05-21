@@ -47,19 +47,9 @@ document.getElementById('statistic-icon').addEventListener('click', () => { stat
 document.getElementById('settings-icon').addEventListener('click', () => { differentTheme('open'); });
 document.getElementById('different-theme-block').addEventListener('click', () => { differentTheme('close'); });
 
-// Закрывает все выпадашки настроек (темы/границы/размеры), кроме указанной по
-// id. Используется на каждом триггере: одновременно может быть открыта только
-// одна — открытие новой автоматически схлопывает соседнюю.
-function closeOtherDropdowns(keepId) {
-    ['theme-dropdown', 'ranges-dropdown', 'sizes-dropdown'].forEach(id => {
-        if (id !== keepId) document.getElementById(id).classList.remove('open');
-    });
-}
-
 // клик по индикатору текущей темы — переключает выпадающий список тем
 document.getElementById('current-theme-indicator').addEventListener('click', (e) => {
     e.stopPropagation(); // не даём клику закрыть всю панель
-    closeOtherDropdowns('theme-dropdown');
     document.getElementById('theme-dropdown').classList.toggle('open');
 });
 
@@ -128,7 +118,7 @@ function loadRangesBounds() {
 }
 
 function saveRangesBounds(b) {
-    cloudSet('rangesBounds', JSON.stringify(b));
+    localStorage.setItem('rangesBounds', JSON.stringify(b));
 }
 
 function clampToBounds(v, lo, hi) {
@@ -160,7 +150,7 @@ function applyRangesBounds(b) {
         v[7] = clampToBounds(v[7], b.mulMin, b.mulMax);
         v[8] = clampToBounds(v[8], b.mulMin, b.mulMax);
         v[9] = clampToBounds(v[9], b.countMin, b.countMax);
-        cloudSet('values', v.join(','));
+        localStorage.setItem('values', v.join(','));
     }
     // Пресеты должны помещаться в текущие границы: если границы сузили — клампим.
     // Заодно перерисовываем инпуты пресетов, чтобы пользователь сразу увидел
@@ -240,7 +230,7 @@ function loadRangesPresets() {
 }
 
 function saveRangesPresets(p) {
-    cloudSet('rangesPresets', JSON.stringify(p));
+    localStorage.setItem('rangesPresets', JSON.stringify(p));
 }
 
 function fillPresetsInputs(p) {
@@ -252,7 +242,6 @@ function fillPresetsInputs(p) {
 // триггер выпадающей панели границ
 document.getElementById('ranges-icon').addEventListener('click', (e) => {
     e.stopPropagation();
-    closeOtherDropdowns('ranges-dropdown');
     document.getElementById('ranges-dropdown').classList.toggle('open');
 });
 
@@ -283,7 +272,7 @@ function loadSizeSettings() {
 }
 
 function saveSizeSettings(s) {
-    cloudSet('sizeSettings', JSON.stringify(s));
+    localStorage.setItem('sizeSettings', JSON.stringify(s));
 }
 
 function applySizeSettings(s) {
@@ -298,7 +287,6 @@ function applySizeSettings(s) {
 // триггер выпадающей панели размеров
 document.getElementById('sizes-icon').addEventListener('click', (e) => {
     e.stopPropagation();
-    closeOtherDropdowns('sizes-dropdown');
     document.getElementById('sizes-dropdown').classList.toggle('open');
 });
 
@@ -593,146 +581,25 @@ function _persistStats() {
     }
 }
 
-<<<<<<< HEAD
-// === Зеркало localStorage → CloudStorage для пользовательских настроек ==
-// cloudSet — обёртка над localStorage.setItem/removeItem. В localStorage пишет
-// сразу (sync, источник истины для UI). В Telegram CloudStorage запись идёт
-// async — но ТОЛЬКО после того, как DOMContentLoaded полностью отработал и
-// мы выставили _cloudWriteEnabled = true (см. конец обработчика). Это нужно
-// чтобы CloudStorage-вызовы при parse-time top-level коде (applyRangesBounds,
-// applySizeSettings и т.п.) не конкурировали с инициализацией Swiper и
-// Telegram WebApp. Прошлая попытка mirror-on-startup ломала навигацию в
-// Telegram именно из-за гонок при инициализации.
-//
-// stats_v2 идёт по отдельному каналу _persistStats (выше) — он не использует
-// этот флаг, поскольку statsRecord* вызываются только из run-time обработчиков
-// (после DOMContentLoaded), а statsLoad() имеет собственный async-flow.
-let _cloudWriteEnabled = false;
-=======
-// === Зеркало localStorage → CloudStorage для остальных настроек ========
-// stats_v2 пишется через _persistStats (выше). Остальные пользовательские
-// настройки (values, тема, границы, пресеты, размеры, активный пресет)
-// дублируются в CloudStorage через cloudSet, чтобы при заходе с другого
-// устройства / переустановки приложение подтянуло их через
-// bootstrapCloudStorage. В браузере вне Telegram cloudSet работает как
-// обычный localStorage.setItem.
-const CLOUD_SETTINGS_KEYS = [
-    'values', 'userTheme', 'rangesBounds', 'rangesPresets',
-    'sizeSettings', 'activePreset',
-];
->>>>>>> e48f3bfaf522289b8567a4cf150b71a93bb11a55
-
-function cloudSet(key, value) {
-    const v = (value === null || value === undefined) ? null : String(value);
-    try {
-        if (v === null) localStorage.removeItem(key);
-        else localStorage.setItem(key, v);
-    } catch (_) {}
-<<<<<<< HEAD
-    if (!_cloudWriteEnabled || !inTelegram()) return;
-=======
-    if (!inTelegram()) return;
->>>>>>> e48f3bfaf522289b8567a4cf150b71a93bb11a55
-    const cs = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.CloudStorage;
-    if (!cs) return;
-    try {
-        if (v === null) {
-            if (cs.removeItem) cs.removeItem(key);
-        } else {
-            if (cs.setItem) cs.setItem(key, v);
-        }
-    } catch (_) {}
-}
-
-<<<<<<< HEAD
 // Загрузка. В Telegram — из CloudStorage (async, callback). Иначе синхронно
 // из localStorage. Если v2 не найдена — пробуем legacy и сразу мигрируем.
 // Возвращает Promise, который резолвится один раз и кэширует результат.
-=======
-// На старте: вытащить все settings-ключи из CloudStorage и положить в
-// localStorage. Ключи, которых нет в облаке, но есть локально — поднимаем
-// обратно (первый заход в Telegram после браузерного тестирования).
-// Возвращает Promise, который резолвится после завершения. Если приложение
-// не в Telegram — резолвится сразу.
-function bootstrapCloudStorage() {
-    if (!inTelegram()) return Promise.resolve();
-    const cs = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.CloudStorage;
-    if (!cs || !cs.getItems) return Promise.resolve();
-    return new Promise(resolve => {
-        cs.getItems(CLOUD_SETTINGS_KEYS, (_err, vals) => {
-            if (vals && typeof vals === 'object') {
-                for (const key of CLOUD_SETTINGS_KEYS) {
-                    const cloudVal = vals[key];
-                    if (cloudVal !== undefined && cloudVal !== null && cloudVal !== '') {
-                        try { localStorage.setItem(key, cloudVal); } catch (_) {}
-                    } else {
-                        try {
-                            const localVal = localStorage.getItem(key);
-                            if (localVal !== null && localVal !== '') {
-                                if (cs.setItem) cs.setItem(key, localVal);
-                            }
-                        } catch (_) {}
-                    }
-                }
-            }
-            resolve();
-        });
-    });
-}
-
-// Слияние двух stats-объектов по «max per field». Применяется в statsLoad,
-// чтобы если CloudStorage отстал (например, write не дошёл offline), а в
-// localStorage уже есть свежие инкременты — мы не потеряли локальные данные.
-// Все счётчики в нашей схеме монотонно неубывающие, так что max == свежее.
-function _mergeStatsObjects(a, b) {
-    const out = emptyStats();
-    const aBy = (a && a.byDate) || {};
-    const bBy = (b && b.byDate) || {};
-    const keys = new Set([...Object.keys(aBy), ...Object.keys(bBy)]);
-    const maxArr = (x, y) => [0, 1, 2, 3].map(i =>
-        Math.max((x && x[i]) || 0, (y && y[i]) || 0));
-    for (const dk of keys) {
-        const ad = aBy[dk] || emptyDayBlock();
-        const bd = bBy[dk] || emptyDayBlock();
-        const blk = _ensureDay(out, dk);
-        for (const cat of STAT_CATEGORIES) {
-            const ac = ad[cat] || emptyCatDay();
-            const bc = bd[cat] || emptyCatDay();
-            blk[cat] = {
-                time:         Math.max(ac.time     || 0, bc.time     || 0),
-                examples:     Math.max(ac.examples || 0, bc.examples || 0),
-                mistakes:     Math.max(ac.mistakes || 0, bc.mistakes || 0),
-                sessions:     Math.max(ac.sessions || 0, bc.sessions || 0),
-                examplesByOp: maxArr(ac.examplesByOp, bc.examplesByOp),
-                mistakesByOp: maxArr(ac.mistakesByOp, bc.mistakesByOp),
-            };
-        }
-    }
-    return out;
-}
-
-// Загрузка. В Telegram — параллельно из CloudStorage (async) и localStorage,
-// потом merge по «max per field» — это защита от потери данных, если cloud-
-// write не дошёл offline. Если в облаке нет v2, пробуем legacy. Возвращает
-// Promise, который резолвится один раз и кэширует результат.
->>>>>>> e48f3bfaf522289b8567a4cf150b71a93bb11a55
 function statsLoad() {
     if (_statsLoaded) return Promise.resolve(_statsCache);
     if (_statsLoadPromise) return _statsLoadPromise;
 
-    const parseSafe = (s) => {
-        if (!s) return null;
-        try { return JSON.parse(s); } catch (_) { return null; }
-    };
-    const localV2     = () => _normalizeStats(parseSafe(localStorage.getItem(STATS_KEY_V2)));
-    const localLegacy = () => _normalizeStats(parseSafe(localStorage.getItem(STATS_KEY_LEGACY)));
-    const localCandidate = () => {
-        const v2 = localV2();
-        if (v2 && v2.byDate && Object.keys(v2.byDate).length) return v2;
-        return localLegacy();
-    };
-
     _statsLoadPromise = new Promise(resolve => {
+        const loadFromLocal = () => {
+            try {
+                const raw = JSON.parse(localStorage.getItem(STATS_KEY_V2));
+                if (raw) return _normalizeStats(raw);
+            } catch (_) {}
+            try {
+                const raw = JSON.parse(localStorage.getItem(STATS_KEY_LEGACY));
+                if (raw) return _normalizeStats(raw);
+            } catch (_) {}
+            return emptyStats();
+        };
         const finish = (s, persistAfter) => {
             _statsCache = s || emptyStats();
             _statsLoaded = true;
@@ -744,18 +611,25 @@ function statsLoad() {
             window.Telegram.WebApp.CloudStorage && window.Telegram.WebApp.CloudStorage.getItem) {
             const cs = window.Telegram.WebApp.CloudStorage;
             cs.getItem(STATS_KEY_V2, (_err, val) => {
-                const cloudV2 = _normalizeStats(parseSafe(val));
-                if (cloudV2 && cloudV2.byDate && Object.keys(cloudV2.byDate).length) {
-                    finish(_mergeStatsObjects(cloudV2, localCandidate()), true);
+                let parsed = null;
+                if (val) { try { parsed = JSON.parse(val); } catch (_) {} }
+                if (parsed && parsed.version === 2 && parsed.byDate) {
+                    finish(_normalizeStats(parsed), false);
                     return;
                 }
                 cs.getItem(STATS_KEY_LEGACY, (_err2, val2) => {
-                    const cloudLegacy = _normalizeStats(parseSafe(val2));
-                    finish(_mergeStatsObjects(cloudLegacy, localCandidate()), true);
+                    let legacy = null;
+                    if (val2) { try { legacy = JSON.parse(val2); } catch (_) {} }
+                    if (legacy) {
+                        finish(_normalizeStats(legacy), true); // сразу перезаписываем в v2
+                    } else {
+                        // CloudStorage пуст — пробуем localStorage как последний шанс
+                        finish(loadFromLocal(), true);
+                    }
                 });
             });
         } else {
-            finish(localCandidate(), false);
+            finish(loadFromLocal(), false);
         }
     });
     return _statsLoadPromise;
@@ -818,8 +692,8 @@ function statsByCategory(category) {
 // чекбокса или ползунка сбрасывает пометку (раунд → только overall).
 const ACTIVE_PRESET_KEY = 'activePreset';
 function setActivePreset(p) {
-    if (p === 'big' || p === 'small') cloudSet(ACTIVE_PRESET_KEY, p);
-    else cloudSet(ACTIVE_PRESET_KEY, null);
+    if (p === 'big' || p === 'small') localStorage.setItem(ACTIVE_PRESET_KEY, p);
+    else localStorage.removeItem(ACTIVE_PRESET_KEY);
 }
 function getActivePreset() {
     const v = localStorage.getItem(ACTIVE_PRESET_KEY);
@@ -1480,7 +1354,7 @@ function saveCurrentValues() {
     values[7] = inputs[2].value;
     values[8] = inputs[3].value;
     values[9] = inputs[4].value;
-    cloudSet('values', values);
+    localStorage.setItem('values', values);
 }
 
 function dinamicRange() { // ставит ползунки на сохранённые значения values[5..9]
@@ -1801,7 +1675,7 @@ const THEME_DEFAULT = 'light';
 function applyTheme(name) {
     if (!THEMES.includes(name)) name = THEME_DEFAULT;
     document.documentElement.setAttribute('data-theme', name);
-    cloudSet('userTheme', name);
+    localStorage.setItem('userTheme', name);
     // подсвечиваю активный свотч (на момент первого вызова DOM уже распарсен —
     // main.js подключён в конце <body>)
     document.querySelectorAll('.theme-swatch').forEach(s => {
@@ -1833,43 +1707,31 @@ document.addEventListener('DOMContentLoaded', () => { // первый заход
     window.Telegram.WebApp.disableVerticalSwipes();
 
     // применяю сохранённую тему (или дефолт). applyTheme сам делает фоллбэк
-    // на THEME_DEFAULT, если localStorage пуст или содержит устаревшее имя.
+    // на THEME_DEFAULT, если localStorage пуст или содержит устаревшее имя
+    // (например, 'standart' от прошлой версии).
     applyTheme(localStorage.getItem('userTheme'));
-
-    // восстанавливаю чекбоксы и позиции ползунков из localStorage
-    const test = localStorage.getItem('values');
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    if (test === null || test === undefined || test === '') {
-        for (let i = 0; i < 5; i++) checkboxes[i].checked = true;
-    } else {
-        const forMemery = test.split(',');
+    let test = localStorage.getItem('values');
+    let checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    if (test === null || test === undefined || test === "") {
         for (let i = 0; i < 5; i++) {
-            if (forMemery[i] == 'true') checkboxes[i].checked = true;
+            checkboxes[i].checked = true;
+        }
+    } else {
+        let forMemery = test.split(',');
+        for (let i = 0; i < 5; i++) {
+            if (forMemery[i] == "true") {
+                checkboxes[i].checked = true;
+            }
         }
         dinamicRange();
     }
 
-    // Прогреваем кэш статистики. В Telegram — из CloudStorage + merge с
-    // localStorage (см. statsLoad), в браузере — sync. Если пользователь
-    // откроет страницу статистики раньше, чем CloudStorage вернёт ответ,
-    // statisticOpen() дождётся той же промиссы.
+    // Прогреваем кэш статистики на старте. В Telegram — из CloudStorage
+    // (async), в браузере — из localStorage (sync). Если файла v2 нет, но
+    // есть legacy 'stats' — мигрируем автоматически (см. statsLoad). Если
+    // пользователь откроет страницу статистики раньше, чем CloudStorage
+    // вернёт ответ, statisticOpen() дождётся той же промиссы.
     statsLoad();
-
-<<<<<<< HEAD
-    // Включаем mirror в CloudStorage для пользовательских настроек. До этого
-    // момента cloudSet писал только в localStorage — это защищает Swiper
-    // init и Telegram WebApp bootstrap от конкуренции с CloudStorage IO,
-    // которое запускали parse-time top-level вызовы applyRangesBounds /
-    // applySizeSettings / fillPresetsInputs. С этого момента каждое
-    // изменение настройки (тема, ползунки, чекбоксы, размеры, активный
-    // пресет) уходит и в облако тоже.
-    _cloudWriteEnabled = true;
-=======
-    // bootstrapCloudStorage (подтягивание settings из облака на старте)
-    // временно отключён — вызывал проблемы с инициализацией в Telegram.
-    // Записи настроек по-прежнему уходят в CloudStorage через cloudSet,
-    // так что при следующем заходе значения будут доступны там.
->>>>>>> e48f3bfaf522289b8567a4cf150b71a93bb11a55
 })
 
 
