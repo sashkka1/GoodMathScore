@@ -950,6 +950,16 @@ let _settingsRetryTimer = null;
 // (иначе вложенные localStorage.setItem'ы спровоцируют петлю
 // cloud → local → cloud).
 let _suppressSettingsPersist = false;
+// false до тех пор, пока loadSettingsFromCloud не отработает. Пока флаг
+// false, любые setItem в SETTINGS_LOCAL_KEYS НЕ улетают в облако — иначе
+// на старте каждое устройство перетирало бы облако своим локальным
+// состоянием (applyTheme на DOMContentLoaded пишет userTheme даже если
+// он не менялся, и этот ложный setItem перезаписывал в облаке свежее
+// значение от другого устройства). Если за время загрузки накопились
+// отложенные мутации — выставится _settingsPersistAfterLoad, и после
+// получения облака мы один раз запишем итоговый снапшот.
+let _settingsCloudLoaded = false;
+let _settingsPersistAfterLoad = false;
 
 // Перехват Storage.prototype.setItem/removeItem. Глобальный, но влияет
 // только на localStorage и только на ключи из SETTINGS_LOCAL_KEYS —
@@ -1010,6 +1020,13 @@ function _applySettingsSnapshot(snap) {
 }
 
 function _scheduleSettingsPersist() {
+    if (!_settingsCloudLoaded) {
+        // Облако ещё не подгрузили — запоминаем, что после загрузки надо
+        // будет записать актуальный снапшот. НЕ пишем сейчас: иначе
+        // дефолт текущего устройства затрёт свежие данные другого.
+        _settingsPersistAfterLoad = true;
+        return;
+    }
     if (_settingsInflight || _settingsRetryTimer) {
         _settingsDirty = true;
         return;
@@ -1056,6 +1073,10 @@ function _settingsPersistNow() {
 
 function _flushSettings() {
     if (!_cs()) return;
+    // Пока облако не загружено — запись запрещена (см. _scheduleSettingsPersist).
+    // Если бы flush писал здесь, при быстром закрытии до завершения
+    // loadSettingsFromCloud мы перетёрли бы облако стартовым дефолтом.
+    if (!_settingsCloudLoaded) return;
     if (_settingsInflight) { _settingsDirty = true; return; }
     if (_settingsDirty || _settingsRetryTimer) _settingsPersistNow();
 }
@@ -1066,26 +1087,43 @@ document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') _flushSettings();
 });
 
-// Загружает снапшот настроек из CloudStorage и при необходимости
-// применяет поверх localStorage. Если облако пустое, а локально что-то
-// есть — заливаем локальное в облако (first-time sync).
+// Загружает снапшот настроек из CloudStorage и применяет поверх
+// localStorage. До успешного завершения этой функции _scheduleSettingsPersist
+// блокирует запись в облако — это критично, иначе applyTheme на старте
+// перезатёр бы свежие данные другого устройства своим дефолтом.
 function loadSettingsFromCloud() {
     const cs = _cs();
-    if (!cs) return Promise.resolve();
+    if (!cs) {
+        // CloudStorage недоступен (открыто не в Telegram) — снимаем блок,
+        // чтобы запись локально продолжала работать как обычно. В облаке
+        // ничего не будет, но и страшно ничего не случится.
+        _settingsCloudLoaded = true;
+        return Promise.resolve();
+    }
     return new Promise(resolve => {
+        const finish = (loadedFromCloud) => {
+            _settingsCloudLoaded = true;
+            // Если за время загрузки случились мутации (applyTheme на
+            // старте, либо пользователь успел что-то нажать) — пишем
+            // в облако ОДИН раз итоговый снапшот.
+            // Дополнительно: если облако было пустым, а локально что-то
+            // есть — это first-time sync, тоже пишем.
+            if (_settingsPersistAfterLoad || (!loadedFromCloud && _hasAnyLocalSetting())) {
+                _settingsPersistAfterLoad = false;
+                console.log('[settings] записываем стартовый снапшот в облако');
+                _settingsPersistNow();
+            }
+            resolve();
+        };
         cs.getItem(SETTINGS_KEY_V1, (err, val) => {
             if (err) {
                 console.error('[settings] CloudStorage load failed:', err);
-                resolve();
+                finish(false);
                 return;
             }
             if (!val) {
                 console.log('[settings] CloudStorage пуст');
-                if (_hasAnyLocalSetting()) {
-                    console.log('[settings] заливаем локальные настройки в облако');
-                    _scheduleSettingsPersist();
-                }
-                resolve();
+                finish(false);
                 return;
             }
             let parsed = null;
@@ -1093,8 +1131,14 @@ function loadSettingsFromCloud() {
             if (parsed && parsed.version === 1) {
                 console.log('[settings] CloudStorage load OK');
                 _applySettingsSnapshot(parsed);
+                // Снимаем флаг отложенной записи: применённый снапшот
+                // совпадает с облаком, лишнюю запись делать не нужно.
+                _settingsPersistAfterLoad = false;
+                finish(true);
+            } else {
+                console.warn('[settings] CloudStorage value has unexpected format');
+                finish(false);
             }
-            resolve();
         });
     });
 }
