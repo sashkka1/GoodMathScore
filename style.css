@@ -841,8 +841,14 @@ span.statistic {
 /* Математический знак внутри плитки — рисуется текстовым символом (+, −, ×, ÷)
    из системного шрифта Roboto. Без transform — flex-центрирование родителя
    .choice-value кладёт глиф в геометрический центр плитки, и все 5 чекбоксов
-   (4 знака + timer) визуально выровнены по одной горизонтали. */
+   (4 знака + timer) визуально выровнены по одной горизонтали.
+   position: relative обязателен: input лежит абсолютно поверх (inset:0) и в
+   CSS-стэкинге positioned-элемент рисуется над static-братьями независимо от
+   DOM-порядка. Без relative на span — тема перекрашивает input в var(--bg) при
+   unchecked, и фон input'а закрывает иконку. С positioned span обе сущности
+   попадают в normal DOM-order, и span (идёт после input) рисуется поверх. */
 .op-sign {
+    position: relative;
     font-size: calc(11vw * var(--font-scale));
     font-weight: 700;
     font-family: 'Roboto', 'Segoe UI', sans-serif;
