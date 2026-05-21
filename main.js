@@ -549,16 +549,21 @@ let _statsLoadPromise = null;
 // облаке при первом же successful setItem. Сбрасывается при следующей
 // удачной загрузке.
 let _statsLoadFailed = false;
-// debounce-буфер записи: копим мутации и шлём в CloudStorage пачкой через
-// PERSIST_DEBOUNCE_MS. На каждый решённый пример раньше дёргался setItem
-// с полным JSON — это создавало шторм запросов и легко роняло последние
-// записи. Теперь — одна запись на серию мутаций.
-let _persistTimer = null;
-const PERSIST_DEBOUNCE_MS = 500;
-// текущий setItem inflight: если запись уже в полёте и тут пришла новая
-// мутация — после её резолва триггерим повтор, чтобы свежий JSON долетел.
+// Запись идёт СРАЗУ после мутации (без debounce). Раньше был 500мс
+// debounce — но в Telegram WebApp на мобильных beforeunload/pagehide
+// не всегда триггерится при закрытии (свайп вниз → клиент усыпил
+// WebView, никаких событий не доехало), и последняя пачка просто
+// терялась. Лучше один лишний запрос на каждый пример, чем потерянная
+// серия. Если запись уже в полёте и пришла новая мутация — выставляем
+// _persistDirty=true, и после ответа сервера автоматически шлём ещё
+// один setItem со свежим JSON.
 let _persistInflight = false;
 let _persistDirty = false;
+// retry-таймер на случай err от setItem — единственное место, где
+// используется setTimeout: при ошибке делаем паузу ~800мс перед повтором,
+// чтобы не долбить сервер при rate-limit'е.
+let _persistRetryTimer = null;
+const PERSIST_RETRY_MS = 800;
 
 function _ensureDay(stats, dk) {
     if (!stats.byDate[dk]) stats.byDate[dk] = emptyDayBlock();
@@ -605,79 +610,86 @@ function _normalizeStats(raw) {
     return emptyStats();
 }
 
-// Планирует запись в CloudStorage. Дёргается на каждое изменение кэша.
-// Несколько подряд идущих мутаций (например, 10 примеров в раунде) дают
-// один setItem через PERSIST_DEBOUNCE_MS. Если запись уже в полёте, ставим
-// «грязный» флаг — после её резолва запустим ещё одну с актуальным JSON.
+// Запросить запись stats в CloudStorage. Если запись уже в полёте — после
+// её ответа автоматически уйдёт ещё один setItem со свежим состоянием
+// (благодаря _persistDirty). Если pending retry-таймер уже взведён —
+// _persistDirty подхватит свежий JSON, отдельно дёргать setItem не надо.
 function _scheduleStatsPersist() {
     if (_statsLoadFailed) {
         // НЕ пишем поверх облака пока не уверены, что в нём. Иначе пустой
         // кэш-заглушка после неудачной загрузки затрёт реальные данные.
         return;
     }
-    if (_persistInflight) {
+    if (_persistInflight || _persistRetryTimer) {
         _persistDirty = true;
         return;
     }
-    if (_persistTimer) return;
-    _persistTimer = setTimeout(() => {
-        _persistTimer = null;
-        _persistNow();
-    }, PERSIST_DEBOUNCE_MS);
+    _persistNow();
 }
 
 function _persistNow() {
     if (!_statsCache || _statsLoadFailed) return;
     const cs = _cs();
     if (!cs) return;
+    if (_persistRetryTimer) { clearTimeout(_persistRetryTimer); _persistRetryTimer = null; }
     let json;
     try { json = JSON.stringify(_statsCache); } catch (_) { return; }
     // CloudStorage: 4096 байт на значение. Один JSON-блоб со всей историей
-    // упирается в этот лимит относительно быстро (4 категории×N дней×массивы
-    // по операциям). Когда упрёмся — setItem вернёт err, ретрай не поможет;
-    // нужно шардировать по ключу-на-день (TODO). Сейчас просто кричим в
-    // консоль, чтобы это заметить.
+    // упирается в этот лимит относительно быстро (4 категории × N дней ×
+    // массивы по операциям). Когда упрёмся — setItem вернёт err, ретрай
+    // не поможет; нужно шардировать по ключу-на-день (TODO).
     if (json.length > 3800) {
         console.warn('[stats] payload size', json.length, 'байт — близко к лимиту CloudStorage (4096)');
     }
     _persistInflight = true;
     _persistDirty = false;
-    cs.setItem(STATS_KEY_V2, json, (err) => {
+    const t0 = Date.now();
+    console.log('[stats] setItem start, size=' + json.length);
+    try {
+        cs.setItem(STATS_KEY_V2, json, (err) => {
+            const dt = Date.now() - t0;
+            _persistInflight = false;
+            if (err) {
+                console.error('[stats] setItem FAILED after', dt + 'ms:', err);
+                _persistDirty = true;
+                // Retry через паузу — Telegram мог ответить rate-limit'ом
+                // или временным сбоем. Не блокируем UI.
+                _persistRetryTimer = setTimeout(() => {
+                    _persistRetryTimer = null;
+                    if (_persistDirty) _persistNow();
+                }, PERSIST_RETRY_MS);
+                return;
+            }
+            console.log('[stats] setItem OK in', dt + 'ms');
+            // Пока летел этот setItem, могли прийти новые мутации —
+            // отправляем ещё один проход со свежим JSON.
+            if (_persistDirty) _persistNow();
+        });
+    } catch (e) {
         _persistInflight = false;
-        if (err) {
-            console.error('[stats] CloudStorage setItem failed:', err);
-            // Ретрай через увеличенный debounce. Если падает раз за разом —
-            // значит сеть лежит или превышен лимит размера; мы хотя бы не
-            // молчим, и при восстановлении сети следующий цикл всё запишет.
-            _persistDirty = true;
-        }
-        if (_persistDirty && !_persistTimer) {
-            _persistTimer = setTimeout(() => {
-                _persistTimer = null;
-                _persistNow();
-            }, err ? PERSIST_DEBOUNCE_MS * 4 : PERSIST_DEBOUNCE_MS);
-        }
-    });
-}
-
-// Принудительно сбросить накопленную запись (например, перед закрытием
-// WebApp). Если был активный таймер — отменяем и пишем немедленно.
-function _flushStats() {
-    if (_persistTimer) { clearTimeout(_persistTimer); _persistTimer = null; }
-    if (!_persistInflight && _statsCache && !_statsLoadFailed) {
-        _persistNow();
-    } else if (_persistInflight) {
+        console.error('[stats] setItem threw:', e);
         _persistDirty = true;
     }
 }
 
-// Telegram WebApp событие закрытия из публичного API не выставлено в явном
-// виде; beforeunload срабатывает и в Desktop, и в мобильных WebView'ах —
-// используем его как best-effort flush.
+// Принудительно сбросить запись (перед закрытием WebApp). Если ничего не
+// в полёте — пишем немедленно. Если уже летит — взводим dirty, чтобы
+// callback дозаписал свежий JSON.
+function _flushStats() {
+    if (!_statsCache || _statsLoadFailed) return;
+    if (_persistInflight) { _persistDirty = true; return; }
+    _persistNow();
+}
+
+// Закрытие WebApp в Telegram плохо детектируется: beforeunload/pagehide
+// срабатывают в Desktop, но на мобильных клиентах при свайпе вниз WebView
+// часто усыпляется без события. visibilitychange — самое надёжное:
+// document.hidden становится true даже когда страница уходит во фон.
 window.addEventListener('beforeunload', _flushStats);
-// pagehide дополнительно ловит уход во фон на iOS — там beforeunload может
-// не сработать. Дублирующий вызов безопасен.
 window.addEventListener('pagehide', _flushStats);
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') _flushStats();
+});
 
 // Загрузка из CloudStorage. localStorage больше НЕ читается — это была
 // главная причина «отката» статистики: при сетевом сбое CS возвращал
@@ -805,6 +817,179 @@ function statsByCategory(category) {
         if (e) out[dk] = e;
     }
     return out;
+}
+
+// === Синхронизация настроек через CloudStorage =========================
+// Один JSON под ключом SETTINGS_KEY_V1, содержащий снапшот значений из
+// localStorage по перечисленным ключам. Принцип:
+//   - localStorage остаётся source-of-truth для UI (быстрый старт, никакого
+//     ожидания асинхронного CS при инициализации слайдеров/чекбоксов).
+//   - CloudStorage — реплика для синхронизации между устройствами. После
+//     любой записи в один из SETTINGS_LOCAL_KEYS автоматически шлём свежий
+//     снапшот в облако (через перехват Storage.prototype.setItem/removeItem).
+//   - На старте параллельно с UI читаем CloudStorage. Если облако не пустое
+//     и отличается от локального — записываем поверх localStorage и для
+//     userTheme/sizeSettings вызываем live-apply (applyTheme, applySizeSettings).
+//     Для values/rangesBounds live-apply нет (там сложная инициализация
+//     слайдеров) — применятся при следующем запуске.
+
+const SETTINGS_KEY_V1 = 'settings_v1';
+const SETTINGS_LOCAL_KEYS = ['values', 'activePreset', 'rangesBounds', 'sizeSettings', 'userTheme'];
+
+let _settingsInflight = false;
+let _settingsDirty = false;
+let _settingsRetryTimer = null;
+// Флаг для подавления авто-персиста, пока мы применяем снапшот из облака
+// (иначе вложенные localStorage.setItem'ы спровоцируют петлю
+// cloud → local → cloud).
+let _suppressSettingsPersist = false;
+
+// Перехват Storage.prototype.setItem/removeItem. Глобальный, но влияет
+// только на localStorage и только на ключи из SETTINGS_LOCAL_KEYS —
+// поэтому stats_v2, rangesBounds и любые внешние библиотечные записи
+// проходят без вмешательства.
+(function patchLocalStorageForSync() {
+    const _origSetItem = Storage.prototype.setItem;
+    const _origRemoveItem = Storage.prototype.removeItem;
+    Storage.prototype.setItem = function(key, value) {
+        _origSetItem.call(this, key, value);
+        if (this === localStorage && SETTINGS_LOCAL_KEYS.indexOf(key) !== -1
+            && !_suppressSettingsPersist) {
+            _scheduleSettingsPersist();
+        }
+    };
+    Storage.prototype.removeItem = function(key) {
+        _origRemoveItem.call(this, key);
+        if (this === localStorage && SETTINGS_LOCAL_KEYS.indexOf(key) !== -1
+            && !_suppressSettingsPersist) {
+            _scheduleSettingsPersist();
+        }
+    };
+})();
+
+function _collectSettingsSnapshot() {
+    const out = { version: 1 };
+    for (const k of SETTINGS_LOCAL_KEYS) {
+        const v = localStorage.getItem(k);
+        if (v != null) out[k] = v;
+    }
+    return out;
+}
+
+function _hasAnyLocalSetting() {
+    for (const k of SETTINGS_LOCAL_KEYS) {
+        if (localStorage.getItem(k) != null) return true;
+    }
+    return false;
+}
+
+function _applySettingsSnapshot(snap) {
+    if (!snap || typeof snap !== 'object') return;
+    _suppressSettingsPersist = true;
+    try {
+        for (const k of SETTINGS_LOCAL_KEYS) {
+            if (snap[k] != null) localStorage.setItem(k, snap[k]);
+        }
+    } finally {
+        _suppressSettingsPersist = false;
+    }
+    // Live-apply для настроек, у которых есть готовая apply-функция:
+    if (snap.userTheme && typeof applyTheme === 'function') {
+        try { applyTheme(snap.userTheme); } catch (_) {}
+    }
+    if (snap.sizeSettings && typeof applySizeSettings === 'function') {
+        try { applySizeSettings(JSON.parse(snap.sizeSettings)); } catch (_) {}
+    }
+}
+
+function _scheduleSettingsPersist() {
+    if (_settingsInflight || _settingsRetryTimer) {
+        _settingsDirty = true;
+        return;
+    }
+    _settingsPersistNow();
+}
+
+function _settingsPersistNow() {
+    const cs = _cs();
+    if (!cs) return;
+    if (_settingsRetryTimer) { clearTimeout(_settingsRetryTimer); _settingsRetryTimer = null; }
+    const snap = _collectSettingsSnapshot();
+    let json;
+    try { json = JSON.stringify(snap); } catch (_) { return; }
+    if (json.length > 3800) {
+        console.warn('[settings] payload size', json.length, 'байт — близко к лимиту');
+    }
+    _settingsInflight = true;
+    _settingsDirty = false;
+    const t0 = Date.now();
+    console.log('[settings] setItem start, size=' + json.length);
+    try {
+        cs.setItem(SETTINGS_KEY_V1, json, (err) => {
+            const dt = Date.now() - t0;
+            _settingsInflight = false;
+            if (err) {
+                console.error('[settings] setItem FAILED after', dt + 'ms:', err);
+                _settingsDirty = true;
+                _settingsRetryTimer = setTimeout(() => {
+                    _settingsRetryTimer = null;
+                    if (_settingsDirty) _settingsPersistNow();
+                }, PERSIST_RETRY_MS);
+                return;
+            }
+            console.log('[settings] setItem OK in', dt + 'ms');
+            if (_settingsDirty) _settingsPersistNow();
+        });
+    } catch (e) {
+        _settingsInflight = false;
+        console.error('[settings] setItem threw:', e);
+        _settingsDirty = true;
+    }
+}
+
+function _flushSettings() {
+    if (!_cs()) return;
+    if (_settingsInflight) { _settingsDirty = true; return; }
+    if (_settingsDirty || _settingsRetryTimer) _settingsPersistNow();
+}
+
+window.addEventListener('beforeunload', _flushSettings);
+window.addEventListener('pagehide', _flushSettings);
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') _flushSettings();
+});
+
+// Загружает снапшот настроек из CloudStorage и при необходимости
+// применяет поверх localStorage. Если облако пустое, а локально что-то
+// есть — заливаем локальное в облако (first-time sync).
+function loadSettingsFromCloud() {
+    const cs = _cs();
+    if (!cs) return Promise.resolve();
+    return new Promise(resolve => {
+        cs.getItem(SETTINGS_KEY_V1, (err, val) => {
+            if (err) {
+                console.error('[settings] CloudStorage load failed:', err);
+                resolve();
+                return;
+            }
+            if (!val) {
+                console.log('[settings] CloudStorage пуст');
+                if (_hasAnyLocalSetting()) {
+                    console.log('[settings] заливаем локальные настройки в облако');
+                    _scheduleSettingsPersist();
+                }
+                resolve();
+                return;
+            }
+            let parsed = null;
+            try { parsed = JSON.parse(val); } catch (_) {}
+            if (parsed && parsed.version === 1) {
+                console.log('[settings] CloudStorage load OK');
+                _applySettingsSnapshot(parsed);
+            }
+            resolve();
+        });
+    });
 }
 
 // === Активный пресет (для категоризации раундов) =======================
@@ -1863,11 +2048,17 @@ document.addEventListener('DOMContentLoaded', () => { // первый заход
     }
 
     // Прогреваем кэш статистики на старте. В Telegram — из CloudStorage
-    // (async), в браузере — из localStorage (sync). Если файла v2 нет, но
-    // есть legacy 'stats' — мигрируем автоматически (см. statsLoad). Если
-    // пользователь откроет страницу статистики раньше, чем CloudStorage
-    // вернёт ответ, statisticOpen() дождётся той же промиссы.
+    // (async). Если файла v2 нет, но есть legacy 'stats' — мигрируем
+    // автоматически (см. statsLoad). Если пользователь откроет страницу
+    // статистики раньше, чем CloudStorage вернёт ответ, statisticOpen()
+    // дождётся той же промиссы.
     statsLoad();
+
+    // Параллельно подтягиваем настройки из облака. UI уже инициализирован
+    // из localStorage выше — если облако содержит более свежие значения,
+    // _applySettingsSnapshot обновит localStorage и live-переключит тему
+    // и размеры (для values/rangesBounds применится при перезаходе).
+    loadSettingsFromCloud();
 })
 
 
