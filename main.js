@@ -489,9 +489,14 @@ function splitInto4(total) {
 }
 
 // === Хранилище статистики v2 ===========================================
-// Единый формат записи и чтения статистики. Источник истины — Telegram
-// CloudStorage (когда приложение открыто в Telegram), плюс localStorage
-// как offline-кэш и единственный backend в браузере для разработки.
+// Источник истины — Telegram CloudStorage. localStorage в путях статистики
+// НЕ используется: раньше он был «fallback'ом», и при первой неудачной
+// загрузке из CloudStorage (сетевой сбой, лаг) тёкущее устройство тут же
+// заливало в облако своё локальное состояние и затирало правильные данные —
+// см. историю багов в CLAUDE.md / changelog. Сейчас выбор простой: внутри
+// Telegram статистика хранится в CloudStorage; вне Telegram — статистика
+// просто не работает (детект по наличию API `window.Telegram.WebApp.CloudStorage`,
+// а не по userAgent: Telegram Desktop не всегда содержит "Telegram" в UA).
 //
 // Схема (key: STATS_KEY_V2):
 //   {
@@ -509,15 +514,19 @@ function splitInto4(total) {
 //   }
 //
 // Категория раунда определяется через localStorage.activePreset (см.
-// setActivePreset). По умолчанию — null (только overall обновляется).
+// setActivePreset) — это локальное состояние UI текущего раунда, не данные
+// статистики, поэтому в облако его синхронизировать не нужно.
 
 const STATS_KEY_V2 = 'stats_v2';
 const STATS_KEY_LEGACY = 'stats';        // старый формат массива по дням
 
-const inTelegram = () =>
-    typeof navigator !== 'undefined' &&
-    !!navigator.userAgent &&
-    navigator.userAgent.includes('Telegram');
+// Доступ к CloudStorage. Возвращает API или null. Это единственный backend.
+function _cs() {
+    const cs = window && window.Telegram && window.Telegram.WebApp
+        ? window.Telegram.WebApp.CloudStorage
+        : null;
+    return cs && cs.getItem && cs.setItem ? cs : null;
+}
 
 function emptyCatDay() {
     return {
@@ -534,6 +543,22 @@ function emptyStats() { return { version: 2, byDate: {} }; }
 let _statsCache = null;
 let _statsLoaded = false;
 let _statsLoadPromise = null;
+// _statsLoadFailed = true означает: мы НЕ знаем, что в облаке (сеть/CS не
+// ответили, или CloudStorage недоступен вовсе). В этом состоянии запись
+// заблокирована — иначе пустой кэш в памяти затёр бы валидные данные в
+// облаке при первом же successful setItem. Сбрасывается при следующей
+// удачной загрузке.
+let _statsLoadFailed = false;
+// debounce-буфер записи: копим мутации и шлём в CloudStorage пачкой через
+// PERSIST_DEBOUNCE_MS. На каждый решённый пример раньше дёргался setItem
+// с полным JSON — это создавало шторм запросов и легко роняло последние
+// записи. Теперь — одна запись на серию мутаций.
+let _persistTimer = null;
+const PERSIST_DEBOUNCE_MS = 500;
+// текущий setItem inflight: если запись уже в полёте и тут пришла новая
+// мутация — после её резолва триггерим повтор, чтобы свежий JSON долетел.
+let _persistInflight = false;
+let _persistDirty = false;
 
 function _ensureDay(stats, dk) {
     if (!stats.byDate[dk]) stats.byDate[dk] = emptyDayBlock();
@@ -580,76 +605,161 @@ function _normalizeStats(raw) {
     return emptyStats();
 }
 
-function _persistStats() {
-    if (!_statsCache) return;
+// Планирует запись в CloudStorage. Дёргается на каждое изменение кэша.
+// Несколько подряд идущих мутаций (например, 10 примеров в раунде) дают
+// один setItem через PERSIST_DEBOUNCE_MS. Если запись уже в полёте, ставим
+// «грязный» флаг — после её резолва запустим ещё одну с актуальным JSON.
+function _scheduleStatsPersist() {
+    if (_statsLoadFailed) {
+        // НЕ пишем поверх облака пока не уверены, что в нём. Иначе пустой
+        // кэш-заглушка после неудачной загрузки затрёт реальные данные.
+        return;
+    }
+    if (_persistInflight) {
+        _persistDirty = true;
+        return;
+    }
+    if (_persistTimer) return;
+    _persistTimer = setTimeout(() => {
+        _persistTimer = null;
+        _persistNow();
+    }, PERSIST_DEBOUNCE_MS);
+}
+
+function _persistNow() {
+    if (!_statsCache || _statsLoadFailed) return;
+    const cs = _cs();
+    if (!cs) return;
     let json;
     try { json = JSON.stringify(_statsCache); } catch (_) { return; }
-    try { localStorage.setItem(STATS_KEY_V2, json); } catch (_) {}
-    if (inTelegram() && window.Telegram && window.Telegram.WebApp &&
-        window.Telegram.WebApp.CloudStorage && window.Telegram.WebApp.CloudStorage.setItem) {
-        try { window.Telegram.WebApp.CloudStorage.setItem(STATS_KEY_V2, json); } catch (_) {}
+    // CloudStorage: 4096 байт на значение. Один JSON-блоб со всей историей
+    // упирается в этот лимит относительно быстро (4 категории×N дней×массивы
+    // по операциям). Когда упрёмся — setItem вернёт err, ретрай не поможет;
+    // нужно шардировать по ключу-на-день (TODO). Сейчас просто кричим в
+    // консоль, чтобы это заметить.
+    if (json.length > 3800) {
+        console.warn('[stats] payload size', json.length, 'байт — близко к лимиту CloudStorage (4096)');
+    }
+    _persistInflight = true;
+    _persistDirty = false;
+    cs.setItem(STATS_KEY_V2, json, (err) => {
+        _persistInflight = false;
+        if (err) {
+            console.error('[stats] CloudStorage setItem failed:', err);
+            // Ретрай через увеличенный debounce. Если падает раз за разом —
+            // значит сеть лежит или превышен лимит размера; мы хотя бы не
+            // молчим, и при восстановлении сети следующий цикл всё запишет.
+            _persistDirty = true;
+        }
+        if (_persistDirty && !_persistTimer) {
+            _persistTimer = setTimeout(() => {
+                _persistTimer = null;
+                _persistNow();
+            }, err ? PERSIST_DEBOUNCE_MS * 4 : PERSIST_DEBOUNCE_MS);
+        }
+    });
+}
+
+// Принудительно сбросить накопленную запись (например, перед закрытием
+// WebApp). Если был активный таймер — отменяем и пишем немедленно.
+function _flushStats() {
+    if (_persistTimer) { clearTimeout(_persistTimer); _persistTimer = null; }
+    if (!_persistInflight && _statsCache && !_statsLoadFailed) {
+        _persistNow();
+    } else if (_persistInflight) {
+        _persistDirty = true;
     }
 }
 
-// Загрузка. В Telegram — из CloudStorage (async, callback). Иначе синхронно
-// из localStorage. Если v2 не найдена — пробуем legacy и сразу мигрируем.
-// Возвращает Promise, который резолвится один раз и кэширует результат.
+// Telegram WebApp событие закрытия из публичного API не выставлено в явном
+// виде; beforeunload срабатывает и в Desktop, и в мобильных WebView'ах —
+// используем его как best-effort flush.
+window.addEventListener('beforeunload', _flushStats);
+// pagehide дополнительно ловит уход во фон на iOS — там beforeunload может
+// не сработать. Дублирующий вызов безопасен.
+window.addEventListener('pagehide', _flushStats);
+
+// Загрузка из CloudStorage. localStorage больше НЕ читается — это была
+// главная причина «отката» статистики: при сетевом сбое CS возвращал
+// пустой/ошибочный ответ, код брал localStorage и затирал им облако.
+// Теперь: успех CS → кэш установлен; ошибка CS → _statsLoadFailed = true,
+// запись заблокирована до следующей удачной загрузки. Промис всё равно
+// резолвится (с пустым кэшем) — чтобы вызывающий код не висел.
 function statsLoad() {
-    if (_statsLoaded) return Promise.resolve(_statsCache);
+    if (_statsLoaded && !_statsLoadFailed) return Promise.resolve(_statsCache);
     if (_statsLoadPromise) return _statsLoadPromise;
 
+    const cs = _cs();
+    if (!cs) {
+        // CloudStorage недоступен (приложение открыто не в Telegram).
+        // Резолвим пустым кэшем, помечаем как failed — запись отключена.
+        _statsCache = emptyStats();
+        _statsLoaded = true;
+        _statsLoadFailed = true;
+        return Promise.resolve(_statsCache);
+    }
+
     _statsLoadPromise = new Promise(resolve => {
-        const loadFromLocal = () => {
-            try {
-                const raw = JSON.parse(localStorage.getItem(STATS_KEY_V2));
-                if (raw) return _normalizeStats(raw);
-            } catch (_) {}
-            try {
-                const raw = JSON.parse(localStorage.getItem(STATS_KEY_LEGACY));
-                if (raw) return _normalizeStats(raw);
-            } catch (_) {}
-            return emptyStats();
-        };
-        const finish = (s, persistAfter) => {
-            _statsCache = s || emptyStats();
+        const succeed = (data) => {
+            _statsCache = data;
             _statsLoaded = true;
-            if (persistAfter) _persistStats();
+            _statsLoadFailed = false;
+            _statsLoadPromise = null;
+            resolve(_statsCache);
+        };
+        const fail = (reason) => {
+            console.error('[stats] CloudStorage load failed:', reason);
+            _statsCache = emptyStats();
+            _statsLoaded = true;
+            _statsLoadFailed = true;
+            _statsLoadPromise = null;
             resolve(_statsCache);
         };
 
-        if (inTelegram() && window.Telegram && window.Telegram.WebApp &&
-            window.Telegram.WebApp.CloudStorage && window.Telegram.WebApp.CloudStorage.getItem) {
-            const cs = window.Telegram.WebApp.CloudStorage;
-            cs.getItem(STATS_KEY_V2, (_err, val) => {
-                let parsed = null;
-                if (val) { try { parsed = JSON.parse(val); } catch (_) {} }
-                if (parsed && parsed.version === 2 && parsed.byDate) {
-                    finish(_normalizeStats(parsed), false);
-                    return;
+        cs.getItem(STATS_KEY_V2, (err, val) => {
+            if (err) { fail(err); return; }
+            let parsed = null;
+            if (val) { try { parsed = JSON.parse(val); } catch (_) {} }
+            if (parsed && parsed.version === 2 && parsed.byDate) {
+                succeed(_normalizeStats(parsed));
+                return;
+            }
+            // v2 в облаке нет — возможно есть legacy (старый формат
+            // массива). Пробуем мигрировать.
+            cs.getItem(STATS_KEY_LEGACY, (err2, val2) => {
+                if (err2) { fail(err2); return; }
+                let legacy = null;
+                if (val2) { try { legacy = JSON.parse(val2); } catch (_) {} }
+                if (legacy) {
+                    // Миграция: кладём в кэш и планируем запись в v2.
+                    succeed(_normalizeStats(legacy));
+                    _scheduleStatsPersist();
+                } else {
+                    // Чистый аккаунт — пустая стата, ничего записывать не
+                    // надо до первой мутации.
+                    succeed(emptyStats());
                 }
-                cs.getItem(STATS_KEY_LEGACY, (_err2, val2) => {
-                    let legacy = null;
-                    if (val2) { try { legacy = JSON.parse(val2); } catch (_) {} }
-                    if (legacy) {
-                        finish(_normalizeStats(legacy), true); // сразу перезаписываем в v2
-                    } else {
-                        // CloudStorage пуст — пробуем localStorage как последний шанс
-                        finish(loadFromLocal(), true);
-                    }
-                });
             });
-        } else {
-            finish(loadFromLocal(), false);
-        }
+        });
     });
     return _statsLoadPromise;
 }
 
-// Применяет функцию-мутатор к live-stats и сразу персистит. Если хранилище
-// ещё не загружено, операция дождётся загрузки и потом применит мутацию —
-// поэтому первая запись после старта может быть с задержкой 1-2 тика.
+// Применяет функцию-мутатор и планирует запись. Если кэш в состоянии
+// «failed» (последняя загрузка не удалась), пробуем перезагрузить перед
+// мутацией. Если опять не получилось — мутацию пропускаем (важнее не
+// затереть облако, чем сохранить текущее значение). На следующем старте
+// статистика будет считаться от того, что лежит в облаке.
 function _statsMutate(fn) {
-    statsLoad().then(s => { fn(s); _persistStats(); });
+    if (_statsLoadFailed) {
+        _statsLoaded = false;
+        _statsLoadPromise = null;
+    }
+    statsLoad().then(() => {
+        if (_statsLoadFailed) return;
+        fn(_statsCache);
+        _scheduleStatsPersist();
+    });
 }
 
 // Регистрирует старт новой сессии (нажатие «Начать»). Инкрементирует sessions
@@ -1235,13 +1345,15 @@ window.regenerateMockStats = () => {
     }
     _statsCache = out;
     _statsLoaded = true;
-    _persistStats();
+    _statsLoadFailed = false;
+    _scheduleStatsPersist();
     renderAllStatSlides();
 };
 window.clearMockStats = () => {
     _statsCache = emptyStats();
     _statsLoaded = true;
-    _persistStats();
+    _statsLoadFailed = false;
+    _scheduleStatsPersist();
     renderAllStatSlides();
 };
 
