@@ -47,9 +47,19 @@ document.getElementById('statistic-icon').addEventListener('click', () => { stat
 document.getElementById('settings-icon').addEventListener('click', () => { differentTheme('open'); });
 document.getElementById('different-theme-block').addEventListener('click', () => { differentTheme('close'); });
 
+// Закрывает все выпадашки настроек (темы/границы/размеры), кроме указанной по
+// id. Используется на каждом триггере: одновременно может быть открыта только
+// одна — открытие новой автоматически схлопывает соседнюю.
+function closeOtherDropdowns(keepId) {
+    ['theme-dropdown', 'ranges-dropdown', 'sizes-dropdown'].forEach(id => {
+        if (id !== keepId) document.getElementById(id).classList.remove('open');
+    });
+}
+
 // клик по индикатору текущей темы — переключает выпадающий список тем
 document.getElementById('current-theme-indicator').addEventListener('click', (e) => {
     e.stopPropagation(); // не даём клику закрыть всю панель
+    closeOtherDropdowns('theme-dropdown');
     document.getElementById('theme-dropdown').classList.toggle('open');
 });
 
@@ -242,6 +252,7 @@ function fillPresetsInputs(p) {
 // триггер выпадающей панели границ
 document.getElementById('ranges-icon').addEventListener('click', (e) => {
     e.stopPropagation();
+    closeOtherDropdowns('ranges-dropdown');
     document.getElementById('ranges-dropdown').classList.toggle('open');
 });
 
@@ -287,6 +298,7 @@ function applySizeSettings(s) {
 // триггер выпадающей панели размеров
 document.getElementById('sizes-icon').addEventListener('click', (e) => {
     e.stopPropagation();
+    closeOtherDropdowns('sizes-dropdown');
     document.getElementById('sizes-dropdown').classList.toggle('open');
 });
 
