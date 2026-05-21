@@ -1,0 +1,282 @@
+/* =====================================================================
+   Темы оформления.
+   Переключение — через атрибут data-theme на <html>:
+       document.documentElement.setAttribute('data-theme', 'dark')
+   Дефолт = light (он же :root без атрибута).
+   ===================================================================== */
+
+:root,
+:root[data-theme="light"] {
+    --bg:                  rgb(234, 234, 234);
+    --text:                #000;
+    --text-accent:         rgb(28, 170, 231);
+    --accent:              rgb(28, 170, 231);
+    --accent-active:       rgb(18, 108, 146);
+    --on-accent:           #ffffff;
+    --checkbox-border:     #000;
+    --shadow:              0 2px 10px rgba(0, 0, 0, 0.08);
+    --slider-track:        #707D7D;
+    --slider-thumb-border: #ffffff;
+    --blink-bad:           red;
+    --blink-good:          green;
+}
+
+:root[data-theme="white"] {
+    --bg:                  #ffffff;
+    --text:                #737373;
+    --text-accent:         #737373;
+    --accent:              #737373;
+    --accent-active:       #525252;
+    --on-accent:           #ffffff;
+    --checkbox-border:     #d4d4d4;
+    --shadow:              0 2px 10px rgba(0, 0, 0, 0.08);
+    --slider-track:        #e5e5e5;
+    --slider-thumb-border: #ffffff;
+    --blink-bad:           #DC2626;
+    --blink-good:          #16A34A;
+}
+
+:root[data-theme="gray"] {
+    --bg:                  #d4d4d4;
+    --text:                #404040;
+    --text-accent:         #404040;
+    --accent:              #525252;
+    --accent-active:       #737373;
+    --on-accent:           #ffffff;
+    --checkbox-border:     #a3a3a3;
+    --shadow:              0 2px 10px rgba(0, 0, 0, 0.10);
+    --slider-track:        #bdbdbd;
+    --slider-thumb-border: #ffffff;
+    --blink-bad:           #DC2626;
+    --blink-good:          #16A34A;
+}
+
+:root[data-theme="dark"] {
+    --bg:                  #202020;
+    --text:                #b5b5b5;
+    --text-accent:         #b5b5b5;
+    --accent:              #2f2f2f;
+    --accent-active:       #404040;
+    --on-accent:           #b5b5b5;
+    --checkbox-border:     #2d2d2d;
+    --shadow:              0 2px 10px rgba(0, 0, 0, 0.5);
+    --slider-track:        #1E1E1E;
+    --slider-thumb-border: #b5b5b5;
+    --blink-bad:           rgb(55, 0, 0);
+    --blink-good:          rgb(0, 54, 0);
+}
+
+:root[data-theme="black"] {
+    --bg:                  #000000;
+    --text:                #ffffff;
+    --text-accent:         #ffffff;
+    --accent:              #1a1a1a;
+    --accent-active:       #333333;
+    --on-accent:           #ffffff;
+    --checkbox-border:     #2a2a2a;
+    --shadow:              0 2px 10px rgba(255, 255, 255, 0.04);
+    --slider-track:        #1a1a1a;
+    --slider-thumb-border: #ffffff;
+    --blink-bad:           rgb(55, 0, 0);
+    --blink-good:          rgb(0, 54, 0);
+}
+
+:root[data-theme="blue"] {
+    --bg:                  #DBEAFE;
+    --text:                #1E3A8A;
+    --text-accent:         #1D4ED8;
+    --accent:              #2563EB;
+    --accent-active:       #1E40AF;
+    --on-accent:           #ffffff;
+    --checkbox-border:     #1E3A8A;
+    --shadow:              0 2px 10px rgba(30, 58, 138, 0.18);
+    --slider-track:        #93C5FD;
+    --slider-thumb-border: #ffffff;
+    --blink-bad:           #DC2626;
+    --blink-good:          #16A34A;
+}
+
+:root[data-theme="green"] {
+    --bg:                  #DCFCE7;
+    --text:                #14532D;
+    --text-accent:         #15803D;
+    --accent:              #16A34A;
+    --accent-active:       #166534;
+    --on-accent:           #ffffff;
+    --checkbox-border:     #14532D;
+    --shadow:              0 2px 10px rgba(20, 83, 45, 0.18);
+    --slider-track:        #86EFAC;
+    --slider-thumb-border: #ffffff;
+    --blink-bad:           #DC2626;
+    --blink-good:          #15803D;
+}
+
+:root[data-theme="purple"] {
+    --bg:                  #EDE9FE;
+    --text:                #4C1D95;
+    --text-accent:         #6D28D9;
+    --accent:              #7C3AED;
+    --accent-active:       #5B21B6;
+    --on-accent:           #ffffff;
+    --checkbox-border:     #4C1D95;
+    --shadow:              0 2px 10px rgba(76, 29, 149, 0.18);
+    --slider-track:        #C4B5FD;
+    --slider-thumb-border: #ffffff;
+    --blink-bad:           #DC2626;
+    --blink-good:          #16A34A;
+}
+
+:root[data-theme="orange"] {
+    --bg:                  #FFEDD5;
+    --text:                #7C2D12;
+    --text-accent:         #C2410C;
+    --accent:              #EA580C;
+    --accent-active:       #9A3412;
+    --on-accent:           #ffffff;
+    --checkbox-border:     #7C2D12;
+    --shadow:              0 2px 10px rgba(124, 45, 18, 0.18);
+    --slider-track:        #FDBA74;
+    --slider-thumb-border: #ffffff;
+    --blink-bad:           #DC2626;
+    --blink-good:          #16A34A;
+}
+
+/* =====================================================================
+   Применение переменных к элементам.
+   ===================================================================== */
+
+body,
+.main1,
+.main2,
+.statistic,
+.example-answer,
+.choice input[type="checkbox"] {
+    background-color: var(--bg);
+}
+
+.main1 {
+    color: var(--text);
+}
+
+.main2,
+.statistic,
+.statistic-header,
+.op-icon,
+.filter-icon,
+.settings-icon,
+.ranges-icon,
+.sizes-icon {
+    color: var(--text-accent);
+}
+
+.choice input[type="checkbox"] {
+    border-color: var(--checkbox-border);
+}
+
+.choice input[type="checkbox"]:checked,
+button,
+.fill,
+.fill-double,
+.easy-basket-filter-info p,
+.easy-basket-filter-info-double p,
+.easy-basket-filter-info-three p,
+.easy-basket-filter-info input,
+.easy-basket-filter-info-double input,
+.easy-basket-filter-info-three input,
+input[type=range]::-webkit-slider-thumb {
+    background-color: var(--accent);
+}
+
+.choice input[type="checkbox"]:checked {
+    border-color: var(--accent);
+}
+
+button,
+.example-answer,
+.graph-conteiner {
+    box-shadow: var(--shadow);
+}
+
+button,
+.easy-basket-filter-info p,
+.easy-basket-filter-info-double p,
+.easy-basket-filter-info-three p,
+.easy-basket-filter-info input,
+.easy-basket-filter-info-double input,
+.easy-basket-filter-info-three input {
+    color: var(--on-accent);
+}
+
+button:active {
+    background-color: var(--accent-active);
+}
+
+input[type=range]::-webkit-slider-thumb {
+    border-color: var(--slider-thumb-border);
+    box-shadow: 0 1px 5px -1px rgba(0, 0, 0, 0.25);
+}
+
+input[type=range]::-webkit-slider-runnable-track,
+input[type=range].lower-double::-webkit-slider-runnable-track {
+    background-color: var(--slider-track);
+}
+
+.blink-bad {
+    background-color: var(--blink-bad);
+}
+
+.blink-good {
+    background-color: var(--blink-good);
+}
+
+/* Плавный переход при смене темы */
+.main1,
+.main2,
+.statistic,
+.example-answer,
+.graph-conteiner,
+.choice input[type="checkbox"],
+.op-icon,
+.filter-icon,
+.settings-icon,
+.ranges-icon,
+.sizes-icon,
+button,
+.fill,
+.fill-double,
+.easy-basket-filter-info p,
+.easy-basket-filter-info-double p,
+.easy-basket-filter-info-three p,
+.easy-basket-filter-info input,
+.easy-basket-filter-info-double input,
+.easy-basket-filter-info-three input,
+input[type=range]::-webkit-slider-thumb {
+    transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* =====================================================================
+   Превью-кружки в выезжающей панели выбора темы.
+   Цвета зафиксированы — это «образцы», не зависят от текущей темы.
+   У белого свотча тонкое внутреннее кольцо, иначе он бы пропадал
+   на светлых фонах (light/blue/green/...).
+   ===================================================================== */
+
+.theme-swatch-light  { background-color: rgb(28, 170, 231); }
+.theme-swatch-white  { background-color: #ffffff; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12); }
+.theme-swatch-gray   { background-color: #d4d4d4; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12); }
+.theme-swatch-dark   { background-color: #2f2f2f; }
+.theme-swatch-black  { background-color: #000000; }
+.theme-swatch-blue   { background-color: #2563EB; }
+.theme-swatch-green  { background-color: #16A34A; }
+.theme-swatch-purple { background-color: #7C3AED; }
+.theme-swatch-orange { background-color: #EA580C; }
+
+/* Активная тема — увеличена на 20% (7vh → 8.4vh) относительно остальных свотчей.
+   Реальные width/height (а не transform:scale) дают: 1) одинаковый видимый gap
+   между всеми соседями (flex считает по фактическим боксам, а не по отрендеренным
+   через transform); 2) активный свотч сверху/снизу колонки не подрезается
+   вертикальным overflow:hidden у dropdown'а. */
+.theme-swatch.active-theme {
+    width: 8.4vh;
+    height: 8.4vh;
+}

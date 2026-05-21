@@ -3,6 +3,17 @@
     padding: 0;
     margin: 0;
     border: 0;
+    /* Глушим стандартную синюю подсветку на тап в мобильных Chromium-WebView
+       (Telegram, Android Chrome). Анимация press-фидбэка у нас своя через
+       transform: scale на :active. */
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Глобальные масштабы (1 = 100%, диапазон 0.8..1.2). Меняются ползунками
+   в `#sizes-dropdown`, сохраняются в localStorage.sizeSettings. */
+:root {
+    --font-scale: 1;
+    --btn-scale: 1;
 }
 
 .conteiner {
@@ -21,38 +32,76 @@ body {
     height: 100vh;
     display: flex;
     justify-content: center;
+    overflow: hidden;
+}
+
+.main-swiper {
+    width: 100vw;
+    height: 100vh;
+}
+
+/* Direct-child комбинатор обязателен: без `>` правило ловит вложенные слайды
+   внутри .stat-swiper (Общая/Большой/Малый) и форсит им height:100vh вместо
+   нормального 100% от их swiper-wrapper'а — тогда overflow:auto на .stat-slide
+   не активируется. */
+.main-swiper > .swiper-wrapper > .swiper-slide {
+    width: 100vw;
+    height: 100vh;
 }
 
 .main1 {
     width: 100vw;
     height: 100vh;
-    /* background-color: rgb(234, 234, 234); */
-    /* font-weight: 550; */
     display: flex;
     align-items: center;
     flex-direction: column;
+    justify-content: space-between;
+    padding: 2.5vh 0 4.5vh;
+    box-sizing: border-box;
 }
 
 .header1 {
-    width: 95vw;
-    height: 13vh;
+    /* 88vw + центрирование (через .main1 align-items:center) ⇒ от каждого края
+       экрана до ближайшей иконки ~6vw отступа. Раньше было ~2.5vw — иконки
+       прижимались впритык. */
+    width: 88vw;
+    height: 8vh;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0;
 }
 
+/* Сообщение о завершении раунда. Раньше имело фиксированную height: 13vh —
+   при показе ломало layout шапки (8vh теперь). Сделано «безразмерным»: при
+   показе занимает столько, сколько нужно содержимому, при .none — display:none. */
 .win-message {
-    width: 100%;
-    height: 13vh;
     display: flex;
     justify-content: center;
-    align-items: end;
+    align-items: center;
+    gap: 6vw;
+    color: var(--text-accent);
 }
 
-.different-theme {
+.win-mistakes,
+.win-time {
+    font-size: calc(6vw * var(--font-scale));
+    font-weight: 600;
+    line-height: 1;
+}
+
+.settings-icon {
     height: 7vh;
     aspect-ratio: 1 / 1;
-    border-radius: 1vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transform: scale(var(--btn-scale));
+}
+
+.settings-icon .settings {
+    font-size: 6vh;
 }
 
 .different-theme-block {
@@ -60,49 +109,252 @@ body {
     height: 100%;
     position: absolute;
     right: 0;
+    overflow: hidden;
     transition-duration: 0.4s;
     z-index: 10;
 }
 
-.conteiner {
+/* Горизонтальное меню настроек, выезжает справа налево из-под иконки шестерёнки.
+   Сейчас в нём один пункт — индикатор-триггер выбора темы; в будущем добавятся ещё.
+   overflow:hidden + flex-end дают эффект "пункт выезжает из-за иконки": правое ребро
+   меню зафиксировано, при росте ширины обнажается всё больше левой части пунктов. */
+.settings-menu {
     position: absolute;
     overflow: hidden;
     width: 0;
     right: calc(7vh + 2.5vw);
-    height: 13vh;
-    display: flex;
-    justify-content: end;
-    align-items: center;
-    transition-duration: 0.4s;
-}
-
-.dark,
-.red,
-.green,
-.standart {
+    top: 3vh;
     height: 7vh;
-    aspect-ratio: 1 / 1;
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: 0.8vh;
     transition-duration: 0.4s;
 }
 
-.dark {
-    /* background-color: black; */
+.settings-menu > * {
+    width: 7vh;
+    height: 7vh;
+    flex-shrink: 0;
 }
 
-.green {
-    /* background-color: green; */
-    border-top-right-radius: 1vw;
-    border-bottom-right-radius: 1vw;
+/* Индикатор текущей темы (он же — кнопка открытия выпадающего списка тем).
+   Цвет фона ставится JS-ом через подмену класса theme-swatch-{name}. */
+.current-theme-indicator {
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-.red {
-    /* background-color: red; */
+.current-theme-indicator:active {
+    transform: scale(0.92);
 }
 
-.standart {
-    border-top-left-radius: 1vw;
-    border-bottom-left-radius: 1vw;
-    /* background-color: rgb(28, 170, 231); */
+/* Вертикальный выпадающий список тем — позиционируется как сосед меню (а не его
+   потомок), чтобы overflow:hidden на меню не клипал dropdown.
+   Ширина 8.4vh = 7vh × 1.2, чтобы активный свотч (увеличенный через width/height —
+   см. .theme-swatch.active-theme в thems/themes.css) умещался в колонке. Свотчи
+   центрированы (align-items: center), а сам dropdown смещён вправо на 0.7vh так,
+   чтобы центр колонки совпадал с центром индикатора-триггера. */
+.theme-dropdown {
+    position: absolute;
+    right: calc(6.3vh + 2.5vw);
+    top: calc(3vh + 7vh + 0.8vh);
+    width: 8.4vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8vh;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+    pointer-events: none;
+}
+
+.theme-dropdown.open {
+    max-height: 80vh;
+    pointer-events: auto;
+}
+
+/* Иконка-триггер выпадающей панели границ ползунков (второй пункт settings-menu).
+   Цвет берёт var(--text-accent) через общий селектор в thems/themes.css. */
+.ranges-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.ranges-icon .material-icons-round {
+    font-size: 6vh;
+}
+
+/* Панель кастомных границ ползунков — сосед theme-dropdown.
+   right-edge привязан к right-edge иконки `tune` (она вторая в settings-menu),
+   панель раскрывается max-height-анимацией вниз. */
+.ranges-dropdown {
+    position: absolute;
+    right: calc(14.8vh + 2.5vw);
+    top: calc(3vh + 7vh + 0.8vh);
+    width: 60vw;
+    background-color: var(--bg);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, padding 0.35s ease;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+    box-sizing: border-box;
+}
+
+.ranges-dropdown.open {
+    max-height: 85vh;
+    padding: 1.4vh 2vw;
+    pointer-events: auto;
+    /* контента больше высоты экрана быть в принципе не должно, но если бывает
+       (узкий экран) — даём проскроллить, а не клипать */
+    overflow-y: auto;
+}
+
+/* Заголовок секции внутри панели (Границы / Малый / Большой). Чуть меньше,
+   чем op-label, чтобы не конкурировал с инпутами по визуальному весу. */
+.ranges-section-label {
+    color: var(--text);
+    font-size: 2.2vh;
+    font-weight: 600;
+    opacity: 0.7;
+    padding-top: 0.6vh;
+}
+
+.ranges-section-label:first-child {
+    padding-top: 0;
+}
+
+/* Сетка панели границ: [op-label] [min input] [max input] на каждой строке.
+   Колонка лейбла подстраивается под текст ("Кол-во" — самый длинный),
+   обе колонки инпутов делят остаток 50/50. */
+.ranges-grid {
+    display: grid;
+    grid-template-columns: auto 1fr 1fr;
+    align-items: center;
+    gap: 1.6vh 1.5vw;
+}
+
+.ranges-op-label {
+    color: var(--text);
+    font-size: 3vh;
+    padding-right: 0.5vw;
+    white-space: nowrap;
+}
+
+.ranges-input {
+    width: 100%;
+    height: 5.5vh;
+    border-radius: 6px;
+    border: 1px solid var(--checkbox-border);
+    background-color: var(--bg);
+    color: var(--text);
+    padding: 0 0.5vw;
+    font-size: 3vh;
+    text-align: center;
+    box-sizing: border-box;
+    /* убираем нативные стрелочки спиннера (WebKit/Firefox) */
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.ranges-input::-webkit-outer-spin-button,
+.ranges-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Для single-value пресета (count) растягиваем инпут на обе колонки -
+   сигнализирует, что это одно значение, а не пара lower/upper. */
+.ranges-input-span {
+    grid-column: span 2;
+}
+
+.ranges-input:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+
+/* Иконка-триггер панели размеров (третий пункт settings-menu, после `tune`).
+   Берёт цвет var(--text-accent) через общий селектор в thems/themes.css. */
+.sizes-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.sizes-icon .material-icons-round {
+    font-size: 6vh;
+}
+
+/* Панель размеров — третий dropdown в overlay-настройках. Right-edge привязан
+   к right-edge иконки `format_size` (она третья в settings-menu). */
+.sizes-dropdown {
+    position: absolute;
+    right: calc(22.6vh + 2.5vw);
+    top: calc(3vh + 7vh + 0.8vh);
+    width: 50vw;
+    background-color: var(--bg);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, padding 0.35s ease;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.8vh;
+    box-sizing: border-box;
+}
+
+.sizes-dropdown.open {
+    max-height: 40vh;
+    padding: 2vh 2.5vw;
+    pointer-events: auto;
+}
+
+.sizes-row {
+    display: flex;
+    align-items: center;
+    gap: 2vw;
+}
+
+.sizes-row-label {
+    color: var(--text);
+    font-size: 2.6vh;
+    flex-shrink: 0;
+    width: 11vw;
+}
+
+/* Ползунок размеров — наследует общие стили input[type=range], но не получает
+   .lower/.upper-классы (одиночный, без двойного thumb и fill). */
+.sizes-input {
+    flex: 1;
+    height: 5vh;
+}
+
+/* Свотчи внутри выпадающего — размер триггера (7vh), не 6vh как было в старой сетке.
+   Активный свотч переопределяет width/height (см. .theme-swatch.active-theme),
+   поэтому транзишен включает оба свойства плюс transform для press-фидбэка. */
+.theme-swatch {
+    width: 7vh;
+    height: 7vh;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: width 0.2s ease, height 0.2s ease, transform 0.2s ease;
+}
+
+.theme-swatch:active {
+    transform: scale(0.92);
 }
 
 
@@ -110,160 +362,569 @@ body {
 .statistic-icon {
     height: 7vh;
     aspect-ratio: 1 / 1;
+    transform: scale(var(--btn-scale));
+}
+
+/* Иконка «домой» на главной решения / статистики — обёртка масштабируется
+   через btn-scale, чтобы её размер шёл в одной связке с остальными кнопками
+   и иконками меню. На размер шрифта самой иконки (span.home — в каждом
+   медиа-брейкпоинте) не влияет. */
+.back-to-home {
+    display: inline-flex;
+    transform: scale(var(--btn-scale));
+    transform-origin: left center;
 }
 
 span.statistic {
     font-size: 7vh;
 }
 
+/* Корень статистики. Флип теперь — поворот всей внутренней обёртки на 90°
+   с одновременной подменой width/height (поворот «как у смартфона»: контент
+   живёт в альбомной системе координат и попадает в портретный viewport уже
+   повёрнутым). overflow:hidden на корне отрезает то, что вылезает за пределы
+   физического экрана во время transition. */
 .statistic {
+    position: relative;
     width: 100%;
     height: 100%;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
+    overflow: hidden;
+}
+
+.statistic-flip-inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100vw;
+    height: 100vh;
+    /* Дети — header и stat-swiper — позиционируются абсолютно (см. их правила).
+       Раньше flex-column раздавал высоты, но связка flex + nested-Swiper +
+       overflow внутри слайда давала indefinite height на .stat-slide, и
+       overflow-y:auto не активировался. Абсолютное позиционирование — жёсткий
+       и понятный layout вне зависимости от flex-min/Swiper-quirks. */
+    transform: translate(-50%, -50%) rotate(0deg);
+    transform-origin: center center;
+    transition: transform 0.55s ease, width 0.55s ease, height 0.55s ease;
+}
+
+.statistic.flipped .statistic-flip-inner {
+    width: 100vh;
+    height: 100vw;
+    transform: translate(-50%, -50%) rotate(90deg);
 }
 
 .statistic-header {
-    position: relative;
+    position: absolute;
     top: 0;
+    left: 2.5%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 90vw;
-    height: 10vh;
+    /* Размеры в % от flip-inner — при повороте flip-inner становится
+       100vh × 100vw, и шапка автоматически растягивается под новую горизонталь. */
+    width: 95%;
+    height: 16%;
+    gap: 1.5vw;
 }
 
-.statistic-header .time {
-    color: blue;
-}
-
-.statistic-header .mistake {
-    color: red;
-}
-
-.statistic-header .examples {
-    color: green;
-}
-
-.statistic-block {
-    width: 100vw;
+/* Две строки кнопок навигации между home (слева) и flip (справа).
+   Верхняя строка: [Общая | Неделя | Месяц], нижняя: [Большой | Малый]. */
+.stat-controls {
     display: flex;
-    align-items: center;
     flex-direction: column;
+    gap: 1vh;
+    flex: 1 1 auto;
+    align-items: center;
+}
+
+.stat-row {
+    display: flex;
+    gap: 1.2vw;
+    justify-content: center;
+}
+
+/* Базовая кнопка навигации в шапке. Неактивная — прозрачная с акцентным
+   текстом; активная — заливка --accent. Категорийная (data-cat) и периодная
+   (data-period) ведут себя одинаково с т.з. стилей; различает их только JS
+   при назначении класса active. */
+.stat-nav-btn {
+    height: 5vh;
+    padding: 0 3vw;
+    border-radius: 10px;
+    background-color: transparent;
+    color: var(--text-accent);
+    font-size: calc(3.3vw * var(--font-scale));
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: none;
+    transform: scale(var(--btn-scale));
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    white-space: nowrap;
+}
+
+.stat-nav-btn.active {
+    background-color: var(--accent);
+    color: var(--on-accent);
+    box-shadow: var(--shadow);
+}
+
+.stat-nav-btn:active {
+    background-color: var(--accent-active);
+    color: var(--on-accent);
+}
+
+.stat-flip-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-accent);
+    transform: scale(var(--btn-scale));
+    flex-shrink: 0;
+}
+
+.stat-flip-icon .material-icons-round {
+    font-size: 6.5vh;
+}
+
+.stat-swiper {
+    /* Абсолютное позиционирование внутри .statistic-flip-inner (см. правило
+       .statistic-flip-inner — больше не flex-container). Жёсткие top/height
+       в % дают definite-размер: .stat-slide внутри получает height:100% от
+       нас (через Swiper-CSS), что и нужно для активации overflow-y:auto. */
+    position: absolute;
+    top: 16%;
+    left: 0;
+    width: 100%;
+    height: 84%;
+    overflow: hidden;
+}
+
+.stat-slide {
+    /* На слайдах Большой/Малый теперь 4 графика — не вмещаются в один экран.
+       Раньше слайд был flex-column со scroll'ом, но в связке со Swiper'ом
+       вертикальная прокрутка не отрабатывала. Теперь — обычный блок с
+       overflow-y:auto и абсолютными vh-высотами у детей. Это надёжнее для
+       вложенной прокрутки внутри горизонтального Swiper'а. */
+    display: block !important;
+    padding: 1vh 0;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    /* Подсказка браузеру, что элемент скроллится вертикально по touch —
+       Swiper тогда не «съедает» вертикальные жесты. */
+    touch-action: pan-y;
+}
+
+.stat-slide::-webkit-scrollbar {
+    display: none;
+}
+
+/* Таблица сравнения для слайда «Общая»: 3 колонки (Общая / 30 дней / 7 дней),
+   5 строк-метрик, каждая строка — три значения над одной общей подписью.
+   Внешний контейнер — единая «карточка» с тенью и фоном темы. Внутри разделены
+   только тонкими hairline-границами, без gap, чтобы граница тянулась через всю
+   ширину карточки. */
+.stat-cmp-table {
+    width: 92%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    background-color: var(--bg);
+}
+
+.stat-cmp-headers {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 1.2vh 0 0.8vh;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.18);
+}
+
+.stat-cmp-headers > span {
+    text-align: center;
+    font-size: calc(3vw * var(--font-scale));
+    font-weight: 700;
+    color: var(--accent);
+    opacity: 0.85;
+    letter-spacing: 0.02em;
+}
+
+.stat-cmp-row {
+    display: flex;
+    flex-direction: column;
+    padding: 1.4vh 0 0.9vh;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.12);
+}
+
+.stat-cmp-row:last-child {
+    border-bottom: none;
+}
+
+.stat-cmp-values {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.stat-cmp-val {
+    text-align: center;
+    font-size: calc(5.2vw * var(--font-scale));
+    font-weight: 600;
+    color: var(--text-accent);
+    line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 1vw;
+    box-sizing: border-box;
+}
+
+.stat-cmp-label {
+    text-align: center;
+    font-size: calc(2.8vw * var(--font-scale));
+    color: var(--text-accent);
+    opacity: 0.6;
+    margin-top: 0.5vh;
+    padding: 0 2vw;
+}
+
+/* Подпись над op-bar чартом на слайде «Общая»: отделяет таблицу от диаграммы
+   ошибок по операциям. */
+.stat-overall-section-label {
+    width: 92%;
+    margin: 2vh auto 0.6vh;
+    font-size: calc(3vw * var(--font-scale));
+    font-weight: 600;
+    color: var(--accent);
+    opacity: 0.85;
+    text-align: center;
+    letter-spacing: 0.02em;
+}
+
+/* Управление видимостью второго ряда кнопок (Большой/Малый): скрывается, когда
+   активна категория «Общая», показывается на категориях big/small. */
+.stat-row-hidden {
+    display: none !important;
+}
+
+/* В flipped-режиме графики не интерактивны: Morris/Raphael вычисляет
+   подсвечиваемую точку по физическим координатам события, но SVG визуально
+   повёрнут CSS-трансформом на 90° — координаты не совпадают с тем, на что
+   тыкает пользователь, поэтому tooltip показывает неправильную точку.
+   pointer-events:none убирает интерактив (для точных значений — портретный
+   режим) и одновременно делает всю область графика свободной для драг-скролла. */
+.statistic.flipped .graph-conteiner,
+.statistic.flipped .graph-conteiner * {
+    pointer-events: none;
+}
+
+
+/* Блок средних значений (для слайдов Большой / Малый): две колонки,
+   число большое + подпись мелкая. */
+.stat-averages {
+    display: flex;
     justify-content: space-around;
+    width: 90%;
+    height: 9vh;
+    align-items: center;
+    color: var(--text-accent);
+    margin: 0 auto 1vh;
+}
+
+.stat-avg-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+}
+
+.stat-avg-value {
+    font-size: calc(7vw * var(--font-scale));
+    font-weight: 600;
+}
+
+.stat-avg-label {
+    font-size: calc(2.6vw * var(--font-scale));
+    opacity: 0.7;
+    margin-top: 0.6vh;
 }
 
 .graph-conteiner {
-    height: 28vh;
-    width: 90vw;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    /* Абсолютная высота в vh — слайд теперь блочный и скроллит, поэтому %
+       больше не подходят (резолвились бы относительно растущего контента).
+       22vh ≈ прежним 22% от ~84vh слайда. */
+    height: 22vh;
+    width: 90%;
+    margin: 0 auto 1.3vh;
+    border-radius: 12px;
     overflow: auto;
     scrollbar-width: none;
     /* Firefox */
     -ms-overflow-style: none;
-    margin-bottom: 2vh;
 }
 
-.graph-wrapper-examples,
-.graph-wrapper-time,
-.graph-wrapper-mistake {
-    height: 95%;
-    min-width: 1250px;
+/* Статичный график (без Morris) не нуждается в горизонтальном скролле и
+   занимает фон темы вместо тёмной заливки Morris-канвы. */
+.stat-graph-static {
+    overflow: hidden;
+    background-color: var(--bg);
+    box-shadow: var(--shadow);
 }
 
-
-
-
-
-.choice {
-    width: 80vw;
-    height: 13vh;
+/* ── Горизонтальные bar'ы по операциям (op-bar чарт) ─────────── */
+.op-bars {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 100%;
+    height: 100%;
+    padding: 0.6vh 2vw;
+    box-sizing: border-box;
+}
+
+.op-bar-row {
+    display: flex;
     align-items: center;
+    gap: 2vw;
+    line-height: 1;
+}
+
+.op-bar-label {
+    width: 5vw;
+    text-align: center;
+    font-size: calc(4vw * var(--font-scale));
+    font-weight: 700;
+    color: var(--text-accent);
+}
+
+.op-bar-track {
+    flex: 1 1 auto;
+    height: 2.4vh;
+    background-color: rgba(128, 128, 128, 0.18);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.op-bar-fill {
+    height: 100%;
+    background-color: #e0533a;
+    border-radius: 6px;
+    transition: width 0.35s ease;
+}
+
+.op-bar-value {
+    width: 18vw;
+    text-align: right;
+    font-size: calc(2.8vw * var(--font-scale));
+    color: var(--text-accent);
+    opacity: 0.85;
+}
+
+
+
+
+
+/* Чекбоксы операций — плитки с иконкой и подписью. Нативный checkbox скрыт
+   и расстелен поверх плитки как невидимый overlay, ловит клики по всей
+   площади. Активное состояние подсвечивается через :has(input:checked) —
+   заливается --accent, иконка и подпись перекрашиваются в --on-accent. */
+.choice {
+    width: 94vw;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2vw;
+    flex-shrink: 0;
 }
 
 .choice-value {
+    /* Без обводки: unchecked-плитка — просто пустое место со знаком.
+       Checked-плитка заливается --accent. Padding симметричный, чтобы знак
+       центрировался по вертикали. */
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 1.9vh 0;
+    border-radius: 14px;
+    background-color: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.choice-value:active {
+    transform: scale(0.94);
+}
+
+/* Нативный input — невидимый overlay поверх плитки. Specificity 0,1,2
+   ([type=...]) перебивает старые media-query правила `.choice input{width:6vw}`. */
+.choice input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    border: none;
+    background: transparent;
+    border-radius: 14px;
+    cursor: pointer;
+    /* z-index НЕ ставим — input должен быть ПОД sign/label, иначе при checked
+       состоянии themes.css раскрашивает input.background-color в --accent, и
+       overlay закрывает собой текст и знак внутри плитки. С естественным
+       порядком (input идёт первым в DOM, без z-index) flex-сиблинги .op-sign и
+       .op-label рендерятся НАД ним и остаются видны. */
+}
+
+/* Перебиваем правило из thems/themes.css `.choice input[type="checkbox"]:checked
+   {background-color: var(--accent)}` — оно делало input непрозрачным.
+   Здесь специфичность 0,2,2 (.choice + .choice-value + input + :checked) > theme's
+   0,2,2 (равная, но позже — мы пишем style.css ПЕРЕД themes.css в подключении,
+   так что нужен более тяжёлый селектор). Делаем через .choice-value > input. */
+.choice .choice-value > input[type="checkbox"]:checked {
+    background-color: transparent;
+}
+
+/* Active-fill при чекнутом чекбоксе. :has() поддерживается во всех Chromium-
+   based браузерах (Telegram WebView, современные Chrome/Edge/Safari). */
+.choice-value:has(input:checked) {
+    background-color: var(--accent);
+}
+
+.choice-value:has(input:checked) .op-sign {
+    color: var(--on-accent);
+}
+
+/* Математический знак внутри плитки — рисуется текстовым символом (+, −, ×, ÷)
+   из системного шрифта Roboto. translateY(-0.08em) подвигает глиф ВВЕРХ —
+   font-metrics Roboto + line-height: 1 опускают глиф ниже геометрического
+   центра em-box'а (descender добавляет нижнюю часть line-box, поднимая
+   visible-mid). Компенсация подбирается эмпирически. */
+.op-sign {
+    font-size: calc(11vw * var(--font-scale));
+    font-weight: 700;
+    font-family: 'Roboto', 'Segoe UI', sans-serif;
+    line-height: 1;
+    margin: 0;
+    color: var(--text-accent);
+    pointer-events: none;
+    transition: color 0.2s ease;
+    display: block;
+    transform: translateY(-0.08em);
+}
+
+/* Иконка таймера — Material Icons глиф, он дизайнится центрированным в em-box.
+   Отменяем translateY от .op-sign (Material Icons и так в центре). */
+.op-sign-icon {
+    font-size: calc(11vw * var(--font-scale));
+    transform: none;
+}
+
+.op-icon-divide {
+    font-weight: 700;
+    font-family: 'Roboto', 'Segoe UI', sans-serif;
+    transform: translateY(-18%);
+}
+
+.filter-label {
     display: flex;
     align-items: center;
-    flex-direction: column;
+    justify-content: center;
+    gap: 0.4em;
+    /* Фиксированная высота, чтобы все три .filter-label занимали одну и ту же
+       вертикальную зону независимо от font-size иконки. Иначе огромная иконка
+       `123` (10vw) у count-фильтра делает его label выше других, и
+       justify-content:space-between внутри .filter даёт неодинаковые зазоры
+       между лейблом и слайдером в трёх строках — визуально это и читается как
+       «расстояния разные» и «средний тоньше». */
+    height: 7vh;
 }
 
-.choice input {
-    appearance: none;
-    /* Убираем стандартное оформление */
-    width: 6vw;
-    aspect-ratio: 1 / 1;
-    /* border: 1px solid #000; */
-    border-radius: 1vw;
+.filter-icon {
+    font-size: calc(5vw * var(--font-scale));
+    line-height: 1;
 }
 
-.choice input[type="checkbox"] {
-    border: 1px solid;
-    /* border-color: black; */
-    /* background-color: rgb(234, 234, 234); */
+/* Иконка «количество примеров» (единственная из Material Symbols среди фильтров) —
+   крупнее остальных и чуть опущена, чтобы оптически попасть в центр строки. */
+.material-symbols-rounded.filter-icon {
+    font-size: calc(10vw * var(--font-scale));
+    transform: translateY(0.4vw);
 }
 
-.choice input[type="checkbox"]:checked {
-    /* background-color: rgb(28, 170, 231); 
-    border-color: rgb(28, 170, 231); */
+.filter-icon-divide {
+    font-weight: 700;
+    font-family: 'Roboto', 'Segoe UI', sans-serif;
+    font-size: calc(7.2vw * var(--font-scale));
+    line-height: 0.65;
+    display: inline-block;
+    width: 1em;
+    text-align: center;
+    transform: translateY(-18%);
 }
 
 
 .tuning-small-big {
     width: 90vw;
-    height: 12vh;
+    height: 11vh;
     display: flex;
     align-items: center;
-    justify-content: space-around;
+    justify-content: space-between;
+    gap: 4vw;
+    flex-shrink: 0;
 }
 
 .tuning-small-big button {
-    width: 41.5%;
-    height: 80%;
-    border-radius: 5px;
-    transition-duration: 0.4s;
+    flex: 1;
+    height: 8vh;
+    border-radius: 12px;
+    transform: scale(var(--btn-scale));
+    transition: transform 0.15s ease, background-color 0.2s ease;
 }
 
+/* Active-фидбэк через transform: scale — не дёргает соседей и сохраняет
+   общий btn-scale (умножается на 0.95). Замена прежней анимации через
+   изменение width/margin, которая визуально шатала соседнюю кнопку. */
 .tuning-small-big button:active {
-    width: 36.5%;
-    height: 75%;
-    transition-duration: 0.4s;
-    margin-left: 2.5%;
-    margin-right: 2.5%;
+    transform: scale(calc(var(--btn-scale) * 0.95));
 }
 
 
 .filter {
-    /* margin: 2vh 0 0 0; */
     width: 100vw;
-    height: 13vh;
+    height: 12vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
+    flex-shrink: 0;
 }
 
 
 .start-button {
-    margin: 3vh 0 0 0;
-    width: 40vw;
-    height: 10vh;
-    border-radius: 5px;
-    /* box-shadow: 0px 1px 4px  rgb(92, 92, 92);
-    background-color: rgb(28, 170, 231);
-    color: white; */
-    transition-duration: 0.4s;
+    margin: 0;
+    width: 70vw;
+    height: 8.5vh;
+    border-radius: 16px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    transform: scale(var(--btn-scale));
+    transition: transform 0.15s ease, background-color 0.2s ease;
+    flex-shrink: 0;
 }
 
+/* Active-фидбэк через transform: scale (умножается на 0.96 от текущего btn-scale)
+   вместо изменения width/height/margin — это не сдвигает соседние элементы и
+   не запускает reflow всей главной страницы при каждом нажатии. */
 .start-button:active {
-    margin-top: 3.5vh;
-    width: 35%;
-    height: 9%;
-    transition-duration: 0.4s;
-    /* background-color: rgb(18, 108, 146); */
+    transform: scale(calc(var(--btn-scale) * 0.96));
 }
 
 
@@ -288,27 +949,111 @@ span.statistic {
     align-items: center;
 }
 
+/* Блок «пример + ответ» на экране решения. Стиль — Big Number Stack:
+   пример сверху как мелкая подпись, ответ снизу крупными цифрами на тонкой
+   линии-бланке. Все цвета и тени — из активной темы (var(--text-accent)).
+   Селекторы для пример/ответ — по ID (#example, #example-answer), потому что
+   в main.js эти элементы пересоздаются через outerHTML без class-атрибутов,
+   и стиль по классу терялся бы. */
 .example-block {
-    /* background-color: aliceblue; */
-    height: 15vh;
     width: 100vw;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
+    gap: 1.5vh;
+    padding: 1vh 0 1.5vh;
 }
 
-.example-answer {
+#example {
+    color: var(--text-accent);
+    letter-spacing: 0.03em;
+    line-height: 1;
+    margin: 0;
+    /* font-size намеренно НЕ задан — наследуется от .cssmain2 через media
+       queries, чтобы размер совпадал со счётом и временем в шапке. */
+}
+
+/* Слот ответа: цифры центрированы над линией. Линия — это псевдо-элемент
+   ::after, а не border-bottom: border-radius применённый к border'у даёт
+   слишком слабое скругление, потому что граница тонкая. Псевдо-элемент же
+   рендерится как настоящая пилюля с полными rounded-end'ами. */
+.ea-slot {
     position: relative;
     display: flex;
     justify-content: center;
-    align-items: center;
-    /* border-bottom: 1px solid rgb(8, 130, 183); */
-    width: 40vw;
-    height: 6vh;
-    /* background-color: rgb(240, 240, 240);
-    box-shadow: 0px 1px 4px  rgb(92, 92, 92);  */
-    border-radius: 5px;
+    align-items: flex-end;
+    padding-bottom: 1vh;
+    min-width: 22vw;
+    max-width: 80vw;
+}
+
+.ea-slot::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 4px;
+    background-color: var(--text-accent);
+    border-radius: 999px;
+    transition: background-color 0.25s ease;
+}
+
+#example-answer {
+    font-size: calc(12.5vw * var(--font-scale));
+    font-weight: 700;
+    color: var(--text-accent);
+    line-height: 1;
+    margin: 0;
+    text-align: center;
+    min-width: 1ch;
+    /* Резервируем высоту одной строки даже когда <p> пустой — иначе слот
+       схлопывается по высоте, и линия прыгает вверх/вниз при наборе цифр. */
+    min-height: 1em;
+    transition: color 0.25s ease;
+}
+
+/* Подсветка правильного/неверного ответа. Перебиваем стандартное .blink-good /
+   .blink-bad из themes.css — там залит весь прямоугольник background-color, что
+   плохо смотрится при минималистичном «бланке». Здесь — окраска линии и цифр,
+   плюс мягкое свечение под линией. На ошибке цифры коротко тряхнёт.
+   Специфичность .ea-slot.blink-* (0,2,0) выше чем .blink-* (0,1,0) — перекрывает. */
+.ea-slot.blink-good,
+.ea-slot.blink-bad {
+    background-color: transparent;
+}
+
+.ea-slot.blink-good {
+    /* drop-shadow вместо box-shadow: тень следует за реальной формой контента
+       (пилюля-линия + цифры), а не за прямоугольником box'а. Так нет
+       «свечения сквозь» прозрачный фон слота — только мягкие ореолы вокруг
+       линии и цифр. */
+    filter: drop-shadow(0 3px 6px var(--blink-good));
+}
+.ea-slot.blink-good::after {
+    background-color: var(--blink-good);
+}
+.ea-slot.blink-good #example-answer {
+    color: var(--blink-good);
+}
+
+.ea-slot.blink-bad {
+    filter: drop-shadow(0 3px 6px var(--blink-bad));
+}
+.ea-slot.blink-bad::after {
+    background-color: var(--blink-bad);
+}
+.ea-slot.blink-bad #example-answer {
+    color: var(--blink-bad);
+    animation: ea-shake 0.35s ease;
+}
+
+@keyframes ea-shake {
+    0%, 100% { transform: translateX(0); }
+    20%      { transform: translateX(-5px); }
+    40%      { transform: translateX(5px); }
+    60%      { transform: translateX(-3px); }
+    80%      { transform: translateX(2px); }
 }
 
 .keyboard {
@@ -319,13 +1064,15 @@ span.statistic {
     width: 100%;
     height: 40%;
     margin-bottom: 2%;
+    transform: scale(var(--btn-scale));
+    transform-origin: center bottom;
 }
 
 .keyboard button {
     width: 30%;
     height: 21%;
     margin: 3px;
-    border-radius: 5px;
+    border-radius: 12px;
     /* box-shadow: 0px 1px 4px  rgb(92, 92, 92);
     background-color: rgb(28, 170, 231);
     color: white; */
@@ -354,16 +1101,16 @@ span.statistic {
 
 @media (min-width: 992px) {
     .cssmain1 {
-        font-size: 2vw;
+        font-size: calc(2vw * var(--font-scale));
     }
 
     .cssmain2 {
-        font-size: 3vw;
+        font-size: calc(3vw * var(--font-scale));
     }
 
     .forPSize,
     .statistic p {
-        font-size: 2vw;
+        font-size: calc(2vw * var(--font-scale));
     }
 
     span.home {
@@ -377,16 +1124,16 @@ span.statistic {
 
 @media (max-width: 992px) {
     .cssmain1 {
-        font-size: 3vw;
+        font-size: calc(3vw * var(--font-scale));
     }
 
     .cssmain2 {
-        font-size: 4vw;
+        font-size: calc(4vw * var(--font-scale));
     }
 
     .forPSize,
     .statistic p {
-        font-size: 2.5vw;
+        font-size: calc(2.5vw * var(--font-scale));
     }
 
     span.home {
@@ -400,16 +1147,16 @@ span.statistic {
 
 @media (max-width: 780px) {
     .cssmain1 {
-        font-size: 4vw;
+        font-size: calc(4vw * var(--font-scale));
     }
 
     .cssmain2 {
-        font-size: 5vw;
+        font-size: calc(5vw * var(--font-scale));
     }
 
     .forPSize,
     .statistic p {
-        font-size: 3vw;
+        font-size: calc(3vw * var(--font-scale));
     }
 
     span.home {
@@ -423,16 +1170,16 @@ span.statistic {
 
 @media (max-width: 650px) {
     .cssmain1 {
-        font-size: 5vw;
+        font-size: calc(5vw * var(--font-scale));
     }
 
     .cssmain2 {
-        font-size: 6vw;
+        font-size: calc(6vw * var(--font-scale));
     }
 
     .forPSize,
     .statistic p {
-        font-size: 4vw;
+        font-size: calc(4vw * var(--font-scale));
     }
 
     span.home {
@@ -446,16 +1193,16 @@ span.statistic {
 
 @media (max-width: 570px) {
     .cssmain1 {
-        font-size: 6vw;
+        font-size: calc(6vw * var(--font-scale));
     }
 
     .cssmain2 {
-        font-size: 7vw;
+        font-size: calc(7vw * var(--font-scale));
     }
 
     .forPSize,
     .statistic p {
-        font-size: 4.5vw;
+        font-size: calc(4.5vw * var(--font-scale));
     }
 
     .choice input {
@@ -473,16 +1220,16 @@ span.statistic {
 
 @media (max-width: 400px) {
     .cssmain1 {
-        font-size: 6.5vw;
+        font-size: calc(6.5vw * var(--font-scale));
     }
 
     .cssmain2 {
-        font-size: 8vw;
+        font-size: calc(8vw * var(--font-scale));
     }
 
     .forPSize,
     .statistic p {
-        font-size: 5.5vw;
+        font-size: calc(5.5vw * var(--font-scale));
     }
 
     .choice input {
@@ -519,13 +1266,13 @@ span.statistic {
 }
 
 .fill {
-    height: 3px;
+    height: 5px;
     width: 33%;
-    /* background-color: rgb(28, 170, 231); */
     position: absolute;
     top: 0;
     left: 0;
     z-index: 2;
+    border-radius: 3px;
 }
 
 .easy-basket-filter-info {
@@ -541,7 +1288,7 @@ span.statistic {
     /* color: #fff; */
     padding: 2px 6px;
     /* background-color: rgb(28, 170, 231); */
-    border-radius: 4px;
+    border-radius: 8px;
     margin: 0;
 }
 
@@ -603,22 +1350,20 @@ input[type=text]:focus {
 
 input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    height: 20px;
-    width: 20px;
-    /* border: 5px solid #f1f1f1;
-    box-shadow: 0 1px 5px -1px rgba(0, 0, 0, 0.5); */
+    height: 22px;
+    width: 22px;
     border-radius: 100%;
-    /* background: rgb(28, 170, 231); */
     cursor: pointer;
-    margin-top: -9px;
+    /* -((thumb-22 - track-5) / 2) = -8.5px чтобы центр thumb совпал с центром
+       трека после увеличения толщины трека. */
+    margin-top: -8.5px;
 }
 
 input[type=range]::-webkit-slider-runnable-track {
     width: 100%;
-    height: 3px;
+    height: 5px;
     cursor: pointer;
-    /* background: #707D7D; */
-    border-radius: 1.3px;
+    border-radius: 3px;
 }
 
 input[type=range].lower::-webkit-slider-runnable-track {
@@ -669,13 +1414,13 @@ input[type=range].lower::-webkit-slider-runnable-track {
 }
 
 .fill-double {
-    height: 3px;
+    height: 5px;
     width: 38%;
-    /* background-color: rgb(28, 170, 231); */
     position: absolute;
     top: 0;
     left: 0;
     z-index: 2;
+    border-radius: 3px;
 }
 
 .easy-basket-filter-info-double {
@@ -691,7 +1436,7 @@ input[type=range].lower::-webkit-slider-runnable-track {
     /* color: #fff; */
     padding: 2px 6px;
     /* background-color: rgb(28, 170, 231); */
-    border-radius: 4px;
+    border-radius: 8px;
     margin: 0;
 }
 
@@ -791,7 +1536,7 @@ input[type=range].lower-double::-webkit-slider-runnable-track {
     /* color: #fff; */
     padding: 2px 6px;
     /* background-color: rgb(28, 170, 231); */
-    border-radius: 4px;
+    border-radius: 8px;
     margin: 0;
 }
 

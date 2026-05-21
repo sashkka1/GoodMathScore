@@ -6,68 +6,255 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MathScore</title>
     <link rel="stylesheet" href="./style.css" />
-    <link rel="stylesheet" id="theme" href="./style.css" />
+    <link rel="stylesheet" href="./thems/themes.css" />
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js?v=1.0.2"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Icons+Round">
     <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,700,0,-25&icon_names=monitoring" />
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,700,0,-25&icon_names=123" />
 </head>
 
 <body>
 
     <div class="different-theme-block" id="different-theme-block">
-        <div class="conteiner" id="conteiner">
-            <div class="standart" id="standart"></div>
-            <div class="dark" id="dark"></div>
-            <div class="red" id="red"></div>
-            <div class="green" id="green"></div>
+        <div class="settings-menu" id="settings-menu">
+            <div class="current-theme-indicator" id="current-theme-indicator"></div>
+            <div class="ranges-icon" id="ranges-icon">
+                <span class="material-icons-round">tune</span>
+            </div>
+            <div class="sizes-icon" id="sizes-icon">
+                <span class="material-icons-round">format_size</span>
+            </div>
+        </div>
+        <div class="theme-dropdown" id="theme-dropdown">
+            <div class="theme-swatch theme-swatch-light"  data-theme-name="light"></div>
+            <div class="theme-swatch theme-swatch-white"  data-theme-name="white"></div>
+            <div class="theme-swatch theme-swatch-gray"   data-theme-name="gray"></div>
+            <div class="theme-swatch theme-swatch-dark"   data-theme-name="dark"></div>
+            <div class="theme-swatch theme-swatch-black"  data-theme-name="black"></div>
+            <div class="theme-swatch theme-swatch-blue"   data-theme-name="blue"></div>
+            <div class="theme-swatch theme-swatch-green"  data-theme-name="green"></div>
+            <div class="theme-swatch theme-swatch-purple" data-theme-name="purple"></div>
+            <div class="theme-swatch theme-swatch-orange" data-theme-name="orange"></div>
+        </div>
+        <div class="ranges-dropdown" id="ranges-dropdown">
+            <div class="ranges-section-label">Границы</div>
+            <div class="ranges-grid">
+                <span class="ranges-op-label">+/−</span>
+                <input class="ranges-input" type="number" inputmode="numeric" min="0" max="1000" step="1" data-bound="sumMin" />
+                <input class="ranges-input" type="number" inputmode="numeric" min="0" max="1000" step="1" data-bound="sumMax" />
+
+                <span class="ranges-op-label">×/÷</span>
+                <input class="ranges-input" type="number" inputmode="numeric" min="1" max="100" step="1" data-bound="mulMin" />
+                <input class="ranges-input" type="number" inputmode="numeric" min="1" max="100" step="1" data-bound="mulMax" />
+
+                <span class="ranges-op-label">Кол-во</span>
+                <input class="ranges-input" type="number" inputmode="numeric" min="1" max="100" step="1" data-bound="countMin" />
+                <input class="ranges-input" type="number" inputmode="numeric" min="1" max="100" step="1" data-bound="countMax" />
+            </div>
+
+            <div class="ranges-section-label">Малый</div>
+            <div class="ranges-grid">
+                <span class="ranges-op-label">+/−</span>
+                <input class="ranges-input" type="number" inputmode="numeric" min="0" max="1000" step="1" data-preset="smallSumLower" />
+                <input class="ranges-input" type="number" inputmode="numeric" min="0" max="1000" step="1" data-preset="smallSumUpper" />
+
+                <span class="ranges-op-label">×/÷</span>
+                <input class="ranges-input" type="number" inputmode="numeric" min="1" max="100" step="1" data-preset="smallMulLower" />
+                <input class="ranges-input" type="number" inputmode="numeric" min="1" max="100" step="1" data-preset="smallMulUpper" />
+
+                <span class="ranges-op-label">Кол-во</span>
+                <input class="ranges-input ranges-input-span" type="number" inputmode="numeric" min="1" max="100" step="1" data-preset="smallCount" />
+            </div>
+
+            <div class="ranges-section-label">Большой</div>
+            <div class="ranges-grid">
+                <span class="ranges-op-label">+/−</span>
+                <input class="ranges-input" type="number" inputmode="numeric" min="0" max="1000" step="1" data-preset="bigSumLower" />
+                <input class="ranges-input" type="number" inputmode="numeric" min="0" max="1000" step="1" data-preset="bigSumUpper" />
+
+                <span class="ranges-op-label">×/÷</span>
+                <input class="ranges-input" type="number" inputmode="numeric" min="1" max="100" step="1" data-preset="bigMulLower" />
+                <input class="ranges-input" type="number" inputmode="numeric" min="1" max="100" step="1" data-preset="bigMulUpper" />
+
+                <span class="ranges-op-label">Кол-во</span>
+                <input class="ranges-input ranges-input-span" type="number" inputmode="numeric" min="1" max="100" step="1" data-preset="bigCount" />
+            </div>
+        </div>
+
+        <div class="sizes-dropdown" id="sizes-dropdown">
+            <div class="sizes-row">
+                <span class="sizes-row-label">Шрифт</span>
+                <input class="sizes-input" type="range" min="80" max="120" step="1" value="100" data-size="fontScale" />
+            </div>
+            <div class="sizes-row">
+                <span class="sizes-row-label">Кнопки</span>
+                <input class="sizes-input" type="range" min="80" max="120" step="1" value="100" data-size="btnScale" />
+            </div>
         </div>
     </div>
 
-    <div class="none" id="statistic">
-        <div class="statistic" id="statistic">
-            <div class="statistic-header">
-                <div class="back-to-home" id="back-to-home-statistic">
-                    <span class="material-icons-round home">home</span>
+    <div class="swiper main-swiper" id="main-swiper">
+    <div class="swiper-wrapper">
+
+    <div class="swiper-slide" id="statistic">
+        <div class="statistic" id="statistic-root">
+            <div class="statistic-flip-inner" id="statistic-flip-inner">
+                <div class="statistic-header">
+                    <div class="back-to-home" id="back-to-home-statistic">
+                        <span class="material-icons-round home">home</span>
+                    </div>
+                    <div class="stat-controls">
+                        <div class="stat-row">
+                            <button class="stat-nav-btn stat-cat-btn active" data-cat="overall">Общая</button>
+                            <button class="stat-nav-btn stat-period-btn" data-period="week">Неделя</button>
+                            <button class="stat-nav-btn stat-period-btn active" data-period="month">Месяц</button>
+                        </div>
+                        <div class="stat-row" id="stat-row-cat">
+                            <button class="stat-nav-btn stat-cat-btn" data-cat="big">Большой</button>
+                            <button class="stat-nav-btn stat-cat-btn" data-cat="small">Малый</button>
+                        </div>
+                    </div>
+                    <div class="stat-flip-icon" id="stat-flip-icon">
+                        <span class="material-icons-round">screen_rotation</span>
+                    </div>
                 </div>
-                <p class="time">time</p>
-                <p class="examples">examples</p>
-                <p class="mistake">mistake</p>
-                <p></p>
-            </div>
-            <div class="statistic-block" id="statistic-block">
-                <div class="graph-conteiner" id="graph-conteiner-examples">
-                    <!-- <div class="graph-wrapper-examples" id="graph-wrapper-examples"></div> -->
-                </div>
-                <div class="graph-conteiner" id="graph-conteiner-time">
-                    <!-- <div class="graph-wrapper-time" id="graph-wrapper-time"></div> -->
-                </div>
-                <div class="graph-conteiner" id="graph-conteiner-mistake">
-                    <!-- <div class="graph-wrapper-mistake" id="graph-wrapper-mistake"></div> -->
+
+                <div class="swiper stat-swiper" id="stat-swiper">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide stat-slide" data-category="overall">
+                            <div class="stat-cmp-table">
+                                <div class="stat-cmp-headers">
+                                    <span>Общая</span>
+                                    <span>30 дней</span>
+                                    <span>7 дней</span>
+                                </div>
+                                <div class="stat-cmp-row">
+                                    <div class="stat-cmp-values">
+                                        <span class="stat-cmp-val" data-metric="totalTime" data-period="all">—</span>
+                                        <span class="stat-cmp-val" data-metric="totalTime" data-period="30d">—</span>
+                                        <span class="stat-cmp-val" data-metric="totalTime" data-period="7d">—</span>
+                                    </div>
+                                    <div class="stat-cmp-label">всего времени</div>
+                                </div>
+                                <div class="stat-cmp-row">
+                                    <div class="stat-cmp-values">
+                                        <span class="stat-cmp-val" data-metric="totalExamples" data-period="all">—</span>
+                                        <span class="stat-cmp-val" data-metric="totalExamples" data-period="30d">—</span>
+                                        <span class="stat-cmp-val" data-metric="totalExamples" data-period="7d">—</span>
+                                    </div>
+                                    <div class="stat-cmp-label">примеров решено</div>
+                                </div>
+                                <div class="stat-cmp-row">
+                                    <div class="stat-cmp-values">
+                                        <span class="stat-cmp-val" data-metric="totalSessions" data-period="all">—</span>
+                                        <span class="stat-cmp-val" data-metric="totalSessions" data-period="30d">—</span>
+                                        <span class="stat-cmp-val" data-metric="totalSessions" data-period="7d">—</span>
+                                    </div>
+                                    <div class="stat-cmp-label">сессий</div>
+                                </div>
+                                <div class="stat-cmp-row">
+                                    <div class="stat-cmp-values">
+                                        <span class="stat-cmp-val" data-metric="totalMistakes" data-period="all">—</span>
+                                        <span class="stat-cmp-val" data-metric="totalMistakes" data-period="30d">—</span>
+                                        <span class="stat-cmp-val" data-metric="totalMistakes" data-period="7d">—</span>
+                                    </div>
+                                    <div class="stat-cmp-label">ошибок</div>
+                                </div>
+                                <div class="stat-cmp-row">
+                                    <div class="stat-cmp-values">
+                                        <span class="stat-cmp-val" data-metric="avgTime" data-period="all">—</span>
+                                        <span class="stat-cmp-val" data-metric="avgTime" data-period="30d">—</span>
+                                        <span class="stat-cmp-val" data-metric="avgTime" data-period="7d">—</span>
+                                    </div>
+                                    <div class="stat-cmp-label">время / сессию</div>
+                                </div>
+                                <div class="stat-cmp-row">
+                                    <div class="stat-cmp-values">
+                                        <span class="stat-cmp-val" data-metric="avgExamples" data-period="all">—</span>
+                                        <span class="stat-cmp-val" data-metric="avgExamples" data-period="30d">—</span>
+                                        <span class="stat-cmp-val" data-metric="avgExamples" data-period="7d">—</span>
+                                    </div>
+                                    <div class="stat-cmp-label">примеров / сессию</div>
+                                </div>
+                                <div class="stat-cmp-row">
+                                    <div class="stat-cmp-values">
+                                        <span class="stat-cmp-val" data-metric="avgMistakes" data-period="all">—</span>
+                                        <span class="stat-cmp-val" data-metric="avgMistakes" data-period="30d">—</span>
+                                        <span class="stat-cmp-val" data-metric="avgMistakes" data-period="7d">—</span>
+                                    </div>
+                                    <div class="stat-cmp-label">ошибок / сессию</div>
+                                </div>
+                            </div>
+                            <div class="stat-overall-section-label">ошибки по операциям за всё время</div>
+                            <div class="graph-conteiner stat-graph stat-graph-static" data-metric="opBar"></div>
+                        </div>
+                        <div class="swiper-slide stat-slide" data-category="big">
+                            <div class="stat-averages">
+                                <span class="stat-avg-cell"><span class="stat-avg-value" data-avg="time">—</span><span class="stat-avg-label">время/сессия</span></span>
+                                <span class="stat-avg-cell"><span class="stat-avg-value" data-avg="examples">—</span><span class="stat-avg-label">примеры/сессия</span></span>
+                            </div>
+                            <div class="graph-conteiner stat-graph" data-metric="time"></div>
+                            <div class="graph-conteiner stat-graph" data-metric="examples"></div>
+                            <div class="graph-conteiner stat-graph" data-metric="dailyStacked"></div>
+                            <div class="graph-conteiner stat-graph stat-graph-static" data-metric="opBar"></div>
+                        </div>
+                        <div class="swiper-slide stat-slide" data-category="small">
+                            <div class="stat-averages">
+                                <span class="stat-avg-cell"><span class="stat-avg-value" data-avg="time">—</span><span class="stat-avg-label">время/сессия</span></span>
+                                <span class="stat-avg-cell"><span class="stat-avg-value" data-avg="examples">—</span><span class="stat-avg-label">примеры/сессия</span></span>
+                            </div>
+                            <div class="graph-conteiner stat-graph" data-metric="time"></div>
+                            <div class="graph-conteiner stat-graph" data-metric="examples"></div>
+                            <div class="graph-conteiner stat-graph" data-metric="dailyStacked"></div>
+                            <div class="graph-conteiner stat-graph stat-graph-static" data-metric="opBar"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="main1">
+    <div class="swiper-slide" id="main1">
         <div class="main1 cssmain1">
             <div class="header1">
                 <div class="statistic-icon" id="statistic-icon">
-                    <span class="material-symbols-rounded statistic">monitoring</span>
+                    <span class="material-icons-round statistic">bar_chart</span>
                 </div>
-                <p id="win-message" class="win-message none">Ошибки: <br> Время: </p>
-                <div class="different-theme" id="different-theme"></div>
+                <div id="win-message" class="win-message none">
+                    <span class="win-mistakes" id="win-mistakes"></span>
+                    <span class="win-time" id="win-time"></span>
+                </div>
+                <div class="settings-icon" id="settings-icon">
+                    <span class="material-icons-round settings">settings</span>
+                </div>
             </div>
             <div class="choice">
-                <p class="choice-value"><input type="checkbox" id="checkbox+" value="0"> +</p>
-                <p class="choice-value"><input type="checkbox" id="checkbox-" value="1"> −</p>
-                <p class="choice-value"><input type="checkbox" id="checkboxx" value="2"> ⋅</p>
-                <p class="choice-value"><input type="checkbox" id="checkbox/" value="3"> ∶</p>
-                <p class="choice-value"><input type="checkbox">⏱</p>
+                <p class="choice-value">
+                    <input type="checkbox" id="checkbox+" value="0">
+                    <span class="op-sign">+</span>
+                </p>
+                <p class="choice-value">
+                    <input type="checkbox" id="checkbox-" value="1">
+                    <span class="op-sign">−</span>
+                </p>
+                <p class="choice-value">
+                    <input type="checkbox" id="checkboxx" value="2">
+                    <span class="op-sign">×</span>
+                </p>
+                <p class="choice-value">
+                    <input type="checkbox" id="checkbox/" value="3">
+                    <span class="op-sign">÷</span>
+                </p>
+                <p class="choice-value">
+                    <input type="checkbox">
+                    <span class="material-icons-round op-sign op-sign-icon">timer</span>
+                </p>
             </div>
 
             <div class="tuning-small-big">
@@ -76,7 +263,10 @@
             </div>
 
             <div class="filter">
-                <p>Диапозон для: +, −</p>
+                <p class="filter-label">
+                    <span class="material-icons-round filter-icon">add</span>
+                    <span class="material-icons-round filter-icon">remove</span>
+                </p>
                 <div class="easy-basket-filter">
                     <div class="easy-basket-filter-info">
                         <p class="iLower"><input disabled type="text" id="easy-basket-lower"
@@ -96,7 +286,10 @@
                 </div>
             </div>
             <div class="filter">
-                <p>Диапозон для: ⋅, ∶</p>
+                <p class="filter-label">
+                    <span class="material-icons-round filter-icon">close</span>
+                    <span class="filter-icon filter-icon-divide">÷</span>
+                </p>
                 <div class="easy-basket-filter-double">
                     <div class="easy-basket-filter-info-double">
                         <p class="iLower-double cssmain2"><input disabled type="text"
@@ -115,7 +308,9 @@
                 </div>
             </div>
             <div class="filter">
-                <p>Количество примеров</p>
+                <p class="filter-label">
+                    <span class="material-symbols-rounded filter-icon">123</span>
+                </p>
                 <div class="easy-basket-filter-three">
                     <div class="easy-basket-filter-info-three">
                         <p class="iLower-three cssmain2"><input disabled type="text"
@@ -134,7 +329,7 @@
         </div>
     </div>
 
-    <div class="none" id="main2">
+    <div class="swiper-slide" id="main2">
         <div class="main2 cssmain2">
             <div class="header">
                 <div class="back-to-home" id="back-to-home">
@@ -151,9 +346,9 @@
             </div>
 
             <div class="example-block">
-                <p class="number" id="example">35 + 343 = </p>
-                <div class="example-answer" id="example-answer-block">
-                    <p id="example-answer"></p>
+                <p class="ea-problem" id="example">35 + 343</p>
+                <div class="ea-slot" id="example-answer-block">
+                    <p class="ea-digits" id="example-answer"></p>
                 </div>
             </div>
 
@@ -177,6 +372,9 @@
                 </button>
             </div>
         </div>
+    </div>
+
+    </div>
     </div>
 
     <script src="./main.js"></script>
