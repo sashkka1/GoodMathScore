@@ -118,11 +118,15 @@ body {
    Сейчас в нём один пункт — индикатор-триггер выбора темы; в будущем добавятся ещё.
    overflow:hidden + flex-end дают эффект "пункт выезжает из-за иконки": правое ребро
    меню зафиксировано, при росте ширины обнажается всё больше левой части пунктов. */
+/* right offset = (right padding header1 = 6vw) + (gear width = 7vh) + gap 1.5vh.
+   Без этого менюшка вылезала бы под иконку шестерёнки: её левый край находится
+   на 6vw+7vh от правого края, а у settings-menu правый край должен быть ЛЕВЕЕ
+   этого + небольшой видимый зазор. */
 .settings-menu {
     position: absolute;
     overflow: hidden;
     width: 0;
-    right: calc(7vh + 2.5vw);
+    right: calc(8.5vh + 6vw);
     top: 3vh;
     height: 7vh;
     display: flex;
@@ -158,7 +162,7 @@ body {
    чтобы центр колонки совпадал с центром индикатора-триггера. */
 .theme-dropdown {
     position: absolute;
-    right: calc(6.3vh + 2.5vw);
+    right: calc(7.8vh + 6vw);
     top: calc(3vh + 7vh + 0.8vh);
     width: 8.4vh;
     display: flex;
@@ -190,13 +194,14 @@ body {
 }
 
 /* Панель кастомных границ ползунков — сосед theme-dropdown.
-   right-edge привязан к right-edge иконки `tune` (она вторая в settings-menu),
-   панель раскрывается max-height-анимацией вниз. */
+   Шире, чем сама панель settings-menu: занимает 70vw, прижата к правому краю
+   viewport (а не к иконке-триггеру), чтобы на узких экранах помещались
+   inputы с лейблами и текст не наезжал на цифры. */
 .ranges-dropdown {
     position: absolute;
-    right: calc(14.8vh + 2.5vw);
+    right: 2vw;
     top: calc(3vh + 7vh + 0.8vh);
-    width: 60vw;
+    width: 70vw;
     background-color: var(--bg);
     border-radius: 8px;
     box-shadow: var(--shadow);
@@ -296,13 +301,14 @@ body {
     font-size: 6vh;
 }
 
-/* Панель размеров — третий dropdown в overlay-настройках. Right-edge привязан
-   к right-edge иконки `format_size` (она третья в settings-menu). */
+/* Панель размеров — третий dropdown в overlay-настройках. Прижата к правому
+   краю viewport (а не под иконку format_size), чтобы на узких экранах
+   ползунки имели достаточно места и лейблы «Шрифт» / «Кнопки» не наезжали. */
 .sizes-dropdown {
     position: absolute;
-    right: calc(22.6vh + 2.5vw);
+    right: 2vw;
     top: calc(3vh + 7vh + 0.8vh);
-    width: 50vw;
+    width: 70vw;
     background-color: var(--bg);
     border-radius: 8px;
     box-shadow: var(--shadow);
@@ -606,9 +612,12 @@ span.statistic {
 }
 
 /* Управление видимостью второго ряда кнопок (Большой/Малый): скрывается, когда
-   активна категория «Общая», показывается на категориях big/small. */
+   активна категория «Общая», показывается на категориях big/small.
+   visibility:hidden, а не display:none, — место под второй ряд резервируется
+   всегда, и первый ряд (Общая/Неделя/Месяц) не «прыгает» вверх-вниз при
+   переключении категории. */
 .stat-row-hidden {
-    display: none !important;
+    visibility: hidden;
 }
 
 /* В flipped-режиме графики не интерактивны: Morris/Raphael вычисляет
@@ -620,6 +629,20 @@ span.statistic {
 .statistic.flipped .graph-conteiner,
 .statistic.flipped .graph-conteiner * {
     pointer-events: none;
+}
+
+/* В flipped flip-inner имеет CSS-высоту = 100vw, поэтому height:16% header'а
+   превращается в 16vw — на портретном экране это меньше, чем два ряда кнопок
+   (2×5vh + 1vh gap = 11vh). Из-за этого первая строка не влезала и обрезалась
+   .statistic { overflow:hidden }. В flipped увеличиваем header до 26% и
+   сдвигаем stat-swiper вниз на ту же величину. */
+.statistic.flipped .statistic-header {
+    height: 26%;
+}
+
+.statistic.flipped .stat-swiper {
+    top: 26%;
+    height: 74%;
 }
 
 
@@ -803,10 +826,9 @@ span.statistic {
 }
 
 /* Математический знак внутри плитки — рисуется текстовым символом (+, −, ×, ÷)
-   из системного шрифта Roboto. translateY(-0.08em) подвигает глиф ВВЕРХ —
-   font-metrics Roboto + line-height: 1 опускают глиф ниже геометрического
-   центра em-box'а (descender добавляет нижнюю часть line-box, поднимая
-   visible-mid). Компенсация подбирается эмпирически. */
+   из системного шрифта Roboto. Без transform — flex-центрирование родителя
+   .choice-value кладёт глиф в геометрический центр плитки, и все 5 чекбоксов
+   (4 знака + timer) визуально выровнены по одной горизонтали. */
 .op-sign {
     font-size: calc(11vw * var(--font-scale));
     font-weight: 700;
@@ -817,14 +839,13 @@ span.statistic {
     pointer-events: none;
     transition: color 0.2s ease;
     display: block;
-    transform: translateY(-0.08em);
 }
 
-/* Иконка таймера — Material Icons глиф, он дизайнится центрированным в em-box.
-   Отменяем translateY от .op-sign (Material Icons и так в центре). */
+/* Иконка таймера (Material Icons глиф) — чуть крупнее текстовых знаков, чтобы
+   оптически соответствовать их визуальному весу (Roboto bold-глифы выглядят
+   массивнее, чем outline-Material-иконка того же font-size). */
 .op-sign-icon {
-    font-size: calc(11vw * var(--font-scale));
-    transform: none;
+    font-size: calc(13vw * var(--font-scale));
 }
 
 .op-icon-divide {
@@ -863,11 +884,10 @@ span.statistic {
     font-weight: 700;
     font-family: 'Roboto', 'Segoe UI', sans-serif;
     font-size: calc(7.2vw * var(--font-scale));
-    line-height: 0.65;
+    line-height: 1;
     display: inline-block;
     width: 1em;
     text-align: center;
-    transform: translateY(-18%);
 }
 
 

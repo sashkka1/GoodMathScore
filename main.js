@@ -47,10 +47,20 @@ document.getElementById('statistic-icon').addEventListener('click', () => { stat
 document.getElementById('settings-icon').addEventListener('click', () => { differentTheme('open'); });
 document.getElementById('different-theme-block').addEventListener('click', () => { differentTheme('close'); });
 
+// Аккордеон: одновременно открыт может быть только один из трёх dropdown'ов
+// (theme/ranges/sizes). Повторный клик по уже открытому — закрывает его.
+const DROPDOWN_IDS = ['theme-dropdown', 'ranges-dropdown', 'sizes-dropdown'];
+function toggleDropdownExclusive(targetId) {
+    const target = document.getElementById(targetId);
+    const wasOpen = target.classList.contains('open');
+    DROPDOWN_IDS.forEach(id => document.getElementById(id).classList.remove('open'));
+    if (!wasOpen) target.classList.add('open');
+}
+
 // клик по индикатору текущей темы — переключает выпадающий список тем
 document.getElementById('current-theme-indicator').addEventListener('click', (e) => {
     e.stopPropagation(); // не даём клику закрыть всю панель
-    document.getElementById('theme-dropdown').classList.toggle('open');
+    toggleDropdownExclusive('theme-dropdown');
 });
 
 // делегированная подписка: один обработчик на все свотчи в выпадающем списке.
@@ -242,7 +252,7 @@ function fillPresetsInputs(p) {
 // триггер выпадающей панели границ
 document.getElementById('ranges-icon').addEventListener('click', (e) => {
     e.stopPropagation();
-    document.getElementById('ranges-dropdown').classList.toggle('open');
+    toggleDropdownExclusive('ranges-dropdown');
 });
 
 // клик внутри панели не должен закрывать overlay (panel закрывается только
@@ -287,7 +297,7 @@ function applySizeSettings(s) {
 // триггер выпадающей панели размеров
 document.getElementById('sizes-icon').addEventListener('click', (e) => {
     e.stopPropagation();
-    document.getElementById('sizes-dropdown').classList.toggle('open');
+    toggleDropdownExclusive('sizes-dropdown');
 });
 
 // клик внутри панели не должен закрывать overlay
