@@ -960,6 +960,13 @@ let _suppressSettingsPersist = false;
 // получения облака мы один раз запишем итоговый снапшот.
 let _settingsCloudLoaded = false;
 let _settingsPersistAfterLoad = false;
+// values/rangesBounds меняют поведение слайдеров, чьи min/max закэшированы
+// в замыкании jQuery.ready блоков. Перерисовать их без reload крайне
+// неудобно. Если облако вернуло иные values/rangesBounds — взводим этот
+// флаг и делаем reload, как только пользователь окажется на главном экране
+// (или сразу, если он там уже). Решает кейс «настройки не синхронизируются»
+// между устройствами.
+let _pendingValuesReload = false;
 
 // Перехват Storage.prototype.setItem/removeItem. Глобальный, но влияет
 // только на localStorage и только на ключи из SETTINGS_LOCAL_KEYS —
@@ -1003,9 +1010,22 @@ function _hasAnyLocalSetting() {
 function _applySettingsSnapshot(snap) {
     if (!snap || typeof snap !== 'object') return;
     _suppressSettingsPersist = true;
+    // Помечаем, если значения слайдеров реально изменились — иначе reload
+    // не нужен. Сравнение через строки CSV/JSON: и в localStorage, и в
+    // snap[k] лежат именно строки (записываются через localStorage.setItem,
+    // который принимает строку).
+    let slidersChanged = false;
     try {
         for (const k of SETTINGS_LOCAL_KEYS) {
-            if (snap[k] != null) localStorage.setItem(k, snap[k]);
+            if (snap[k] != null) {
+                const curr = localStorage.getItem(k);
+                if (curr !== snap[k]) {
+                    localStorage.setItem(k, snap[k]);
+                    if (k === 'values' || k === 'rangesBounds') {
+                        slidersChanged = true;
+                    }
+                }
+            }
         }
     } finally {
         _suppressSettingsPersist = false;
@@ -1017,6 +1037,29 @@ function _applySettingsSnapshot(snap) {
     if (snap.sizeSettings && typeof applySizeSettings === 'function') {
         try { applySizeSettings(JSON.parse(snap.sizeSettings)); } catch (_) {}
     }
+    if (slidersChanged) {
+        _pendingValuesReload = true;
+        _maybeApplyPendingReload();
+    }
+}
+
+// Если pending-reload взведён и мы можем безопасно перезагрузить страницу
+// (пользователь на главном экране или ещё не дошёл до инициализации
+// mainSwiper) — делаем это. Если пользователь на main2 (решает примеры)
+// или в статистике — НЕ дёргаем, иначе оборвём активный раунд. Reload
+// сработает при возврате на главную через slideChange-обработчик
+// mainSwiper'а (см. инициализацию ниже в DOMContentLoaded).
+function _maybeApplyPendingReload() {
+    if (!_pendingValuesReload) return;
+    const onMain1 = (typeof mainSwiper === 'undefined' || !mainSwiper ||
+                     mainSwiper.activeIndex === SLIDE_MAIN1);
+    if (!onMain1) return;
+    _pendingValuesReload = false;
+    console.log('[settings] reload — применяем синхронизированные values/rangesBounds');
+    // Небольшая задержка, чтобы текущий стек/Promise.then успел доработать,
+    // в т.ч. финальная запись отложенного _settingsPersistAfterLoad (если
+    // она была) ушла в облако до перезагрузки.
+    setTimeout(() => { location.reload(); }, 120);
 }
 
 function _scheduleSettingsPersist() {
@@ -2192,6 +2235,16 @@ document.addEventListener('DOMContentLoaded', () => { // первый заход
         initialSlide: SLIDE_MAIN1,
         speed: 350,
         simulateTouch: false,
+        on: {
+            // Если облако пришло с новыми values/rangesBounds, пока юзер был
+            // в статистике или решал примеры — _pendingValuesReload=true.
+            // При возврате на главный экран применяем (reload).
+            slideChange: function () {
+                if (this.activeIndex === SLIDE_MAIN1) {
+                    _maybeApplyPendingReload();
+                }
+            },
+        },
     });
 
     window.Telegram.WebApp.expand();
